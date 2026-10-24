@@ -13,7 +13,7 @@ import { formatDate, formatNumber, formatPerMillion } from '#ui/lib/format';
 import RelativeTime from '#ui/components/common/RelativeTime.vue';
 import StatusBadge from '~/components/shared/StatusBadge.vue';
 
-definePageMeta({ permission: 'ai.models.manage', feature: 'ai' });
+definePageMeta({ permission: 'ai.models.manage', feature: 'ai', breadcrumb: 'Detalle' });
 const api = useApi();
 const route = useRoute();
 const id = computed(() => String(route.params.id));

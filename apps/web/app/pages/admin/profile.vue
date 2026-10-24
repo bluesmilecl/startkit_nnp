@@ -10,6 +10,7 @@ import { Field, FieldError, FieldLabel } from '#ui/components/ui/field';
 import { Alert, AlertDescription } from '#ui/components/ui/alert';
 import { formatDate } from '#ui/lib/format';
 
+definePageMeta({ breadcrumb: 'Perfil' });
 useHead({ title: 'Perfil' });
 const api = useApi();
 const me = useMe();

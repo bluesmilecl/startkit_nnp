@@ -23,7 +23,7 @@ import CollectionsSelect from '~/components/shared/CollectionsSelect.vue';
 import JsonDiff from '~/components/shared/JsonDiff.vue';
 import StatusBadge from '~/components/shared/StatusBadge.vue';
 
-definePageMeta({ permission: 'ai.agents.manage', feature: 'ai' });
+definePageMeta({ permission: 'ai.agents.manage', feature: 'ai', breadcrumb: 'Detalle' });
 const api = useApi();
 const route = useRoute();
 const { confirm } = useConfirm();

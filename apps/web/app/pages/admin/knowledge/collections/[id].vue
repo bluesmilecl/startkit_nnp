@@ -42,7 +42,7 @@ import JobProgress from '~/components/knowledge/JobProgress.vue';
 import RolesAclInput from '~/components/knowledge/RolesAclInput.vue';
 import DocumentChunksSheet from '~/components/knowledge/DocumentChunksSheet.vue';
 
-definePageMeta({ permission: ['rag.collections.read', 'rag.collections.manage'], feature: 'rag' });
+definePageMeta({ permission: ['rag.collections.read', 'rag.collections.manage'], feature: 'rag', breadcrumb: 'Detalle' });
 const api = useApi();
 const route = useRoute();
 const can = useCan();

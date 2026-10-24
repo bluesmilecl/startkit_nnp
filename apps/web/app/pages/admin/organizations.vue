@@ -78,7 +78,7 @@ async function removeMember(userId: string, email: string) {
     <Card class="lg:col-span-2">
       <CardHeader><CardTitle>{{ selected ? `Miembros de ${selected.name}` : 'Selecciona una organización' }}</CardTitle></CardHeader>
       <CardContent v-if="selected" class="space-y-4">
-        <div v-if="can('organizations.manage')" class="flex gap-2"><UserPicker v-model="newMember" /><Button :disabled="!newMember" @click="addMember">Agregar</Button></div>
+        <div v-if="can('organizations.manage')" class="flex gap-2"><div class="min-w-0 flex-1"><UserPicker v-model="newMember" /></div><Button :disabled="!newMember" @click="addMember">Agregar</Button></div>
         <ul class="divide-y text-sm">
           <li v-for="m in members" :key="m.id" class="flex items-center justify-between py-2">
             <span>{{ m.name || '—' }} <span class="text-muted-foreground">{{ m.email }}</span></span>

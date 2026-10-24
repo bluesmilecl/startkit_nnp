@@ -88,14 +88,14 @@ test.describe('session @critical', () => {
     await login(page, OWNER);
     await page.goto('/admin/profile');
     await waitHydrated(page);
-    // Revoke from a second session
+    // Revoke this page's session from a second one. Only that session: the shared owner
+    // session used by the other specs must survive.
+    const mine = ((await (await page.request.get('/api/me/sessions')).json()) as { id: string; current: boolean }[]).find((s) => s.current)!;
     const other = await browser.newContext({ baseURL: test.info().project.use.baseURL });
     await apiLogin(other.request, OWNER);
-    const sessions = await (await other.request.get('/api/me/sessions')).json();
     const origin = new URL(page.url()).origin;
-    for (const s of sessions as { id: string; current: boolean }[]) {
-      if (!s.current) await other.request.delete(`/api/me/sessions/${s.id}`, { headers: { origin } });
-    }
+    const revoked = await other.request.delete(`/api/me/sessions/${mine.id}`, { headers: { origin } });
+    expect(revoked.ok(), await revoked.text()).toBeTruthy();
     await other.close();
     await page.getByTestId('profile-name').fill('Propietaria E2E');
     await page.getByTestId('profile-save').click();
