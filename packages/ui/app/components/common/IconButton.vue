@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue';
+import { computed, useAttrs, type Component } from 'vue';
 import { Loader2Icon } from '@lucide/vue';
 import { Button, type ButtonVariants } from '#ui/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '#ui/components/ui/tooltip';
@@ -25,6 +25,9 @@ const props = withDefaults(
   }>(),
   { variant: 'ghost', size: 'icon', tooltip: true, side: 'top', loading: false, disabled: false, pressed: undefined },
 );
+// Attributes (class, data-testid, @click…) go to the button, not to the renderless tooltip provider.
+defineOptions({ inheritAttrs: false });
+const attrs = useAttrs();
 const component = computed(() => (typeof props.icon === 'string' ? ICONS[props.icon] : props.icon));
 </script>
 
@@ -32,7 +35,7 @@ const component = computed(() => (typeof props.icon === 'string' ? ICONS[props.i
   <TooltipProvider v-if="tooltip" :delay-duration="300">
     <Tooltip>
       <TooltipTrigger as-child>
-        <Button :variant="variant" :size="size" :disabled="disabled || loading" :aria-busy="loading || undefined" :aria-label="label" :aria-pressed="pressed">
+        <Button v-bind="attrs" :variant="variant" :size="size" :disabled="disabled || loading" :aria-busy="loading || undefined" :aria-label="label" :aria-pressed="pressed">
           <Loader2Icon v-if="loading" class="animate-spin" aria-hidden="true" />
           <component :is="component" v-else aria-hidden="true" />
         </Button>
@@ -40,7 +43,7 @@ const component = computed(() => (typeof props.icon === 'string' ? ICONS[props.i
       <TooltipContent :side="side">{{ label }}</TooltipContent>
     </Tooltip>
   </TooltipProvider>
-  <Button v-else :variant="variant" :size="size" :disabled="disabled || loading" :aria-busy="loading || undefined" :aria-label="label" :aria-pressed="pressed">
+  <Button v-else v-bind="attrs" :variant="variant" :size="size" :disabled="disabled || loading" :aria-busy="loading || undefined" :aria-label="label" :aria-pressed="pressed">
     <Loader2Icon v-if="loading" class="animate-spin" aria-hidden="true" />
     <component :is="component" v-else aria-hidden="true" />
   </Button>

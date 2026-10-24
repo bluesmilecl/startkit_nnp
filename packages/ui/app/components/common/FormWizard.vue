@@ -66,7 +66,8 @@ watch(wizard.index, async (i) => {
   heading.value?.focus();
 });
 watch(model, (i) => {
-  if (i !== wizard.index.value) wizard.goTo(i);
+  // Only reached steps can be opened from outside; anything else snaps back to the current one.
+  if (i !== wizard.index.value && !wizard.goTo(i)) model.value = wizard.index.value;
 });
 
 const iconOf = (s: WizardStep) => (typeof s.icon === 'string' ? ICONS[s.icon] : s.icon);
