@@ -33,6 +33,7 @@ capa de la imagen. `scripts/e2e-stack.mjs` acepta los mismos argumentos en `E2E_
 | [`docker/compose.yaml`](../docker/compose.yaml) | Base: servicios, perfiles, redes (`internal`, `public`) y volúmenes. |
 | [`docker/compose.dev.yaml`](../docker/compose.dev.yaml) | Desarrollo/evaluación local: publica puertos en `127.0.0.1`, apunta las URL a los servicios Compose, proxy siempre activo en `:8080`, servicio `retrieval-test`. |
 | [`docker/compose.production.yaml`](../docker/compose.production.yaml) | Producción: `NODE_ENV=production`, proveedor IA de prueba desactivado, sistema de archivos de solo lectura, `no-new-privileges`, límites de CPU/memoria, rotación de logs, proxy en 80/443. |
+| [`docker/compose.dokploy.yaml`](../docker/compose.dokploy.yaml) | Dokploy u otra plataforma con Traefik: archivo único con base, Mailpit y apps, sin proxy ni puertos publicados ([ver abajo](#dokploy)). |
 
 ### Perfiles
 
@@ -113,6 +114,48 @@ docker compose --env-file .env -f docker/compose.yaml logs -f api worker
 - PostgreSQL y Mailpit no publican puertos en `compose.production.yaml`.
 - Tras cada despliegue revisa `/admin/diagnostics` y ejecuta `pnpm starter doctor` desde un
   checkout con el mismo `.env` (la CLI no se incluye en las imágenes de ejecución).
+
+## Dokploy
+
+`docker/compose.dokploy.yaml` es un archivo autosuficiente para Dokploy (o cualquier plataforma
+cuyo Traefik enruta a servicios Compose): PostgreSQL + pgvector, Mailpit, `migrate`, `api`,
+`worker` y `web`, sin proxy propio ni puertos publicados. Dokploy construye desde el repositorio y
+pone HTTPS.
+
+1. **Create Service → Compose** en el proyecto y servidor que quieras. Proveedor: GitHub (este
+   repositorio y su rama). **Compose Path:** `./docker/compose.dokploy.yaml`.
+2. **Advanced → Isolated Deployment: activado.** El stack queda en su propia red y Traefik se une
+   a ella; sin esto, nombres como `api` o `mailpit` pueden chocar con otros proyectos del servidor.
+3. **Environment** (Dokploy lo escribe en `docker/.env`; genera los secretos con
+   `openssl rand -hex 32` y `openssl rand -base64 32`):
+
+   ```bash
+   NODE_ENV=production              # development permite AI_TEST_PROVIDER_ENABLED=true (demo sin claves)
+   APP_NAME="Mesa de Ayuda"
+   APP_URL=https://app.tudominio.cl
+   BETTER_AUTH_SECRET=…             # openssl rand -hex 32
+   APP_ENCRYPTION_KEY=…             # openssl rand -base64 32
+   OWNER_EMAIL=tu@empresa.cl
+   POSTGRES_PASSWORD=…
+   POSTGRES_APP_PASSWORD=…
+   MAIL_TRANSPORT=resend            # o smtp (Mailpit del stack), postmark, sendgrid… (mail.md)
+   RESEND_API_KEY=re_…
+   MAIL_FROM="Mesa de Ayuda <no-reply@tudominio.cl>"
+   MAILPIT_UI_AUTH=usuario:clave    # si publicas Mailpit
+   ```
+
+   Con un PostgreSQL externo define `DATABASE_URL` y `DATABASE_MIGRATION_URL`: tienen prioridad
+   sobre la base del stack.
+4. **Domains** (mismo host para web y API, así el navegador llama a `/api` en su propio origen):
+
+   | Host | Path | Servicio | Puerto |
+   | --- | --- | --- | --- |
+   | `app.tudominio.cl` | `/` | `web` | 3000 |
+   | `app.tudominio.cl` | `/api` | `api` | 3001 |
+   | `correo-app.tudominio.cl` (opcional) | `/` | `mailpit` | 8025 |
+
+5. **Deploy.** `migrate` aplica las migraciones antes de que arranquen `api` y `worker`; revisa
+   `/admin/diagnostics` al terminar. Con *Autodeploy* cada push a la rama vuelve a desplegar.
 
 Ver también [installation.md](installation.md), [upgrades.md](upgrades.md) y
 [troubleshooting.md](troubleshooting.md).

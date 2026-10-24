@@ -23,7 +23,7 @@ const steps = [
   ['Manifest up to date', 'node scripts/manifest.mjs --check'],
   ['JSON Schemas up to date', 'node scripts/schemas.mjs --check'],
   ['Documentation', 'pnpm docs:check'],
-  ['Compose variants', 'docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail config -q && docker compose -f docker/compose.yaml -f docker/compose.production.yaml config -q'],
+  ['Compose variants', 'docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail config -q && docker compose -f docker/compose.yaml -f docker/compose.production.yaml config -q && POSTGRES_PASSWORD=x POSTGRES_APP_PASSWORD=x docker compose -f docker/compose.dokploy.yaml config -q'],
   ['Web build', 'pnpm --filter @starter/web build'],
 ];
 if (!args.has('--skip-integration')) steps.push(['Migrations', 'pnpm db:migrate'], ['Integration tests', 'pnpm test:integration']);

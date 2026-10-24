@@ -1,0 +1,132 @@
+# ---------------------------------------------------------------------------------------------
+# Dokploy (or any PaaS whose Traefik routes to compose services). Self-contained: one file, no
+# edge proxy and no published ports. Dokploy builds from the repository, writes the variables of
+# its Environment tab next to this file (docker/.env) and adds the Traefik labels of its domains:
+#   <host>  path /     -> web:3000
+#   <host>  path /api  -> api:3001      (same host: the browser calls /api on its own origin)
+#   <mail-host>        -> mailpit:8025  (optional; protect it with MAILPIT_UI_AUTH)
+# Compose Path in Dokploy: ./docker/compose.dokploy.yaml. Guide: docs/docker.md#dokploy
+# ---------------------------------------------------------------------------------------------
+
+x-app: &app
+  env_file:
+    - path: .env
+      required: false
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options: { max-size: '20m', max-file: '5' }
+  security_opt:
+    - no-new-privileges:true
+
+# Values from Dokploy win; the defaults wire the bundled PostgreSQL and Mailpit.
+x-app-environment: &app-environment
+  DATABASE_URL: ${DATABASE_URL:-postgres://${POSTGRES_APP_USER:-starter_app}:${POSTGRES_APP_PASSWORD}@postgres:5432/${POSTGRES_DB:-starter}}
+  DATABASE_MIGRATION_URL: ${DATABASE_MIGRATION_URL:-postgres://${POSTGRES_USER:-starter}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-starter}}
+  SMTP_URL: ${SMTP_URL:-smtp://mailpit:1025}
+  STORAGE_LOCAL_DIR: /data/storage
+  NUXT_API_INTERNAL_URL: http://api:3001
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg18-trixie
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-starter}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?define POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-starter}
+      POSTGRES_APP_USER: ${POSTGRES_APP_USER:-starter_app}
+      POSTGRES_APP_PASSWORD: ${POSTGRES_APP_PASSWORD:?define POSTGRES_APP_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: { max-size: '20m', max-file: '5' }
+
+  # Captures every e-mail (codes, invitations). With a real provider (MAIL_TRANSPORT=resend…)
+  # nothing reaches it; keep its domain private or set MAILPIT_UI_AUTH="user:password".
+  mailpit:
+    image: ghcr.io/axllent/mailpit:v1.32.0
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 'true'
+      MP_SMTP_AUTH_ALLOW_INSECURE: 'true'
+      MP_UI_AUTH: ${MAILPIT_UI_AUTH:-}
+      MP_MAX_MESSAGES: '500'
+    restart: unless-stopped
+
+  migrate:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    image: starter/api:dokploy
+    command: ['node', 'dist/scripts/migrate.js']
+    restart: 'no'
+    environment:
+      <<: *app-environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    image: starter/api:dokploy
+    environment:
+      <<: *app-environment
+    volumes:
+      - storage:/data/storage
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    stop_grace_period: 30s
+    deploy:
+      resources:
+        limits: { cpus: '2', memory: 1g }
+
+  worker:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: docker/worker.Dockerfile
+    image: starter/worker:dokploy
+    environment:
+      <<: *app-environment
+    volumes:
+      - storage:/data/storage
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    stop_grace_period: 60s
+    deploy:
+      resources:
+        limits: { cpus: '2', memory: 1536m }
+
+  web:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: docker/web.Dockerfile
+    image: starter/web:dokploy
+    environment:
+      <<: *app-environment
+      # The Nitro server is a production build whatever NODE_ENV the API uses.
+      NODE_ENV: production
+    depends_on:
+      api:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits: { cpus: '1', memory: 512m }
+
+volumes:
+  pgdata: {}
+  storage: {}

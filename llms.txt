@@ -39,7 +39,7 @@ Antes de modificar código, lee AGENTS.md: reglas de seguridad (sin secretos en 
 - [Manejo de errores](docs/errors.md): catálogo de códigos, `AppError`, traducción de PostgreSQL, filtro HTTP, logs, reintentos del worker, `normalizeError`, `LoadError`, `useApiData` y página de error
 - [Kit de interfaz](docs/frontend-components.md): formularios desde Zod, asistente por pasos, listas en tabla o tarjetas, gráficos, carrusel, menús, avisos, modales, íconos y reglas
 - [Referencia de la API](docs/api-reference.md): generada desde OpenAPI
-- [Docker](docs/docker.md): perfiles, imágenes y producción
+- [Docker](docs/docker.md): perfiles, imágenes, producción y Dokploy (`docker/compose.dokploy.yaml`)
 - [Pruebas E2E](docs/e2e.md): Playwright, pila E2E e integración
 - [Actualizaciones](docs/upgrades.md) y [dependencias](docs/dependency-updates.md)
 - [Problemas frecuentes](docs/troubleshooting.md)
