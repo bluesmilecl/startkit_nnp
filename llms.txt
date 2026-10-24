@@ -34,7 +34,7 @@ Antes de modificar código, lee AGENTS.md: reglas de seguridad (sin secretos en 
 ## Desarrollo y operación
 
 - [Extender el starter](docs/extending.md): generador de módulos y módulo Proyectos
-- [Componentes de interfaz](docs/frontend-components.md): componentes compartidos y reglas
+- [Kit de interfaz](docs/frontend-components.md): formularios desde Zod, asistente por pasos, listas en tabla o tarjetas, gráficos, carrusel, menús, avisos, modales, íconos y reglas
 - [Referencia de la API](docs/api-reference.md): generada desde OpenAPI
 - [Docker](docs/docker.md): perfiles, imágenes y producción
 - [Pruebas E2E](docs/e2e.md): Playwright, pila E2E e integración
@@ -45,6 +45,7 @@ Antes de modificar código, lee AGENTS.md: reglas de seguridad (sin secretos en 
 
 - [Instalar](skills/install-starter/SKILL.md)
 - [Extender](skills/extend-starter/SKILL.md)
+- [Construir vistas](skills/build-ui/SKILL.md)
 - [Configurar IA](skills/configure-ai/SKILL.md)
 - [Administrar conocimiento](skills/manage-rag/SKILL.md)
 

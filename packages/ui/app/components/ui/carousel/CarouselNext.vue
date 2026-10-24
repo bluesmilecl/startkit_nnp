@@ -35,7 +35,7 @@ const { orientation, canScrollNext, scrollNext } = useCarousel()
   >
     <slot>
       <ArrowRight />
-      <span class="sr-only">Next Slide</span>
+      <span class="sr-only">Siguiente</span><!-- starter: es-CL label -->
     </slot>
   </Button>
 </template>

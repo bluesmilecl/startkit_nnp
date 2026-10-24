@@ -35,7 +35,7 @@ const { orientation, canScrollPrev, scrollPrev } = useCarousel()
   >
     <slot>
       <ArrowLeft />
-      <span class="sr-only">Previous Slide</span>
+      <span class="sr-only">Anterior</span><!-- starter: es-CL label -->
     </slot>
   </Button>
 </template>

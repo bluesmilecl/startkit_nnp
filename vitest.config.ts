@@ -11,8 +11,10 @@ export default defineConfig({
       {
         test: {
           name: 'unit',
-          include: ['packages/*/src/**/*.test.ts', 'apps/*/src/**/*.test.ts', 'tooling/*/src/**/*.test.ts'],
+          include: ['packages/*/src/**/*.test.ts', 'packages/ui/test/**/*.test.ts', 'apps/*/src/**/*.test.ts', 'tooling/*/src/**/*.test.ts'],
           environment: 'node',
+          // The UI layer's pure logic is tested from source; `#ui` is its Nuxt alias.
+          alias: { '#ui': new URL('./packages/ui/app', import.meta.url).pathname },
         },
       },
       {

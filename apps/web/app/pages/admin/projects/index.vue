@@ -3,103 +3,80 @@ import { h } from 'vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { projectsCreate, projectsDelete, projectsList, projectsUpdate, type Project } from '@starter/api-client';
 import { CreateProjectInput } from '@starter/contracts';
-import { FolderKanban, MoreHorizontal, Plus, Search } from '@lucide/vue';
-import { toast } from 'vue-sonner';
+import { FolderKanban, Plus } from '@lucide/vue';
 import { Button } from '#ui/components/ui/button';
-import { Input } from '#ui/components/ui/input';
-import { Textarea } from '#ui/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#ui/components/ui/select';
-import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '#ui/components/ui/sheet';
-import { Field, FieldError, FieldLabel } from '#ui/components/ui/field';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '#ui/components/ui/dropdown-menu';
-import { Alert, AlertDescription } from '#ui/components/ui/alert';
+import ActionMenu from '#ui/components/common/ActionMenu.vue';
 import RelativeTime from '#ui/components/common/RelativeTime.vue';
+import type { FormFieldDef } from '#ui/lib/kit';
 import StatusBadge from '~/components/shared/StatusBadge.vue';
 
 /**
- * Reference module page: server-side list (search, filter, sort, pagination synced to the URL),
- * create/edit in a sheet validated with the shared Zod contract, archive/restore and delete with
- * confirmation, and optimistic-concurrency conflicts surfaced to the user.
+ * Reference module page, built with the UI kit: server-side list whose state lives in the URL
+ * (useListQuery), table or cards (useViewMode), row actions with confirmation (ActionMenu),
+ * create/edit in a side form validated with the shared Zod contract (FormDialog + FormFields),
+ * archive/restore, and optimistic-concurrency conflicts surfaced to the person.
  */
 definePageMeta({ permission: 'projects.read' });
 useHead({ title: 'Proyectos' });
 
 const api = useApi();
 const can = useCan();
-const { confirm } = useConfirm();
-const route = useRoute();
-const router = useRouter();
+const notify = useNotify();
 
 type Sort = 'name' | 'createdAt' | 'updatedAt';
-const query = reactive({
-  page: Number(route.query.page ?? 1),
-  pageSize: 20,
-  search: String(route.query.search ?? ''),
-  status: (route.query.status as Project['status'] | undefined) ?? undefined,
-  sort: 'updatedAt' as Sort,
-  direction: 'desc' as 'asc' | 'desc',
-});
-const searchInput = ref(query.search);
-let debounce: ReturnType<typeof setTimeout> | undefined;
-watch(searchInput, (v) => {
-  clearTimeout(debounce);
-  debounce = setTimeout(() => Object.assign(query, { search: v, page: 1 }), 300);
-});
-watch(
-  () => ({ ...query }),
-  (q) => router.replace({ query: { page: q.page > 1 ? q.page : undefined, search: q.search || undefined, status: q.status } }),
-);
-const { data, status, refresh } = await useAsyncData('projects', () => unwrap(projectsList({ client: api, query: { ...query, search: query.search || undefined } })), { watch: [query] });
-const statusFilter = computed({
-  get: () => query.status ?? 'all',
-  set: (v: string) => Object.assign(query, { status: v === 'all' ? undefined : v, page: 1 }),
-});
+const list = useListQuery({ page: 1, pageSize: 20, search: '', status: undefined as Project['status'] | undefined, sort: 'updatedAt' as Sort, direction: 'desc' as 'asc' | 'desc' });
+const statusFilter = list.filter('status');
+const view = useViewMode('projects');
+const { data, status, refresh } = await useAsyncData('projects', () => unwrap(projectsList({ client: api, query: list.params.value })), { watch: [list.params] });
 
 // ── create / edit ───────────────────────────────────────────────────────
-const sheetOpen = ref(false);
+const formOpen = ref(false);
 const editing = ref<Project | null>(null);
 const form = useZodForm(CreateProjectInput, { name: '', description: '' });
+const fields: FormFieldDef[] = [
+  { name: 'name', label: 'Nombre', required: true, testid: 'project-form-name' },
+  { name: 'description', label: 'Descripción', type: 'textarea', rows: 4, testid: 'project-form-description' },
+];
 function openCreate() {
   editing.value = null;
   form.reset();
-  sheetOpen.value = true;
+  formOpen.value = true;
 }
 function openEdit(p: Project) {
   editing.value = p;
-  form.reset();
-  Object.assign(form.values, { name: p.name, description: p.description ?? '' });
-  sheetOpen.value = true;
+  form.reset({ name: p.name, description: p.description ?? '' });
+  formOpen.value = true;
 }
 const submit = form.handleSubmit(async (values) => {
   const body = { name: values.name, description: values.description || null };
   if (editing.value) {
     await projectsUpdate({ client: api, path: { id: editing.value.id }, body: { ...body, version: editing.value.version } });
-    toast.success('Proyecto actualizado');
+    notify.success('Proyecto actualizado');
   } else {
     await projectsCreate({ client: api, body });
-    toast.success('Proyecto creado');
+    notify.success('Proyecto creado');
   }
-  sheetOpen.value = false;
+  formOpen.value = false;
   await refresh();
 });
 
 async function setStatus(p: Project, next: Project['status']) {
   try {
     await projectsUpdate({ client: api, path: { id: p.id }, body: { status: next, version: p.version } });
-    toast.success(next === 'archived' ? `«${p.name}» archivado` : `«${p.name}» restaurado`);
+    notify.success(next === 'archived' ? `«${p.name}» archivado` : `«${p.name}» restaurado`);
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
   await refresh();
 }
 async function remove(p: Project) {
-  if (!(await confirm({ title: `¿Eliminar «${p.name}»?`, description: 'Se elimina de forma permanente. La auditoría conserva el registro.', confirmLabel: 'Eliminar', destructive: true, typeToConfirm: p.name }))) return;
   try {
     await projectsDelete({ client: api, path: { id: p.id } });
-    toast.success('Proyecto eliminado');
+    notify.success('Proyecto eliminado');
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 
@@ -121,20 +98,33 @@ const columns: ColumnDef<Project>[] = [
     id: 'actions',
     header: () => h('span', { class: 'sr-only' }, 'Acciones'),
     enableSorting: false,
-    cell: ({ row }) =>
-      can('projects.manage')
-        ? h(DropdownMenu, null, {
-            default: () => [
-              h(DropdownMenuTrigger, { asChild: true }, () => h(Button, { variant: 'ghost', size: 'icon', 'aria-label': `Acciones para ${row.original.name}`, 'data-testid': 'project-actions' }, () => h(MoreHorizontal, { class: 'size-4' }))),
-              h(DropdownMenuContent, { align: 'end' }, () => [
-                h(DropdownMenuItem, { onClick: () => openEdit(row.original), 'data-testid': 'project-edit' }, () => 'Editar'),
-                h(DropdownMenuItem, { onClick: () => setStatus(row.original, row.original.status === 'active' ? 'archived' : 'active'), 'data-testid': 'project-toggle-archive' }, () => (row.original.status === 'active' ? 'Archivar' : 'Restaurar')),
-                h(DropdownMenuSeparator),
-                h(DropdownMenuItem, { class: 'text-destructive', onClick: () => remove(row.original), 'data-testid': 'project-delete' }, () => 'Eliminar'),
-              ]),
-            ],
-          })
-        : null,
+    cell: ({ row }) => {
+      const p = row.original;
+      return h(ActionMenu, {
+        label: `Acciones para ${p.name}`,
+        testid: 'project-actions',
+        items: [
+          { label: 'Editar', icon: 'edit', hidden: !can('projects.manage'), testid: 'project-edit', onSelect: () => openEdit(p) },
+          {
+            label: p.status === 'active' ? 'Archivar' : 'Restaurar',
+            icon: p.status === 'active' ? 'archive' : 'restore',
+            hidden: !can('projects.manage'),
+            testid: 'project-toggle-archive',
+            onSelect: () => setStatus(p, p.status === 'active' ? 'archived' : 'active'),
+          },
+          {
+            label: 'Eliminar',
+            icon: 'delete',
+            destructive: true,
+            separator: true,
+            hidden: !can('projects.manage'),
+            testid: 'project-delete',
+            confirm: { title: `¿Eliminar «${p.name}»?`, description: 'Se elimina de forma permanente. La auditoría conserva el registro.', confirmLabel: 'Eliminar', destructive: true, typeToConfirm: p.name },
+            onSelect: () => remove(p),
+          },
+        ],
+      });
+    },
   },
 ];
 </script>
@@ -146,22 +136,20 @@ const columns: ColumnDef<Project>[] = [
     </template>
   </PageHeader>
 
-  <div class="flex flex-col gap-2 sm:flex-row">
-    <div class="relative flex-1">
-      <Search class="text-muted-foreground absolute top-2.5 left-2.5 size-4" aria-hidden="true" />
-      <Input v-model="searchInput" placeholder="Buscar por nombre o descripción" class="pl-8" aria-label="Buscar proyectos" data-testid="project-search" />
-    </div>
-    <Select v-model="statusFilter">
-      <SelectTrigger class="sm:w-48" aria-label="Filtrar por estado"><SelectValue /></SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">Todos los estados</SelectItem>
-        <SelectItem value="active">Activos</SelectItem>
-        <SelectItem value="archived">Archivados</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
+  <DataToolbar v-model:search="list.search.value" v-model:view="view" placeholder="Buscar por nombre o descripción" :filtered="list.filtered.value" testid="project" @clear="list.reset()">
+    <template #filters>
+      <Select v-model="statusFilter">
+        <SelectTrigger class="sm:w-48" aria-label="Filtrar por estado"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Todos los estados</SelectItem>
+          <SelectItem value="active">Activos</SelectItem>
+          <SelectItem value="archived">Archivados</SelectItem>
+        </SelectContent>
+      </Select>
+    </template>
+  </DataToolbar>
 
-  <EmptyState v-if="data && data.total === 0 && !query.search && !query.status" title="Aún no hay proyectos" description="Crea el primero para ver cómo funciona un módulo completo." :icon="FolderKanban">
+  <EmptyState v-if="data && data.total === 0 && !list.filtered.value" title="Aún no hay proyectos" description="Crea el primero para ver cómo funciona un módulo completo." :icon="FolderKanban">
     <Button v-if="can('projects.manage')" @click="openCreate"><Plus class="size-4" /> Nuevo proyecto</Button>
   </EmptyState>
   <DataTable
@@ -169,37 +157,27 @@ const columns: ColumnDef<Project>[] = [
     :columns="columns"
     :data="data?.items ?? []"
     :total="data?.total ?? 0"
-    :page="query.page"
-    :page-size="query.pageSize"
+    :view="view"
+    :page="list.query.page"
+    :page-size="list.query.pageSize"
     :loading="status === 'pending'"
-    :sort="{ id: query.sort, desc: query.direction === 'desc' }"
+    :sort="list.sort.value"
     caption="Proyectos"
-    @update:page="query.page = $event"
-    @update:sort="(s) => Object.assign(query, { sort: (s?.id ?? 'updatedAt') as Sort, direction: s?.desc === false ? 'asc' : 'desc' })"
+    @update:page="list.query.page = $event"
+    @update:sort="list.setSort"
   />
 
-  <Sheet v-model:open="sheetOpen">
-    <SheetContent class="flex flex-col gap-0 sm:max-w-md">
-      <SheetHeader>
-        <SheetTitle>{{ editing ? 'Editar proyecto' : 'Nuevo proyecto' }}</SheetTitle>
-        <SheetDescription>{{ editing ? `Versión ${editing.version}: si alguien lo cambia antes de guardar, se te avisará.` : 'Visible para quienes tienen el permiso de ver proyectos.' }}</SheetDescription>
-      </SheetHeader>
-      <form id="project-form" class="flex-1 space-y-4 overflow-y-auto p-4" novalidate @submit="submit">
-        <Field :data-invalid="!!form.errors.name">
-          <FieldLabel for="pj-name">Nombre</FieldLabel>
-          <Input id="pj-name" v-model="form.values.name" data-testid="project-form-name" />
-          <FieldError :errors="[form.errors.name]" />
-        </Field>
-        <Field :data-invalid="!!form.errors.description">
-          <FieldLabel for="pj-desc">Descripción</FieldLabel>
-          <Textarea id="pj-desc" :model-value="form.values.description ?? ''" rows="4" data-testid="project-form-description" @update:model-value="(v) => (form.values.description = String(v))" />
-          <FieldError :errors="[form.errors.description]" />
-        </Field>
-        <Alert v-if="form.formError.value" variant="destructive" data-testid="project-form-error"><AlertDescription>{{ form.formError.value }}</AlertDescription></Alert>
-      </form>
-      <SheetFooter>
-        <Button type="submit" form="project-form" :disabled="form.submitting.value" data-testid="project-form-submit">{{ editing ? 'Guardar cambios' : 'Crear proyecto' }}</Button>
-      </SheetFooter>
-    </SheetContent>
-  </Sheet>
+  <FormDialog
+    v-model:open="formOpen"
+    variant="sheet"
+    :title="editing ? 'Editar proyecto' : 'Nuevo proyecto'"
+    :description="editing ? `Versión ${editing.version}: si alguien lo cambia antes de guardar, se te avisará.` : 'Visible para quienes tienen el permiso de ver proyectos.'"
+    :submit-label="editing ? 'Guardar cambios' : 'Crear proyecto'"
+    :loading="form.submitting.value"
+    :error="form.formError.value"
+    testid="project-form"
+    @submit="submit"
+  >
+    <FormFields :form="form" :fields="fields" id-prefix="pj" />
+  </FormDialog>
 </template>

@@ -22,6 +22,6 @@ const { toggleSidebar } = useSidebar()
     @click="toggleSidebar"
   >
     <PanelLeft />
-    <span class="sr-only">Toggle Sidebar</span>
+    <span class="sr-only">Mostrar u ocultar navegación</span><!-- starter: es-CL label -->
   </Button>
 </template>

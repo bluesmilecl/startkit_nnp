@@ -56,6 +56,25 @@ test.describe('Proyectos', () => {
     expect(audit.map((a) => a.action)).toEqual(['projects.create', 'projects.update', 'projects.archive', 'projects.restore', 'projects.delete']);
   });
 
+  test('the list can be shown as cards that keep the row actions', async ({ ownerPage: page }) => {
+    await page.goto('/admin');
+    const origin = new URL(page.url()).origin;
+    const name = `Tarjeta ${randomUUID().slice(0, 6)}`;
+    expect((await page.request.post('/api/projects', { data: { name }, headers: { origin } })).status()).toBe(201);
+    await page.goto(`/admin/projects?search=${encodeURIComponent(name)}`);
+    await waitHydrated(page);
+    await page.getByTestId('project-view-cards').click();
+    const card = page.locator('[data-testid^="card-"]').filter({ hasText: name });
+    await expect(card).toBeVisible();
+    await expect(page.getByRole('table')).toHaveCount(0);
+    await card.getByTestId('project-actions').click();
+    await page.getByTestId('project-edit').click();
+    await expect(page.getByTestId('project-form-name')).toHaveValue(name);
+    await page.keyboard.press('Escape');
+    await page.getByTestId('project-view-table').click();
+    await expect(page.getByRole('row', { name: new RegExp(name) })).toBeVisible();
+  });
+
   test('concurrent edits: the second save is rejected with 412 and nothing is overwritten', async ({ ownerPage: page }) => {
     await page.goto('/admin');
     const origin = new URL(page.url()).origin;

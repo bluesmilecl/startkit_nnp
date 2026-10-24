@@ -32,6 +32,24 @@ export function useZodForm<S extends z.ZodObject>(schema: S, initial: z.input<S>
     return null;
   }
 
+  /**
+   * Validates only the given fields (wizard steps, sections). Errors of other fields are left as
+   * they are; returns true when none of `names` (or their nested paths) has an issue.
+   */
+  function validateFields(names: string[]): boolean {
+    for (const n of names) for (const k of Object.keys(errors)) if (k === n || k.startsWith(`${n}.`)) delete errors[k];
+    const result = schema.safeParse(toRaw(values));
+    if (result.success) return true;
+    let ok = true;
+    for (const issue of result.error.issues) {
+      const key = issue.path.join('.') || '_';
+      if (!names.some((n) => key === n || key.startsWith(`${n}.`))) continue;
+      errors[key] ??= issue.message;
+      ok = false;
+    }
+    return ok;
+  }
+
   function validateField(name: string) {
     touched[name] = true;
     const result = schema.safeParse(toRaw(values));
@@ -63,11 +81,23 @@ export function useZodForm<S extends z.ZodObject>(schema: S, initial: z.input<S>
     };
   }
 
+  /** Assigns several values at once (e.g. when opening an edit form). */
+  function setValues(next: Partial<z.input<S>>) {
+    Object.assign(values, next);
+  }
+
+  /** First field with an error, in the order of `order` (or insertion order). */
+  function firstErrorField(order?: string[]): string | undefined {
+    const keys = Object.keys(errors).filter((k) => errors[k]);
+    if (!order) return keys[0];
+    return order.find((n) => keys.some((k) => k === n || k.startsWith(`${n}.`)));
+  }
+
   function reset(next?: Partial<z.input<S>>) {
     Object.assign(values, { ...initial, ...(next ?? {}) });
     clearErrors();
   }
 
   const hasErrors = computed(() => Object.values(errors).some(Boolean));
-  return { values, errors, touched, formError, submitting, hasErrors, validate, validateField, handleSubmit, applyServerError, reset };
+  return { values, errors, touched, formError, submitting, hasErrors, validate, validateField, validateFields, firstErrorField, setValues, handleSubmit, applyServerError, reset };
 }

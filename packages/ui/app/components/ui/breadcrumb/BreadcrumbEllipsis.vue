@@ -18,6 +18,6 @@ const props = defineProps<{
     <slot>
       <MoreHorizontal class="size-4" />
     </slot>
-    <span class="sr-only">More</span>
+    <span class="sr-only">Más</span><!-- starter: es-CL label -->
   </span>
 </template>

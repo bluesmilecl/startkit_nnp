@@ -116,7 +116,11 @@ resumen(@CurrentActor() actor: Actor, @ZParams() p: z.infer<typeof IdParams>) {
 - Crea la página en `apps/web/app/pages/admin/...` con `definePageMeta({ permission, feature })`.
 - Agrega la entrada en [`apps/web/app/utils/navigation.ts`](../apps/web/app/utils/navigation.ts)
   (`title`, `to`, `icon`, `permission`, `feature`); la barra lateral la oculta si no corresponde.
-- Usa los componentes comunes y respeta las reglas de [frontend-components.md](frontend-components.md).
+- Construye la vista con el [kit de interfaz](frontend-components.md): `useListQuery` + `DataToolbar` +
+  `DataTable` (tabla o tarjetas) para listas, `FormFields`/`FormDialog` sobre el contrato Zod para
+  formularios, `FormWizard` para altas por pasos, `ActionMenu`, `AppAlert`, `useNotify` e íconos
+  semánticos (`AppIcon`). La página de Proyectos es el ejemplo completo y la skill
+  [construir vistas](../skills/build-ui/SKILL.md) resume las recetas.
 
 ## Herramientas del chat
 

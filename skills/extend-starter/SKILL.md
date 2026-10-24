@@ -53,4 +53,4 @@ Cola y política en `packages/jobs/src/index.ts`; manejador en `apps/worker/src/
 
 ## Vistas
 
-Componentes de `packages/ui` (catálogo en `/admin/components`). `<ClientOnly>` para `Select` con datos asíncronos, sin `Badge` dentro de `<p>`, textos en español, accesibilidad (labels, `aria-*`).
+Usa el kit de interfaz: sigue la skill [construir vistas](../build-ui/SKILL.md) y la guía [docs/frontend-components.md](../../docs/frontend-components.md) (catálogo vivo en `/admin/components`). `<ClientOnly>` para `Select` con datos asíncronos, sin `Badge` dentro de `<p>`, textos en español, accesibilidad (labels, `aria-*`).

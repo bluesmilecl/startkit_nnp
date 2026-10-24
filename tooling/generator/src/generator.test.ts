@@ -23,6 +23,7 @@ describe('module generator', () => {
         "toast.success('Proyecto creado'); 'Nuevo proyecto'; 'Aún no hay proyectos'",
         "export const projects = pgTable(\n  'projects',\n  {});",
         'return this.projects.create(actor, body); can("projects.manage")',
+        '<DataToolbar testid="project" /> <FormFields id-prefix="pj" /> useViewMode(\'projects\')',
       ].join('\n'),
       n,
     );
@@ -36,6 +37,7 @@ describe('module generator', () => {
     expect(out).toContain("toast.success('Orden de compra creada'); 'Nueva orden de compra'; 'Aún no hay órdenes de compra'");
     expect(out).toContain("pgTable(\n  'ordenes_compra',");
     expect(out).toContain('return this.ordenesCompra.create(actor, body); can("ordenes_compra.manage")');
+    expect(out).toContain('<DataToolbar testid="purchase-order" /> <FormFields id-prefix="oc" /> useViewMode(\'ordenes-compra\')');
     expect(out).not.toMatch(/project|Project|proyecto/i);
   });
 

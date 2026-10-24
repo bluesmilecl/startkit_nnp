@@ -32,7 +32,8 @@ export function formatUsd(value: string | null | undefined, digits = 4): string 
   if (!Number.isFinite(n)) return 'desconocido';
   // Sub-cent amounts (single AI calls) keep three significant digits instead of rounding to 0.00.
   if (n !== 0 && Math.abs(n) < 0.01) return `US$ ${n.toLocaleString(locale(), { maximumSignificantDigits: 3 })}`;
-  return `US$ ${n.toLocaleString(locale(), { minimumFractionDigits: 2, maximumFractionDigits: digits })}`;
+  const max = Math.max(0, Math.min(20, digits));
+  return `US$ ${n.toLocaleString(locale(), { minimumFractionDigits: Math.min(2, max), maximumFractionDigits: max })}`;
 }
 
 /** Visual CLP conversion of a USD amount with a dated rate (never used for accounting). */
@@ -53,6 +54,19 @@ export function formatPerMillion(price: string, unitQuantity: number): string {
 export function formatNumber(value: number | null | undefined): string {
   if (value === null || value === undefined) return '—';
   return value.toLocaleString(locale());
+}
+
+/** Relative change as a signed percentage: 0.124 → "+12,4 %". */
+export function formatPercentChange(ratio: number | null | undefined, digits = 1): string {
+  if (ratio === null || ratio === undefined || !Number.isFinite(ratio)) return '—';
+  const text = new Intl.NumberFormat(locale(), { style: 'percent', maximumFractionDigits: digits, signDisplay: 'exceptZero' }).format(ratio);
+  return text;
+}
+
+/** Share as a percentage: 0.62 → "62 %". */
+export function formatPercent(ratio: number | null | undefined, digits = 0): string {
+  if (ratio === null || ratio === undefined || !Number.isFinite(ratio)) return '—';
+  return new Intl.NumberFormat(locale(), { style: 'percent', maximumFractionDigits: digits }).format(ratio);
 }
 
 export function formatBytes(bytes: number | null | undefined): string {

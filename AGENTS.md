@@ -15,7 +15,7 @@ Este archivo es para agentes (Claude Code u otros) que modifican este repositori
 | Conocimiento (RAG) | `packages/rag/src/` |
 | Trabajos en segundo plano | `packages/jobs/src/index.ts` (colas), `apps/worker/src/handlers/` |
 | Vistas del panel | `apps/web/app/pages/admin/**`, navegación en `apps/web/app/utils/navigation.ts` |
-| Componentes compartidos | `packages/ui/app/components/**` (catálogo vivo en `/admin/components`) |
+| Kit de interfaz (formularios, asistente, tablas/tarjetas, gráficos, carrusel, menús, avisos, modales, íconos) | `packages/ui/app/components/common/**`, `charts/**`, `composables/**`, `lib/icons.ts`; guía en [docs/frontend-components.md](docs/frontend-components.md); catálogo vivo en `/admin/components` |
 | Variables de entorno | `packages/config/src/env.ts` y `.env.example` |
 | Módulo de referencia | **Proyectos**: contrato, tabla, `apps/api/src/modules/projects`, `apps/web/app/pages/admin/projects`, `tests/e2e/projects.spec.ts` |
 
@@ -54,6 +54,7 @@ pnpm verify                        # verificación completa
 - Textos de interfaz en español (es-CL); identificadores y comentarios de código en inglés.
 - Drizzle: en `select` de una sola tabla, las columnas dentro de subconsultas `sql` correlacionadas se renderizan sin calificar; usa `outerRef(columna)` de `@starter/db`.
 - Query strings booleanas con `QueryBool` (no `z.coerce.boolean`).
+- **Vistas con el kit.** Antes de escribir un componente busca el caso en [docs/frontend-components.md](docs/frontend-components.md) (formularios con `useZodForm` + `FormFields`/`FormDialog`, asistentes con `FormWizard`, listas con `useListQuery` + `DataToolbar` + `DataTable` en tabla o tarjetas, `ActionMenu`, `AppAlert`, `useNotify`, `AppModal`, `AppIcon`). Si falta algo reutilizable, agrégalo al kit con su ejemplo en el catálogo.
 - Vue/shadcn: envuelve en `<ClientOnly>` los `Select` de reka-ui cuyos ítems vienen de datos asíncronos; nunca pongas `Badge` (div) dentro de `<p>`; los gráficos ya se renderizan solo en cliente. Revisa que una vista no produzca advertencias de hidratación.
 - Formularios: `useZodForm(Esquema, valores)` con el mismo esquema de contratos; los errores `VALIDATION_FAILED` del servidor vuelven a los campos.
 - Confirmaciones destructivas con `useConfirm()` y `typeToConfirm` para eliminaciones irreversibles.
@@ -79,4 +80,4 @@ pnpm verify                        # verificación completa
 
 ## Skills
 
-Instrucciones paso a paso para tareas frecuentes en [skills/](skills/): [instalar](skills/install-starter/SKILL.md), [extender](skills/extend-starter/SKILL.md), [configurar IA](skills/configure-ai/SKILL.md) y [administrar conocimiento](skills/manage-rag/SKILL.md).
+Instrucciones paso a paso para tareas frecuentes en [skills/](skills/): [instalar](skills/install-starter/SKILL.md), [extender](skills/extend-starter/SKILL.md), [construir vistas](skills/build-ui/SKILL.md), [configurar IA](skills/configure-ai/SKILL.md) y [administrar conocimiento](skills/manage-rag/SKILL.md).

@@ -130,7 +130,9 @@ export function transform(source: string, n: Names): string {
     // Audit resource type and test ids
     [/'project'/g, `'${n.snakeSingular}'`],
     [/\bproject-/g, `${n.kebabSingular}-`],
+    [/"project"/g, `"${n.kebabSingular}"`],
     [/\bpj-/g, `${n.prefix}-`],
+    [/"pj"/g, `"${n.prefix}"`],
     [/\bFolderKanban\b/g, n.icon],
   ];
   for (const [re, rep] of rules) s = s.replace(re, rep as never);

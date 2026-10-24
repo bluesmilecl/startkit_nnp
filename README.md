@@ -77,7 +77,7 @@ docker/  docs/  skills/  scripts/  tests/
 - Identidad: [autenticación](docs/authentication.md) · [permisos](docs/permissions.md) · [herramientas de administración](docs/admin-tools.md)
 - IA: [proveedores](docs/ai-providers.md) · [modelos y tarifas](docs/models-and-pricing.md) · [costos](docs/costs.md) · [agentes y chat](docs/agents-and-chat.md) · [audio y multimedia](docs/audio-and-media.md)
 - Conocimiento: [RAG](docs/rag.md) · [API externa de recuperación](docs/rag-external.md) · [indexación](docs/indexing.md)
-- Desarrollo: [extender el starter](docs/extending.md) · [componentes de interfaz](docs/frontend-components.md) · [pruebas E2E](docs/e2e.md) · [referencia de la API](docs/api-reference.md)
+- Desarrollo: [extender el starter](docs/extending.md) · [kit de interfaz](docs/frontend-components.md) · [pruebas E2E](docs/e2e.md) · [referencia de la API](docs/api-reference.md)
 - Para agentes de código: [AGENTS.md](AGENTS.md) · [skills](skills/) · [llms.txt](llms.txt)
 
 ## Principios de seguridad
