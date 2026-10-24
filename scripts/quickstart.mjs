@@ -7,6 +7,7 @@
  *   node scripts/quickstart.mjs --owner tu@empresa.cl --test-ai          # chat without API keys (dev)
  *   OPENAI_API_KEY=… node scripts/quickstart.mjs --owner tu@empresa.cl --ai openai --chat-model gpt-4.1-mini
  *   node scripts/quickstart.mjs --owner tu@empresa.cl --db external --database-url postgres://…
+ *   node scripts/quickstart.mjs --owner tu@empresa.cl --reset-db          # discard a previous local database
  *
  * Steps: prerequisites → pnpm install → build → .env (starter init) → PostgreSQL + Mailpit in
  * Docker → migrations → optional AI provider → doctor. Ends with a machine-readable line:
@@ -31,6 +32,7 @@ const { values: o } = parseArgs({
     ai: { type: 'string' },
     'chat-model': { type: 'string' },
     start: { type: 'boolean', default: false },
+    'reset-db': { type: 'boolean', default: false },
     help: { type: 'boolean', short: 'h' },
   },
 });
@@ -129,6 +131,17 @@ if (o.db === 'docker') {
   if (!running.includes('postgres') && !hasEnv && !(await portFree(5432))) {
     for (let p = 5433; p < 5450 && !pgPort; p++) if (await portFree(p)) pgPort = p;
     console.log(`${c.yellow('!')} El puerto 5432 está ocupado: PostgreSQL usará ${pgPort}`);
+  }
+  // New secrets cannot open a database volume created by an earlier installation (fixed project name).
+  if (!hasEnv && (sh('docker', ['volume', 'ls', '--format', '{{.Name}}'])?.split('\n') ?? []).includes('starter_pgdata')) {
+    if (!o['reset-db']) {
+      fail('Ya existe una base local de una instalación anterior (volumen Docker starter_pgdata) y este clon no tiene su .env', 'copia aquí el .env de esa instalación, o repite con --reset-db para borrar esa base (se pierden sus datos)');
+    }
+    const ids = sh('docker', ['ps', '-aq', '--filter', 'label=com.docker.compose.project=starter'])?.split('\n').filter(Boolean) ?? [];
+    if (ids.length) sh('docker', ['rm', '-f', ...ids]);
+    for (const v of ['starter_pgdata', 'starter_ragpgdata']) sh('docker', ['volume', 'rm', v]);
+    running.length = 0;
+    console.log(`${c.yellow('!')} Base local anterior eliminada (--reset-db)`);
   }
   if (!running.includes('mailpit')) {
     for (const p of [8025, 1025]) if (!(await portFree(p))) fail(`El puerto ${p} (Mailpit) está ocupado`, 'libéralo o define MAILPIT_PORT / MAILPIT_SMTP_PORT en .env');

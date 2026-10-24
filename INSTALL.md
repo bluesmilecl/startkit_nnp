@@ -56,6 +56,7 @@ Luego de `pnpm dev`:
 | Mi propio PostgreSQL (sin Docker) | `node scripts/quickstart.mjs --owner tu@empresa.cl --db external --database-url postgres://usuario:clave@host:5432/base` |
 | Solo identidad y panel (sin IA ni RAG) | `--modules ''` · solo IA: `--modules ai` · con organizaciones: `--modules ai,rag,organizations` |
 | Arrancar al terminar | agrega `--start` (ejecuta `pnpm dev`) |
+| Reinstalar desde cero en este equipo | agrega `--reset-db` (borra la base local anterior y sus datos) |
 
 Sobre la IA:
 
@@ -105,6 +106,7 @@ Para detener la infraestructura: `pnpm infra:down`. Para borrar todo: `pnpm infr
 | `Docker no responde` | Inicia Docker Desktop / el servicio, o usa `--db external` |
 | `El puerto 8025 (Mailpit) está ocupado` | Libéralo o define `MAILPIT_PORT` y `MAILPIT_SMTP_PORT` en `.env` |
 | `Falta --owner <correo>` | Repite con el correo de quien administrará la aplicación |
+| `Ya existe una base local de una instalación anterior` | Copia el `.env` de esa instalación a este clon, o repite con `--reset-db` (borra esa base) |
 | `Define la clave en la variable OPENAI_API_KEY` | `export OPENAI_API_KEY=…` y repite el comando |
 | `Modelo … no encontrado` | Usa el id exacto; `pnpm starter ai connect --provider openai` lista y sincroniza el catálogo |
 | No llega el código | Mira Mailpit (http://localhost:8025) y `pnpm starter doctor` |
