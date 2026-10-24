@@ -9,6 +9,7 @@ const fallback: PublicSettings = {
   registration: 'invite-only',
   otpLength: 6,
   otpResendSeconds: 60,
+  demoLogin: null,
 };
 
 export function useBranding() {

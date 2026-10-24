@@ -17745,6 +17745,24 @@
           },
           "otpResendSeconds": {
             "type": "integer"
+          },
+          "demoLogin": {
+            "default": null,
+            "nullable": true,
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "email",
+              "code"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -17755,7 +17773,8 @@
           "timeZone",
           "registration",
           "otpLength",
-          "otpResendSeconds"
+          "otpResendSeconds",
+          "demoLogin"
         ],
         "additionalProperties": false
       },

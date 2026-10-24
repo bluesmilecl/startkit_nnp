@@ -68,6 +68,9 @@ export interface CreateAuthOptions {
 export function createAuth({ db, env, mailer, features, basePath = '/api/auth' }: CreateAuthOptions) {
   const settings = new SettingsService({ db, env, mailer, features });
   const production = env.NODE_ENV === 'production';
+  // parseEnv refuses DEMO_LOGIN_EMAIL in production; checked again so a hand-built env cannot enable it.
+  const demoEmail = production ? undefined : env.DEMO_LOGIN_EMAIL;
+  const isDemo = (email: string) => !!demoEmail && email.toLowerCase() === demoEmail;
 
   return betterAuth({
     appName: env.APP_NAME,
@@ -120,8 +123,14 @@ export function createAuth({ db, env, mailer, features, basePath = '/api/auth' }
         storeOTP: 'hashed',
         disableSignUp: false,
         rateLimit: { window: 60, max: 5 },
+        // undefined falls back to the random generator.
+        generateOTP: ({ email, type }) => (type === 'sign-in' && isDemo(email) ? env.DEMO_LOGIN_CODE : undefined),
         async sendVerificationOTP({ email, otp, type }) {
           if (type !== 'sign-in') return;
+          if (isDemo(email)) {
+            log.info('demo sign-in code issued; no e-mail sent');
+            return;
+          }
           try {
             const exists = await db
               .select({ id: users.id })
@@ -155,7 +164,7 @@ export function createAuth({ db, env, mailer, features, basePath = '/api/auth' }
       before: createAuthMiddleware(async (ctx) => {
         if (ctx.path !== '/email-otp/send-verification-otp' || env.OTP_RESEND_SECONDS <= 0) return;
         const email = String((ctx.body as { email?: string } | undefined)?.email ?? '').toLowerCase();
-        if (!email) return;
+        if (!email || isDemo(email)) return;
         // expires_at is written once when the code is issued (created_at changes on failed attempts).
         const [recent] = await db
           .select({ expiresAt: verifications.expiresAt })

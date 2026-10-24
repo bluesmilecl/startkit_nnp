@@ -28,6 +28,12 @@ const submit = form.handleSubmit(async ({ email }) => {
   }
   await navigateTo({ path: '/verify', query: { email, redirect: route.query.redirect, cooldown: error ? '1' : undefined } });
 });
+
+async function useDemo() {
+  if (!branding.value.demoLogin) return;
+  form.values.email = branding.value.demoLogin.email;
+  await submit();
+}
 </script>
 
 <template>
@@ -62,6 +68,12 @@ const submit = form.handleSubmit(async ({ email }) => {
           <Mail v-else class="size-4" />
           Enviar código
         </Button>
+        <AppAlert v-if="branding.demoLogin" title="Cuenta de demostración" data-testid="demo-login">
+          Ingresa con <strong class="break-all">{{ branding.demoLogin.email }}</strong> y el código <strong>{{ branding.demoLogin.code }}</strong>.
+          <template #actions>
+            <Button type="button" size="sm" variant="outline" :disabled="form.submitting.value || !hydrated" data-testid="demo-login-use" @click="useDemo">Entrar con la cuenta demo</Button>
+          </template>
+        </AppAlert>
         <p v-if="branding.registration !== 'open'" class="text-muted-foreground text-center text-xs">
           El acceso es por invitación. Si no recibes el código, solicita acceso a un administrador.
         </p>

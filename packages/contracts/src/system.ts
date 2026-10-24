@@ -77,6 +77,8 @@ export const PublicSettings = z
     registration: z.enum(['open', 'invite-only', 'disabled']),
     otpLength: z.number().int(),
     otpResendSeconds: z.number().int(),
+    /** Demo access (never in production): the login screen offers this account and its fixed code. */
+    demoLogin: z.object({ email: z.string(), code: z.string() }).nullable().default(null),
   })
   .meta({ id: 'PublicSettings' });
 

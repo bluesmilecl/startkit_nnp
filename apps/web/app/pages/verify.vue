@@ -12,6 +12,7 @@ useHead({ title: 'Verificar código' });
 const route = useRoute();
 const branding = useBranding();
 const email = computed(() => String(route.query.email ?? ''));
+const demoCode = computed(() => (branding.value.demoLogin?.email === email.value.toLowerCase() ? branding.value.demoLogin.code : null));
 const code = ref('');
 const error = ref<string | null>(null);
 const info = ref<string | null>(null);
@@ -83,6 +84,12 @@ watch(code, (v) => {
             <InputOTPSlot v-for="i in branding.otpLength" :key="i" :index="i - 1" />
           </InputOTPGroup>
         </InputOTP>
+        <AppAlert v-if="demoCode" class="w-full" data-testid="demo-code">
+          Cuenta de demostración: el código es <strong>{{ demoCode }}</strong>.
+          <template #actions>
+            <Button type="button" size="sm" variant="outline" :disabled="verifying" data-testid="demo-code-use" @click="code = demoCode">Usar código demo</Button>
+          </template>
+        </AppAlert>
         <Alert v-if="error" variant="destructive" class="w-full" data-testid="verify-error">
           <AlertDescription>{{ error }}</AlertDescription>
         </Alert>

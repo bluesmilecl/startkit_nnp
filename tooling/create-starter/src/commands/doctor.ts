@@ -62,6 +62,7 @@ export async function doctor(): Promise<number> {
       if (env.RAG_FETCH_ALLOW_PRIVATE) add('warn', 'RAG_FETCH_ALLOW_PRIVATE=true permite descargar URLs de redes privadas');
     }
     add(env.OWNER_EMAIL ? 'ok' : 'warn', env.OWNER_EMAIL ? 'OWNER_EMAIL definido' : 'OWNER_EMAIL vacío', env.OWNER_EMAIL ? undefined : 'el primer visitante nunca se vuelve administrador; usa "starter owner assign"');
+    if (env.DEMO_LOGIN_EMAIL) add('warn', `Acceso de demostración activo: ${env.DEMO_LOGIN_EMAIL}`, `entra siempre con el código ${env.DEMO_LOGIN_CODE}; solo para demos (se rechaza en producción)`);
     add('info', `Módulos: IA ${env.FEATURE_AI ? 'activa' : 'desactivada'} · conocimiento ${env.FEATURE_RAG ? 'activo' : 'desactivado'} · organizaciones ${env.FEATURE_ORGANIZATIONS ? 'activas' : 'desactivadas'}`);
   }
   const cfgPath = join(root, 'starter.config.json');

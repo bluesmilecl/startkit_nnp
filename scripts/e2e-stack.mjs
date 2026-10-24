@@ -44,6 +44,7 @@ function writeEnv() {
     MAIL_TRANSPORT: 'smtp',
     MAIL_FROM: 'Starter E2E <no-reply@e2e.test>',
     OTP_RESEND_SECONDS: '20',
+    DEMO_LOGIN_EMAIL: 'demo@e2e.test',
     // The deterministic provider runs the real tool-execution path without paid keys.
     AI_TEST_PROVIDER_ENABLED: 'true',
     FEATURE_ORGANIZATIONS: 'false',

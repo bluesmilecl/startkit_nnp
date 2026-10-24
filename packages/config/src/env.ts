@@ -68,6 +68,9 @@ export const envSchema = z.object({
   OTP_EXPIRES_SECONDS: z.coerce.number().int().min(60).max(3600).default(300),
   OTP_MAX_ATTEMPTS: z.coerce.number().int().min(1).max(20).default(5),
   OTP_RESEND_SECONDS: z.coerce.number().int().min(0).max(3600).default(60),
+  /** Demo access (development and demos only): this e-mail always signs in with DEMO_LOGIN_CODE. */
+  DEMO_LOGIN_EMAIL: z.email().transform((v) => v.toLowerCase()).optional(),
+  DEMO_LOGIN_CODE: z.string().regex(/^\d+$/, 'only digits').default('111111'),
   SESSION_EXPIRES_DAYS: z.coerce.number().int().min(1).max(365).default(7),
 
   MAIL_TRANSPORT: z.enum(MAIL_TRANSPORTS).default('smtp'),
@@ -139,6 +142,12 @@ export function parseEnv(source: Record<string, string | undefined> = process.en
   const env = result.data;
   if (env.NODE_ENV === 'production' && env.AI_TEST_PROVIDER_ENABLED) {
     throw new EnvValidationError([{ path: 'AI_TEST_PROVIDER_ENABLED', message: 'must be false in production' }]);
+  }
+  if (env.NODE_ENV === 'production' && env.DEMO_LOGIN_EMAIL) {
+    throw new EnvValidationError([{ path: 'DEMO_LOGIN_EMAIL', message: 'a fixed demo code is not allowed in production' }]);
+  }
+  if (env.DEMO_LOGIN_EMAIL && env.DEMO_LOGIN_CODE.length !== env.OTP_LENGTH) {
+    throw new EnvValidationError([{ path: 'DEMO_LOGIN_CODE', message: `must have OTP_LENGTH (${env.OTP_LENGTH}) digits` }]);
   }
   if (env.STORAGE_DRIVER === 's3' && !env.S3_BUCKET) {
     throw new EnvValidationError([{ path: 'S3_BUCKET', message: 'required when STORAGE_DRIVER=s3' }]);

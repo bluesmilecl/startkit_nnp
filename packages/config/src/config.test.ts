@@ -28,6 +28,13 @@ describe('env', () => {
     expect(() => parseEnv({ ...base, NODE_ENV: 'production', MAIL_TRANSPORT: 'log' })).toThrow(/log transport/);
   });
 
+  it('demo access: fixed code only outside production and with the OTP length', () => {
+    expect(parseEnv({ ...base, DEMO_LOGIN_EMAIL: 'Demo@Empresa.cl' })).toMatchObject({ DEMO_LOGIN_EMAIL: 'demo@empresa.cl', DEMO_LOGIN_CODE: '111111' });
+    expect(() => parseEnv({ ...base, NODE_ENV: 'production', DEMO_LOGIN_EMAIL: 'demo@empresa.cl', MAIL_TRANSPORT: 'smtp' })).toThrow(/not allowed in production/);
+    expect(() => parseEnv({ ...base, DEMO_LOGIN_EMAIL: 'demo@empresa.cl', DEMO_LOGIN_CODE: '1234' })).toThrow(/OTP_LENGTH/);
+    expect(parseEnv(base).DEMO_LOGIN_EMAIL).toBeUndefined();
+  });
+
   it('requires the keys of the chosen mail transport', () => {
     expect(() => parseEnv({ ...base, MAIL_TRANSPORT: 'resend' })).toThrow(/RESEND_API_KEY/);
     expect(() => parseEnv({ ...base, MAIL_TRANSPORT: 'mailgun', MAILGUN_API_KEY: 'k' })).toThrow(/MAILGUN_DOMAIN/);

@@ -28,6 +28,7 @@ export class PublicController {
       registration: s.auth.registration,
       otpLength: this.env.OTP_LENGTH,
       otpResendSeconds: this.env.OTP_RESEND_SECONDS,
+      demoLogin: this.env.NODE_ENV !== 'production' && this.env.DEMO_LOGIN_EMAIL ? { email: this.env.DEMO_LOGIN_EMAIL, code: this.env.DEMO_LOGIN_CODE } : null,
     };
   }
 }

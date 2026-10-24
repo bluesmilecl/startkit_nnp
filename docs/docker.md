@@ -143,6 +143,8 @@ pone HTTPS.
    MAIL_FROM="Mesa de Ayuda <no-reply@tudominio.cl>"
    MAILPIT_UI_AUTH=usuario:clave    # si publicas Mailpit
    MAILPIT_WEBROOT=/mailpit/        # Mailpit en https://app.tudominio.cl/mailpit/ (un solo DNS)
+   # Demo pública (NODE_ENV=development): esta cuenta entra siempre con el código 111111
+   # DEMO_LOGIN_EMAIL=demo@tudominio.cl
    ```
 
    Con un PostgreSQL externo define `DATABASE_URL` y `DATABASE_MIGRATION_URL`: tienen prioridad

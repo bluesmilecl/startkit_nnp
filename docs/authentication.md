@@ -32,6 +32,18 @@ identidad pase por los servicios auditados.
 Los códigos se guardan **hasheados**. No hay caché de sesión en cookies: revocar una sesión o
 desactivar una cuenta surte efecto en la siguiente solicitud.
 
+### Cuenta de demostración
+
+Para demos y desarrollo, `DEMO_LOGIN_EMAIL=demo@tudominio.cl` hace que **esa cuenta** ingrese
+siempre con `DEMO_LOGIN_CODE` (por defecto `111111`, con `OTP_LENGTH` dígitos): no se envía correo,
+no aplica la espera entre reenvíos y la pantalla de ingreso muestra el correo y el código con un
+botón «Entrar con la cuenta demo». El resto de las cuentas sigue con códigos aleatorios.
+
+- El arranque **falla con `NODE_ENV=production`** si `DEMO_LOGIN_EMAIL` está definido.
+- La cuenta debe existir o tener acceso (usa el mismo correo de `OWNER_EMAIL` o invítala); su rol
+  es el que tenga en la plataforma, así que en una demo pública cualquiera entra con ese rol.
+- `pnpm starter doctor` lo marca como advertencia.
+
 ## Modos de registro
 
 | Modo | Quién puede crear cuenta |
@@ -66,6 +78,7 @@ también pueden crearse desde `/admin/users` (con o sin correo de invitación).
 | CSRF | Cookies `SameSite=Lax` + verificación de `Origin`/`Referer`/`Sec-Fetch-Site` en toda escritura de la API de negocio (`CsrfMiddleware`); Better Auth valida sus propios orígenes de confianza. |
 | Cuentas desactivadas | No pueden crear sesión (`ACCOUNT_DISABLED`) y sus sesiones se revocan. |
 | Códigos en logs | Se redactan `otp`/`code`; el transporte `log` está prohibido en producción. |
+| Código fijo de demostración | `DEMO_LOGIN_EMAIL` se rechaza en producción y solo aplica a ese correo. |
 
 ## Correo transaccional
 

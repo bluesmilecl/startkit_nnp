@@ -400,6 +400,10 @@ export type PublicSettings = {
     registration: 'open' | 'invite-only' | 'disabled';
     otpLength: number;
     otpResendSeconds: number;
+    demoLogin: {
+        email: string;
+        code: string;
+    } | null;
 };
 
 export type AuditEvent = {

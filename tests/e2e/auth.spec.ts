@@ -1,4 +1,4 @@
-import { expect, login, otpFor, sql, test, uniqueEmail, waitHydrated, OWNER, apiLogin } from './fixtures.js';
+import { expect, login, otpFor, sql, test, uniqueEmail, waitHydrated, OWNER, apiLogin, mailsTo } from './fixtures.js';
 
 test.describe('OTP login @critical', () => {
   test('correct code signs in and lands on the requested page', async ({ page }) => {
@@ -100,5 +100,28 @@ test.describe('session @critical', () => {
     await page.getByTestId('profile-name').fill('Propietaria E2E');
     await page.getByTestId('profile-save').click();
     await expect(page).toHaveURL(/\/session-expired|\/login/);
+  });
+});
+
+test.describe('demo access', () => {
+  test('the demo account signs in from the login screen with the fixed code and no e-mail', async ({ page, ownerPage }) => {
+    const settings = (await (await page.request.get('/api/public/settings')).json()) as { demoLogin: { email: string; code: string } | null };
+    test.skip(!settings.demoLogin, 'DEMO_LOGIN_EMAIL is not set in this stack');
+    const { email, code } = settings.demoLogin!;
+    // The demo account must have access: the owner creates it once (409 when it already exists).
+    const origin = new URL(test.info().project.use.baseURL!).origin;
+    const roles = (await (await ownerPage.request.get('/api/admin/roles')).json()) as { id: string; key: string }[];
+    const created = await ownerPage.request.post('/api/admin/users', { data: { email, name: 'Cuenta demo', roleIds: [roles.find((r) => r.key === 'admin')!.id], sendInvitation: false }, headers: { origin } });
+    expect([201, 409]).toContain(created.status());
+
+    await page.goto('/login');
+    await waitHydrated(page);
+    await expect(page.getByTestId('demo-login')).toContainText(code);
+    await page.getByTestId('demo-login-use').click();
+    await page.waitForURL(/\/verify/);
+    await waitHydrated(page);
+    await page.getByTestId('demo-code-use').click();
+    await page.waitForURL((url) => !url.pathname.startsWith('/verify'), { timeout: 20_000 });
+    expect(await mailsTo(email)).toHaveLength(0);
   });
 });
