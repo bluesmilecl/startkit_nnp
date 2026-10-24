@@ -35,7 +35,7 @@ export class JobsModule implements OnModuleInit, OnApplicationShutdown {
       const heartbeat = await this.settings.getRaw<{ at: string }>('worker.heartbeat');
       const age = heartbeat ? (Date.now() - new Date(heartbeat.at).getTime()) / 1000 : null;
       return {
-        worker: age !== null && age < 180 ? { status: 'ok', detail: `heartbeat ${Math.round(age)}s` } : { status: 'degraded', detail: heartbeat ? `heartbeat ${Math.round(age!)}s ago` : 'no heartbeat yet' },
+        worker: age !== null && age < 180 ? { status: 'ok', detail: `latido hace ${Math.round(age)} s` } : { status: 'degraded', detail: heartbeat ? `sin latido desde hace ${Math.round(age!)} s` : 'aún sin latido' },
       };
     });
     this.diagnostics.register(async () => {

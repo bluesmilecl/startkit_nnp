@@ -11,6 +11,7 @@ const me = useMe();
 const can = useCan();
 const { data, status } = await useAsyncData('dashboard', () => unwrap(adminDashboard({ client: useApi() })));
 const loading = computed(() => status.value === 'pending');
+const CHECK_LABELS: Record<string, string> = { database: 'Base de datos', migrations: 'Migraciones', worker: 'Worker (trabajos en segundo plano)', contributor: 'Módulos' };
 </script>
 
 <template>
@@ -38,7 +39,7 @@ const loading = computed(() => status.value === 'pending');
       <CardContent>
         <ul class="space-y-2 text-sm" data-testid="health-checks">
           <li v-for="(c, name) in data?.health.checks" :key="name" class="flex items-center justify-between gap-2">
-            <span class="capitalize">{{ name }}</span>
+            <span>{{ CHECK_LABELS[name] ?? name }}</span>
             <span class="flex items-center gap-2"><span class="text-muted-foreground text-xs">{{ c.detail }}</span><StatusBadge :status="c.status" /></span>
           </li>
         </ul>

@@ -35,9 +35,9 @@ export class HealthService {
     if (checks.database.status === 'ok') {
       try {
         const rows = await this.db.db.execute<{ n: number }>(sql`select count(*)::int as n from public.__migrations`);
-        checks.migrations = { status: (rows.rows[0]?.n ?? 0) > 0 ? 'ok' : 'error', detail: `${rows.rows[0]?.n ?? 0} applied` };
+        checks.migrations = { status: (rows.rows[0]?.n ?? 0) > 0 ? 'ok' : 'error', detail: `${rows.rows[0]?.n ?? 0} aplicadas` };
       } catch {
-        checks.migrations = { status: 'error', detail: 'migrations table missing; run the migrate service' };
+        checks.migrations = { status: 'error', detail: 'Falta la tabla de migraciones; ejecuta el servicio migrate' };
       }
       for (const c of this.contributors) {
         try {

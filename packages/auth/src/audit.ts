@@ -14,6 +14,8 @@ export interface AuditEntry {
   metadata?: Record<string, unknown>;
   organizationId?: string | null;
   proposalId?: string | null;
+  /** Person the event belongs to when there is no request actor yet (e.g. the login itself). */
+  actorUserId?: string | null;
 }
 
 /** Keys never persisted in audit snapshots. */
@@ -42,8 +44,8 @@ export async function recordAudit(db: DbOrTx, actor: Actor | null, entry: AuditE
   const viaAgent = actor?.channel === 'chat' && actor.agent;
   try {
     await db.insert(auditEvents).values({
-      actorType: !actor ? 'system' : viaAgent ? 'agent' : actor.channel === 'cli' ? 'cli' : actor.channel === 'system' ? 'system' : 'user',
-      actorUserId: actor && actor.channel !== 'system' ? actor.userId : null,
+      actorType: !actor ? (entry.actorUserId ? 'user' : 'system') : viaAgent ? 'agent' : actor.channel === 'cli' ? 'cli' : actor.channel === 'system' ? 'system' : 'user',
+      actorUserId: actor ? (actor.channel !== 'system' ? actor.userId : null) : (entry.actorUserId ?? null),
       agentId: actor?.agent?.agentId ?? null,
       conversationId: actor?.agent?.conversationId ?? null,
       toolCallId: actor?.agent?.toolCallId ?? null,
@@ -57,7 +59,7 @@ export async function recordAudit(db: DbOrTx, actor: Actor | null, entry: AuditE
       before: entry.before === undefined ? null : redactForAudit(entry.before),
       after: entry.after === undefined ? null : redactForAudit(entry.after),
       metadata: entry.metadata ? redactForAudit(entry.metadata) : null,
-      ip: actor?.ip ?? null,
+      ip: actor?.ip ?? (typeof entry.metadata?.ip === 'string' ? entry.metadata.ip : null),
       userAgent: actor?.userAgent?.slice(0, 300) ?? null,
     });
   } catch (err) {

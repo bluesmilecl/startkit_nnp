@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { HTMLAttributes, Ref } from "vue"
-import { defaultDocument, useEventListener, useMediaQuery, useVModel } from "@vueuse/core"
+import { defaultDocument, useEventListener, useMediaQuery, useMounted, useVModel } from "@vueuse/core"
 import { cn } from "#ui/lib/utils"
 import { TooltipProvider } from "reka-ui"
 import { computed, ref } from "vue"
@@ -19,7 +19,11 @@ const emits = defineEmits<{
   "update:open": [open: boolean]
 }>()
 
-const isMobile = useMediaQuery("(max-width: 768px)")
+// starter: SSR cannot know the viewport, so mobile mode starts after mount (avoids a hydration
+// mismatch on phones). Keep this when syncing from upstream.
+const mobileQuery = useMediaQuery("(max-width: 768px)")
+const mounted = useMounted()
+const isMobile = computed(() => mounted.value && mobileQuery.value)
 const openMobile = ref(false)
 
 const open = useVModel(props, "open", emits, {

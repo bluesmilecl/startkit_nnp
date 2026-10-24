@@ -216,6 +216,7 @@ export function createAuth({ db, env, mailer, features, basePath = '/api/auth' }
               resourceType: 'session',
               resourceId: session.id,
               outcome: 'success',
+              actorUserId: session.userId,
               metadata: { userId: session.userId, ip: session.ipAddress ?? null },
             });
           },

@@ -45,5 +45,11 @@ services:
       NODE_ENV: test
       RETRIEVAL_TEST_PORT: '3005'
       RETRIEVAL_TEST_TOKEN: ${RETRIEVAL_TEST_TOKEN:-}
+    # The api image's own healthcheck probes the API port; this service listens on 3005.
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3005/site/faq.html').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks: [internal]
