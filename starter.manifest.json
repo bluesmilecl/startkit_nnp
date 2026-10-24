@@ -1,0 +1,48 @@
+{
+  "$schema": "./docs/schemas/starter.manifest.schema.json",
+  "name": "starter-kit",
+  "version": "0.1.0",
+  "generatedBy": "scripts/manifest.mjs",
+  "runtime": {
+    "node": {
+      "lts": "24.22.1",
+      "supported": [
+        "24"
+      ],
+      "testedCurrent": [
+        "26"
+      ]
+    },
+    "packageManager": "pnpm@12.15.0",
+    "postgres": {
+      "version": "18",
+      "pgvector": "0.8.7"
+    }
+  },
+  "stack": {
+    "@ai-sdk/vue": "4.0.152",
+    "@hey-api/openapi-ts": "0.99.0",
+    "@nestjs/core": "12.2.0",
+    "@nestjs/swagger": "12.0.3",
+    "@playwright/test": "1.64.1",
+    "@unovis/vue": "1.7.1",
+    "ai": "7.0.152",
+    "better-auth": "1.7.12",
+    "drizzle-kit": "0.31.11",
+    "drizzle-orm": "0.45.4",
+    "nuxt": "4.6.2",
+    "reka-ui": "2.11.0",
+    "shadcn-nuxt": "2.8.2",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5",
+    "vue": "3.5.44",
+    "zod": "4.6.7"
+  },
+  "images": [],
+  "modules": {
+    "organizations": "optional",
+    "ai": "default-on",
+    "rag": "optional"
+  }
+}

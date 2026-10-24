@@ -13,3 +13,8 @@ allowBuilds:
   '@tailwindcss/oxide': true
   # Telemetry postinstall from swagger-ui-dist: explicitly not allowed.
   '@scarf/scarf': false
+
+minimumReleaseAgeExclude:
+  - '@ai-sdk/gateway@4.0.125'
+  - '@ai-sdk/vue@4.0.152'
+  - ai@7.0.152

@@ -24,6 +24,7 @@ export class PublicController {
       logoUrl: s.branding.logoUrl,
       primaryColor: s.branding.primaryColor,
       locale: s.locale.locale,
+      timeZone: s.locale.timezone,
       registration: s.auth.registration,
       otpLength: this.env.OTP_LENGTH,
       otpResendSeconds: this.env.OTP_RESEND_SECONDS,

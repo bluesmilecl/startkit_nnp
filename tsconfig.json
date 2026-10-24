@@ -17,6 +17,9 @@
       "path": "packages/mail"
     },
     {
+      "path": "packages/api-client"
+    },
+    {
       "path": "packages/auth"
     },
     {

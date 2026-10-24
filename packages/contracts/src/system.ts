@@ -73,6 +73,7 @@ export const PublicSettings = z
     logoUrl: z.string().nullable(),
     primaryColor: z.string(),
     locale: z.string(),
+    timeZone: z.string(),
     registration: z.enum(['open', 'invite-only', 'disabled']),
     otpLength: z.number().int(),
     otpResendSeconds: z.number().int(),

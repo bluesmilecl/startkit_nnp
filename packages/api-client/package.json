@@ -1,0 +1,17 @@
+{
+  "name": "@starter/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./openapi.json": "./openapi.json"
+  },
+  "scripts": {
+    "generate": "openapi-ts",
+    "build": "tsc -b"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.99.0"
+  }
+}

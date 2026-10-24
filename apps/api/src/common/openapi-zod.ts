@@ -37,7 +37,13 @@ export function inlineSchema(schema: z.ZodType, io: 'input' | 'output'): Json {
     reused: 'inline',
     cycles: 'ref',
   }) as Json;
-  return cleanup(json) as Json;
+  // Registered sub-schemas are emitted as local definitions; point them to the shared components.
+  delete json.definitions;
+  delete json.$defs;
+  const rewritten = JSON.parse(
+    JSON.stringify(json).replace(/"#\/(?:definitions|\$defs)\/([^"]+)"/g, (_m, id: string) => `"${COMPONENT_PREFIX}${id}"`),
+  ) as Json;
+  return cleanup(rewritten) as Json;
 }
 
 /**

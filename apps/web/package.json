@@ -1,0 +1,31 @@
+{
+  "name": "@starter/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev --port 3000",
+    "build": "nuxt build",
+    "preview": "node .output/server/index.mjs",
+    "typecheck": "nuxt typecheck",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@ai-sdk/vue": "4.0.152",
+    "@starter/api-client": "workspace:*",
+    "@starter/contracts": "workspace:*",
+    "@starter/ui": "workspace:*",
+    "@tanstack/vue-table": "8.21.3",
+    "@lucide/vue": "1.61.0",
+    "@vueuse/core": "15.0.0",
+    "ai": "7.0.152",
+    "better-auth": "1.7.12",
+    "nuxt": "4.6.2",
+    "vue": "3.5.44",
+    "vue-sonner": "2.0.9",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "vue-tsc": "3.3.13"
+  }
+}
