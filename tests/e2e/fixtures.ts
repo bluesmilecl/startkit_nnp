@@ -96,7 +96,7 @@ export const test = base.extend<{ ownerPage: Page }, { ownerState: string }>({
     { scope: 'worker' },
   ],
   ownerPage: async ({ browser, ownerState }, use, testInfo) => {
-    const context = await browser.newContext({ baseURL: testInfo.project.use.baseURL, storageState: ownerState });
+    const context = await browser.newContext({ baseURL: testInfo.project.use.baseURL, storageState: ownerState, permissions: testInfo.project.use.permissions ?? [], locale: testInfo.project.use.locale, timezoneId: testInfo.project.use.timezoneId });
     const page = await context.newPage();
     await use(page);
     await context.close();

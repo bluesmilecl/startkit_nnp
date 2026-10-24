@@ -14,3 +14,8 @@ export * from './services/usage.js';
 export * from './services/recommendation.js';
 export * from './services/lab.js';
 export * from './services/factory.js';
+export * from './services/agents.js';
+export * from './services/metered-model.js';
+export * from './chat/chat.js';
+export * from './chat/admin-tools.js';
+export * from './chat/media.js';

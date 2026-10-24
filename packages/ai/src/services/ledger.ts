@@ -130,6 +130,12 @@ export class UsageLedger {
     return row!.id;
   }
 
+  /** Attempts of a request still marked as running (used before aggregating a request). */
+  async runningAttempts(aiRequestId: string): Promise<string[]> {
+    const rows = await this.db.select({ id: aiAttempts.id }).from(aiAttempts).where(and(eq(aiAttempts.aiRequestId, aiRequestId), eq(aiAttempts.status, 'running')));
+    return rows.map((r) => r.id);
+  }
+
   /** Prices the attempt's units with a persisted snapshot of the applied tariffs. */
   async finishAttempt(attemptId: string, o: AttemptOutcome): Promise<CostResult> {
     const [attempt] = await this.db.select().from(aiAttempts).where(eq(aiAttempts.id, attemptId));

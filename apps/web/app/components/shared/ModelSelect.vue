@@ -28,6 +28,9 @@ const value = computed({
 </script>
 
 <template>
+  <!-- reka-ui renders the options through a teleport to label the selected value: client only. -->
+  <ClientOnly>
+    <template #fallback><div class="border-input h-9 w-full rounded-md border" aria-hidden="true" /></template>
   <Select v-model="value">
     <SelectTrigger :id="id" class="w-full"><SelectValue :placeholder="placeholder" /></SelectTrigger>
     <SelectContent>
@@ -38,4 +41,5 @@ const value = computed({
       </SelectGroup>
     </SelectContent>
   </Select>
+  </ClientOnly>
 </template>

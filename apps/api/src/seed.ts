@@ -1,3 +1,4 @@
+import { AgentsService } from '@starter/ai';
 import { InvitationsService, syncAccessCatalog } from '@starter/auth';
 import type { Env } from '@starter/config';
 import { DEFAULT_ORGANIZATION_ID, organizations, type Database } from '@starter/db';
@@ -10,5 +11,7 @@ export async function seedBaseData(db: Database, env: Env) {
     .onConflictDoNothing();
   const catalog = await syncAccessCatalog(db);
   const owner = env.OWNER_EMAIL ? await InvitationsService.bootstrapOwner(db, env.OWNER_EMAIL) : { result: 'not-configured' as const };
+  // Unpublished default assistant: the floating chat stays hidden until an admin publishes it.
+  if (env.FEATURE_AI) await AgentsService.ensureDefault(db, DEFAULT_ORGANIZATION_ID);
   return { organization: DEFAULT_ORGANIZATION_ID, permissions: catalog.permissions, createdRoles: catalog.createdRoles, owner: owner.result };
 }

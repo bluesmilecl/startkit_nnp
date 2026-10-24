@@ -19,6 +19,8 @@ Swagger UI: `/api/docs` (según `OPENAPI_DOCS`). Documento JSON: `/api/docs-json
 - [admin-settings](#admin-settings) (3)
 - [admin-system](#admin-system) (2)
 - [admin-users](#admin-users) (10)
+- [ai-agents](#ai-agents) (10)
+- [ai-chat](#ai-chat) (10)
 - [ai-connections](#ai-connections) (7)
 - [ai-lab](#ai-lab) (4)
 - [ai-models](#ai-models) (7)
@@ -503,6 +505,287 @@ Autorización delegable: no se pueden asignar roles de jerarquía igual o superi
 - **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
 
 **Permiso requerido:** `users.disable`.
+
+## ai-agents
+
+### `GET /api/ai/agents`
+
+- **operationId:** `ai_agents_list`
+- **Resumen:** Agentes configurables
+- **200**: OK — `application/json` `AgentList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.agents.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/agents`
+
+- **operationId:** `ai_agents_create`
+- **Resumen:** Crear agente (con un borrador inicial)
+- **Cuerpo** (`application/json`): `CreateAgentInput`
+- **201**: OK — `application/json` `AgentDetail`
+- **Errores:** 400, 401, 403, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.agents.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/agents/{id}`
+
+- **operationId:** `ai_agents_get`
+- **Resumen:** Agente con historial de versiones
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `AgentDetail`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.agents.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `PATCH /api/ai/agents/{id}`
+
+- **operationId:** `ai_agents_update`
+- **Resumen:** Renombrar, marcar como predeterminado o archivar
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `UpdateAgentInput`
+- **200**: OK — `application/json` `AgentDetail`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.agents.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `DELETE /api/ai/agents/{id}/draft`
+
+- **operationId:** `ai_agents_discard_draft`
+- **Resumen:** Descartar borrador
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `AgentDetail`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.agents.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `PUT /api/ai/agents/{id}/draft`
+
+- **operationId:** `ai_agents_save_draft`
+- **Resumen:** Guardar borrador
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `SaveDraftInput`
+- **200**: OK — `application/json` `AgentDetail`
+- **Errores:** 400, 401, 403, 404, 412, 422, 500 (`ErrorResponse`)
+
+Guarda la configuración en el único borrador del agente (lo crea a partir de la versión publicada si no existe) y la valida contra el catálogo.
+
+**Permiso requerido:** `ai.agents.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/agents/{id}/publish`
+
+- **operationId:** `ai_agents_publish`
+- **Resumen:** Publicar borrador
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `PublishInput`
+- **200**: OK — `application/json` `AgentDetail`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+Revalida y publica; la versión publicada anterior queda archivada.
+
+**Permiso requerido:** `ai.agents.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/agents/{id}/rollback`
+
+- **operationId:** `ai_agents_rollback`
+- **Resumen:** Restaurar una versión archivada
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `RollbackInput`
+- **200**: OK — `application/json` `AgentDetail`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+Publica una copia de la versión elegida como nueva versión.
+
+**Permiso requerido:** `ai.agents.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/agents/{id}/test`
+
+- **operationId:** `ai_agents_test`
+- **Resumen:** Probar una versión (incluido el borrador)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `AgentTestInput`
+- **200**: OK — `application/json` `AgentTestResult`
+- **Errores:** 400, 401, 402, 403, 409, 422, 500, 502 (`ErrorResponse`)
+
+Ejecuta un mensaje con tus permisos reales; las herramientas sensibles solo crean propuestas. El consumo se registra en el libro.
+
+**Permiso requerido:** `ai.agents.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/agents/{id}/validate`
+
+- **operationId:** `ai_agents_validate`
+- **Resumen:** Validar una configuración sin guardarla
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `AgentConfig`
+- **200**: OK — `application/json` `AgentValidation`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.agents.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+## ai-chat
+
+### `POST /api/ai/attachments`
+
+- **operationId:** `ai_attachments_upload`
+- **Resumen:** Subir archivo para el chat
+- **Cuerpo** (`multipart/form-data`): `object`
+- **201**: OK — `application/json` `AttachmentInfo`
+- **Errores:** 400, 401, 403, 413, 422, 500 (`ErrorResponse`)
+
+Se valida por contenido (no por extensión ni MIME declarado). Imágenes, PDF y texto UTF-8.
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `DELETE /api/ai/attachments/{id}`
+
+- **operationId:** `ai_attachments_delete`
+- **Resumen:** Eliminar adjunto
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/attachments/{id}/content`
+
+- **operationId:** `ai_attachments_content`
+- **Resumen:** Contenido de un adjunto propio
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/octet-stream` `string`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/chat`
+
+- **operationId:** `ai_chat_stream`
+- **Resumen:** Enviar mensaje (streaming UI message stream del AI SDK)
+- **Cuerpo** (`application/json`): `ChatRequest`
+- **200**: UI message stream (SSE) — `text/event-stream` `string`
+- **Errores:** 400, 401, 402, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+El cliente envía solo el texto nuevo y referencias a adjuntos ya subidos; historial, instrucciones, modelo, herramientas y colecciones los aporta el servidor. Responde Server-Sent Events con el protocolo UI message stream. Cerrar la conexión cancela la generación y el consumo se registra.
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/chat/agent`
+
+- **operationId:** `ai_chat_agent`
+- **Resumen:** Agente del chat flotante (versión publicada)
+- **Parámetros:**
+  - `agentId` (query): `uuid`
+- **200**: OK — `application/json` `ChatAgentInfo`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+Devuelve 409 NOT_CONFIGURED mientras no exista un agente publicado; el chat no se muestra en ese caso.
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/conversations`
+
+- **operationId:** `ai_conversations_list`
+- **Resumen:** Mis conversaciones
+- **Parámetros:**
+  - `agentId` (query): `uuid`
+- **200**: OK — `application/json` `ConversationList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `DELETE /api/ai/conversations/{id}`
+
+- **operationId:** `ai_conversations_delete`
+- **Resumen:** Eliminar conversación y sus adjuntos
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/conversations/{id}`
+
+- **operationId:** `ai_conversations_get`
+- **Resumen:** Mensajes de una conversación propia
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `ConversationMessages`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `PATCH /api/ai/conversations/{id}`
+
+- **operationId:** `ai_conversations_rename`
+- **Resumen:** Renombrar conversación
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `RenameConversationInput`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/transcriptions`
+
+- **operationId:** `ai_transcriptions_create`
+- **Resumen:** Transcribir una grabación del micrófono
+- **Cuerpo** (`multipart/form-data`): `object`
+- **200**: OK — `application/json` `TranscriptionResult`
+- **Errores:** 400, 401, 402, 403, 413, 422, 500, 502 (`ErrorResponse`)
+
+Usa el modelo de transcripción del agente publicado. La grabación no se almacena; el texto vuelve al campo de entrada para revisión.
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
 
 ## ai-connections
 
@@ -1127,5 +1410,5 @@ Comprueba base de datos y migraciones. pgvector solo se verifica si RAG está ha
 
 ## Esquemas
 
-98 esquemas en `components.schemas` (ver `openapi.json`).
+121 esquemas en `components.schemas` (ver `openapi.json`).
 

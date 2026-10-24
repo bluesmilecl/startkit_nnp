@@ -381,6 +381,9 @@ importers:
       '@starter/observability':
         specifier: workspace:*
         version: link:../observability
+      '@starter/storage':
+        specifier: workspace:*
+        version: link:../storage
       ai:
         specifier: 7.0.152
         version: 7.0.152(zod@4.6.7)

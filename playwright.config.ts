@@ -26,7 +26,15 @@ export default defineConfig({
     timezoneId: 'America/Santiago',
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'], launchOptions: executablePath ? { executablePath } : {} } },
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Fake microphone so the dictation flow runs headless (real MediaRecorder + upload path).
+        permissions: ['microphone'],
+        launchOptions: { ...(executablePath ? { executablePath } : {}), args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] },
+      },
+    },
     { name: 'mobile', use: { ...devices['Pixel 7'], launchOptions: executablePath ? { executablePath } : {} }, grep: /@mobile/ },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },

@@ -39,6 +39,7 @@ function canonical(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
   if (value && typeof value === 'object') {
     return `{${Object.keys(value)
+      .filter((k) => (value as Record<string, unknown>)[k] !== undefined)
       .sort()
       .map((k) => `${JSON.stringify(k)}:${canonical((value as Record<string, unknown>)[k])}`)
       .join(',')}}`;
@@ -118,6 +119,8 @@ export class ProposalsService {
       }
       throw err;
     }
+    // Stored arguments are exactly what gets hashed (JSON round trip drops undefined values).
+    const args = JSON.parse(JSON.stringify(preview.args)) as Record<string, unknown>;
     const [row] = await this.deps.db
       .insert(actionProposals)
       .values({
@@ -127,8 +130,8 @@ export class ProposalsService {
         resourceType: preview.resourceType,
         resourceId: preview.resourceId,
         resourceVersion: preview.resourceVersion,
-        args: preview.args,
-        argsHash: proposalHash(action, preview.resourceId, preview.resourceVersion, preview.args),
+        args,
+        argsHash: proposalHash(action, preview.resourceId, preview.resourceVersion, args),
         preview: { title: preview.title, target: preview.target, changes: preview.changes, effects: preview.effects },
         source: source.source,
         agentId: source.agentId ?? null,

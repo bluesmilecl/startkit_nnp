@@ -135,6 +135,14 @@ describe('action proposals (preview → confirm → execute)', () => {
     expect(await code(usersSvc.get(owner, target.id))).toBe('NOT_FOUND');
   });
 
+  it('optional arguments left undefined do not break the integrity hash', async () => {
+    const target = await makeUser(ctx.handle, { roles: ['viewer'] });
+    const p = await proposals.propose(owner, 'users.disable', { userId: target.id, reason: undefined }, { source: 'chat' });
+    const r = await proposals.confirm(owner, p.id);
+    expect(r.proposal.status).toBe('executed');
+    expect((await usersSvc.get(owner, target.id)).status).toBe('disabled');
+  });
+
   it('rejects confirmation by another user, expired proposals and stale previews', async () => {
     const target = await makeUser(ctx.handle, { roles: ['viewer'] });
     const p = await proposals.propose(owner, 'users.disable', { userId: target.id }, { source: 'chat' });

@@ -64,7 +64,7 @@ async function revokeOthers() {
         <ul class="divide-y" data-testid="my-sessions">
           <li v-for="s in sessions" :key="s.id" class="flex items-center justify-between gap-2 py-3 text-sm">
             <div class="min-w-0">
-              <p class="truncate">{{ s.userAgent ?? 'Dispositivo desconocido' }} <Badge v-if="s.current" class="ml-1">Actual</Badge></p>
+              <div class="truncate">{{ s.userAgent ?? 'Dispositivo desconocido' }} <Badge v-if="s.current" class="ml-1">Actual</Badge></div>
               <p class="text-muted-foreground text-xs">{{ s.ipAddress ?? '—' }} · desde {{ formatDate(s.createdAt) }} · vence {{ formatDate(s.expiresAt) }}</p>
             </div>
             <Button variant="ghost" size="sm" @click="revoke(s.id, s.current)">Cerrar</Button>

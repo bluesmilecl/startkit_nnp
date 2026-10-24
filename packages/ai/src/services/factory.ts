@@ -1,3 +1,5 @@
+import { ChatService, type ChatDeps } from '../chat/chat.js';
+import { AgentsService } from './agents.js';
 import { BudgetsService } from './budgets.js';
 import { ConnectionsService, type AiDeps } from './connections.js';
 import { LabService } from './lab.js';
@@ -26,7 +28,13 @@ export function createAiServices(deps: AiDeps) {
     usage: new UsageService(deps),
     recommendation: new RecommendationService(deps, prices, runtime),
     lab: new LabService(deps, runtime),
+    agents: new AgentsService(deps, prices),
   };
 }
 
 export type AiServices = ReturnType<typeof createAiServices>;
+
+/** The chat needs storage and the proposals service (API process only). */
+export function createChatService(deps: ChatDeps, ai: AiServices): ChatService {
+  return new ChatService(deps, ai.agents, ai.runtime);
+}

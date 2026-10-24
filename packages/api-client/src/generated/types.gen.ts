@@ -987,6 +987,327 @@ export type LabRun = {
 
 export type LabRunList = Array<LabRun>;
 
+export type AgentConfig = {
+    description: string;
+    model: {
+        /**
+         * Catalog model (chat function)
+         */
+        primaryModelId: string | null;
+        fallbackModelIds: Array<string>;
+        temperature: number | null;
+        maxOutputTokens: number;
+    };
+    instructions: string;
+    limits: {
+        /**
+         * Model ↔ tool round trips per message
+         */
+        maxSteps: number;
+        maxInputChars: number;
+        historyMessages: number;
+        timeoutMs: number;
+        retries: number;
+    };
+    tools: {
+        admin: Array<'users_list' | 'users_get' | 'users_create' | 'users_update' | 'users_enable' | 'users_disable' | 'users_delete' | 'users_changeRole' | 'users_assignRole' | 'users_removeRole' | 'roles_list' | 'roles_get' | 'roles_create' | 'roles_setPermissions' | 'roles_delete' | 'permissions_list'>;
+    };
+    knowledge: {
+        /**
+         * tool: the model decides when to search; always: retrieve before answering
+         */
+        mode: 'off' | 'tool' | 'always';
+        collectionIds: Array<string>;
+        topK: number;
+        minScore: number;
+        requireCitations: boolean;
+        abstainWithoutContext: boolean;
+    };
+    media: {
+        attachments: boolean;
+        allowedTypes: Array<'image' | 'pdf' | 'text'>;
+        maxFiles: number;
+        maxFileBytes: number;
+        audioInput: boolean;
+        transcriptionModelId: string | null;
+        language: string | null;
+        maxAudioSeconds: number;
+    };
+    ui: {
+        title: string;
+        greeting: string;
+        placeholder: string;
+        suggestions: Array<string>;
+        /**
+         * Model, tokens, latency and cost per message for users with ai.usage.read
+         */
+        showDetailsToAdmins: boolean;
+    };
+    access: {
+        requiredPermission: 'users.read' | 'users.create' | 'users.invite' | 'users.update' | 'users.disable' | 'users.delete' | 'roles.read' | 'roles.manage' | 'permissions.read' | 'permissions.manage' | 'organizations.read' | 'organizations.manage' | 'settings.read' | 'settings.update' | 'audit.read' | 'system.diagnostics' | 'api.docs' | 'ai.chat' | 'ai.providers.manage' | 'ai.models.manage' | 'ai.agents.manage' | 'ai.usage.read' | 'ai.budgets.manage' | 'ai.lab.use' | 'rag.collections.read' | 'rag.collections.manage' | 'rag.sources.manage' | 'rag.documents.read' | 'rag.documents.delete' | 'rag.jobs.manage' | 'rag.playground.use' | 'rag.analytics.read' | 'projects.read' | 'projects.manage';
+    };
+};
+
+export type ValidationIssue = {
+    path: string;
+    severity: 'error' | 'warning';
+    message: string;
+};
+
+export type AgentValidation = {
+    ok: boolean;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    checkedAt: string;
+    issues: Array<ValidationIssue>;
+};
+
+export type AgentVersion = {
+    id: string;
+    agentId: string;
+    version: number;
+    status: 'draft' | 'published' | 'archived';
+    config: AgentConfig;
+    validation: AgentValidation | null;
+    notes: string | null;
+    basedOnVersionId: string | null;
+    createdBy: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    publishedAt: string | null;
+};
+
+export type AgentSummary = {
+    id: string;
+    key: string;
+    name: string;
+    isDefault: boolean;
+    archived: boolean;
+    published: {
+        id: string;
+        version: number;
+        /**
+         * ISO-8601 timestamp (UTC)
+         */
+        publishedAt: string | null;
+        modelId: string | null;
+    } | null;
+    draft: {
+        id: string;
+        version: number;
+        /**
+         * ISO-8601 timestamp (UTC)
+         */
+        updatedAt: string;
+        ok: boolean | null;
+    } | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+};
+
+export type AgentList = Array<AgentSummary>;
+
+export type AgentDetail = {
+    id: string;
+    key: string;
+    name: string;
+    isDefault: boolean;
+    archived: boolean;
+    published: {
+        id: string;
+        version: number;
+        /**
+         * ISO-8601 timestamp (UTC)
+         */
+        publishedAt: string | null;
+        modelId: string | null;
+    } | null;
+    draft: {
+        id: string;
+        version: number;
+        /**
+         * ISO-8601 timestamp (UTC)
+         */
+        updatedAt: string;
+        ok: boolean | null;
+    } | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+    versions: Array<AgentVersion>;
+};
+
+export type CreateAgentInput = {
+    key: string;
+    name: string;
+    basedOnAgentId?: string;
+};
+
+export type UpdateAgentInput = {
+    name?: string;
+    isDefault?: true;
+    archived?: boolean;
+};
+
+export type SaveDraftInput = {
+    config: AgentConfig;
+    notes?: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    expectedUpdatedAt?: string;
+};
+
+export type PublishInput = {
+    versionId: string;
+    notes?: string;
+};
+
+export type RollbackInput = {
+    versionId: string;
+};
+
+export type AgentTestInput = {
+    versionId: string;
+    message: string;
+};
+
+export type AgentTestResult = {
+    text: string;
+    toolCalls: Array<{
+        name: string;
+        input: unknown;
+        output: unknown;
+    }>;
+    modelId: string;
+    costUsd: UsdAmount | null;
+    costStatus: string;
+    latencyMs: number;
+    inputTokens: number | null;
+    outputTokens: number | null;
+};
+
+export type ChatAgentInfo = {
+    agentId: string;
+    versionId: string;
+    title: string;
+    greeting: string;
+    placeholder: string;
+    suggestions: Array<string>;
+    attachments: {
+        enabled: boolean;
+        allowedTypes: Array<string>;
+        maxFiles: number;
+        maxFileBytes: number;
+    };
+    audioInput: {
+        enabled: boolean;
+        maxSeconds: number;
+    };
+    knowledge: boolean;
+    showDetails: boolean;
+    tools: Array<{
+        key: string;
+        label: string;
+        proposal: boolean;
+    }>;
+};
+
+export type ChatRequest = {
+    /**
+     * Client chat id (AI SDK)
+     */
+    id?: string;
+    conversationId?: string | null;
+    agentId?: string;
+    message: {
+        id: string;
+        role: 'user';
+        parts: Array<{
+            type: 'text';
+            text: string;
+        }>;
+        metadata?: unknown;
+    };
+    attachmentIds: Array<string>;
+    trigger?: string;
+    messageId?: string;
+};
+
+export type ConversationSummary = {
+    id: string;
+    agentId: string;
+    title: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+    messageCount: number;
+};
+
+export type ConversationList = Array<ConversationSummary>;
+
+export type ConversationMessage = {
+    id: string;
+    role: 'user' | 'assistant' | 'system';
+    parts: Array<unknown>;
+    metadata: unknown;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+};
+
+export type ConversationMessages = {
+    conversation: ConversationSummary;
+    messages: Array<ConversationMessage>;
+};
+
+export type RenameConversationInput = {
+    title: string;
+};
+
+export type AttachmentInfo = {
+    id: string;
+    filename: string;
+    mediaType: string;
+    sizeBytes: number;
+    kind: 'image' | 'pdf' | 'text' | 'audio';
+    url: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+};
+
+export type TranscriptionResult = {
+    text: string;
+    language: string | null;
+    durationSeconds: number | null;
+    /**
+     * Only for users with ai.usage.read
+     */
+    costUsd: UsdAmount | null;
+    costStatus: string | null;
+};
+
 export type OrganizationList = Array<OrganizationSummary>;
 
 export type OrganizationMemberList = Array<{
@@ -2993,6 +3314,633 @@ export type AdminUsersRevokeSessionsResponses = {
 
 export type AdminUsersRevokeSessionsResponse = AdminUsersRevokeSessionsResponses[keyof AdminUsersRevokeSessionsResponses];
 
+export type AiAgentsListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/ai/agents';
+};
+
+export type AiAgentsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAgentsListError = AiAgentsListErrors[keyof AiAgentsListErrors];
+
+export type AiAgentsListResponses = {
+    /**
+     * OK
+     */
+    200: AgentList;
+};
+
+export type AiAgentsListResponse = AiAgentsListResponses[keyof AiAgentsListResponses];
+
+export type AiAgentsCreateData = {
+    body: CreateAgentInput;
+    path?: never;
+    query?: never;
+    url: '/api/ai/agents';
+};
+
+export type AiAgentsCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAgentsCreateError = AiAgentsCreateErrors[keyof AiAgentsCreateErrors];
+
+export type AiAgentsCreateResponses = {
+    /**
+     * OK
+     */
+    201: AgentDetail;
+};
+
+export type AiAgentsCreateResponse = AiAgentsCreateResponses[keyof AiAgentsCreateResponses];
+
+export type AiAgentsGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/agents/{id}';
+};
+
+export type AiAgentsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAgentsGetError = AiAgentsGetErrors[keyof AiAgentsGetErrors];
+
+export type AiAgentsGetResponses = {
+    /**
+     * OK
+     */
+    200: AgentDetail;
+};
+
+export type AiAgentsGetResponse = AiAgentsGetResponses[keyof AiAgentsGetResponses];
+
+export type AiAgentsUpdateData = {
+    body: UpdateAgentInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/agents/{id}';
+};
+
+export type AiAgentsUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAgentsUpdateError = AiAgentsUpdateErrors[keyof AiAgentsUpdateErrors];
+
+export type AiAgentsUpdateResponses = {
+    /**
+     * OK
+     */
+    200: AgentDetail;
+};
+
+export type AiAgentsUpdateResponse = AiAgentsUpdateResponses[keyof AiAgentsUpdateResponses];
+
+export type AiAgentsDiscardDraftData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/agents/{id}/draft';
+};
+
+export type AiAgentsDiscardDraftErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAgentsDiscardDraftError = AiAgentsDiscardDraftErrors[keyof AiAgentsDiscardDraftErrors];
+
+export type AiAgentsDiscardDraftResponses = {
+    /**
+     * OK
+     */
+    200: AgentDetail;
+};
+
+export type AiAgentsDiscardDraftResponse = AiAgentsDiscardDraftResponses[keyof AiAgentsDiscardDraftResponses];
+
+export type AiAgentsSaveDraftData = {
+    body: SaveDraftInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/agents/{id}/draft';
+};
+
+export type AiAgentsSaveDraftErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Precondición fallida (versión desactualizada)
+     */
+    412: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAgentsSaveDraftError = AiAgentsSaveDraftErrors[keyof AiAgentsSaveDraftErrors];
+
+export type AiAgentsSaveDraftResponses = {
+    /**
+     * OK
+     */
+    200: AgentDetail;
+};
+
+export type AiAgentsSaveDraftResponse = AiAgentsSaveDraftResponses[keyof AiAgentsSaveDraftResponses];
+
+export type AiAgentsPublishData = {
+    body: PublishInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/agents/{id}/publish';
+};
+
+export type AiAgentsPublishErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAgentsPublishError = AiAgentsPublishErrors[keyof AiAgentsPublishErrors];
+
+export type AiAgentsPublishResponses = {
+    /**
+     * OK
+     */
+    200: AgentDetail;
+};
+
+export type AiAgentsPublishResponse = AiAgentsPublishResponses[keyof AiAgentsPublishResponses];
+
+export type AiAgentsRollbackData = {
+    body: RollbackInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/agents/{id}/rollback';
+};
+
+export type AiAgentsRollbackErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAgentsRollbackError = AiAgentsRollbackErrors[keyof AiAgentsRollbackErrors];
+
+export type AiAgentsRollbackResponses = {
+    /**
+     * OK
+     */
+    200: AgentDetail;
+};
+
+export type AiAgentsRollbackResponse = AiAgentsRollbackResponses[keyof AiAgentsRollbackResponses];
+
+export type AiAgentsTestData = {
+    body: AgentTestInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/agents/{id}/test';
+};
+
+export type AiAgentsTestErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Presupuesto excedido
+     */
+    402: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+    /**
+     * Error del proveedor externo
+     */
+    502: ErrorResponse;
+};
+
+export type AiAgentsTestError = AiAgentsTestErrors[keyof AiAgentsTestErrors];
+
+export type AiAgentsTestResponses = {
+    /**
+     * OK
+     */
+    200: AgentTestResult;
+};
+
+export type AiAgentsTestResponse = AiAgentsTestResponses[keyof AiAgentsTestResponses];
+
+export type AiAgentsValidateData = {
+    body: AgentConfig;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/agents/{id}/validate';
+};
+
+export type AiAgentsValidateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAgentsValidateError = AiAgentsValidateErrors[keyof AiAgentsValidateErrors];
+
+export type AiAgentsValidateResponses = {
+    /**
+     * OK
+     */
+    200: AgentValidation;
+};
+
+export type AiAgentsValidateResponse = AiAgentsValidateResponses[keyof AiAgentsValidateResponses];
+
+export type AiAttachmentsUploadData = {
+    body: {
+        file: Blob | File;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/ai/attachments';
+};
+
+export type AiAttachmentsUploadErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Contenido demasiado grande
+     */
+    413: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAttachmentsUploadError = AiAttachmentsUploadErrors[keyof AiAttachmentsUploadErrors];
+
+export type AiAttachmentsUploadResponses = {
+    /**
+     * OK
+     */
+    201: AttachmentInfo;
+};
+
+export type AiAttachmentsUploadResponse = AiAttachmentsUploadResponses[keyof AiAttachmentsUploadResponses];
+
+export type AiAttachmentsDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/attachments/{id}';
+};
+
+export type AiAttachmentsDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAttachmentsDeleteError = AiAttachmentsDeleteErrors[keyof AiAttachmentsDeleteErrors];
+
+export type AiAttachmentsDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type AiAttachmentsDeleteResponse = AiAttachmentsDeleteResponses[keyof AiAttachmentsDeleteResponses];
+
+export type AiAttachmentsContentData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/attachments/{id}/content';
+};
+
+export type AiAttachmentsContentErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiAttachmentsContentError = AiAttachmentsContentErrors[keyof AiAttachmentsContentErrors];
+
+export type AiAttachmentsContentResponses = {
+    /**
+     * OK
+     */
+    200: Blob | File;
+};
+
+export type AiAttachmentsContentResponse = AiAttachmentsContentResponses[keyof AiAttachmentsContentResponses];
+
 export type AiBudgetsListData = {
     body?: never;
     path?: never;
@@ -3168,6 +4116,110 @@ export type AiBudgetsUpdateResponses = {
 };
 
 export type AiBudgetsUpdateResponse = AiBudgetsUpdateResponses[keyof AiBudgetsUpdateResponses];
+
+export type AiChatStreamData = {
+    body: ChatRequest;
+    path?: never;
+    query?: never;
+    url: '/api/ai/chat';
+};
+
+export type AiChatStreamErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Presupuesto excedido
+     */
+    402: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiChatStreamError = AiChatStreamErrors[keyof AiChatStreamErrors];
+
+export type AiChatStreamResponses = {
+    /**
+     * UI message stream (SSE)
+     */
+    200: string;
+};
+
+export type AiChatStreamResponse = AiChatStreamResponses[keyof AiChatStreamResponses];
+
+export type AiChatAgentData = {
+    body?: never;
+    path?: never;
+    query?: {
+        agentId?: string;
+    };
+    url: '/api/ai/chat/agent';
+};
+
+export type AiChatAgentErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiChatAgentError = AiChatAgentErrors[keyof AiChatAgentErrors];
+
+export type AiChatAgentResponses = {
+    /**
+     * OK
+     */
+    200: ChatAgentInfo;
+};
+
+export type AiChatAgentResponse = AiChatAgentResponses[keyof AiChatAgentResponses];
 
 export type AiConnectionsListData = {
     body?: never;
@@ -3446,6 +4498,190 @@ export type AiConnectionsTestResponses = {
 };
 
 export type AiConnectionsTestResponse = AiConnectionsTestResponses[keyof AiConnectionsTestResponses];
+
+export type AiConversationsListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        agentId?: string;
+    };
+    url: '/api/ai/conversations';
+};
+
+export type AiConversationsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiConversationsListError = AiConversationsListErrors[keyof AiConversationsListErrors];
+
+export type AiConversationsListResponses = {
+    /**
+     * OK
+     */
+    200: ConversationList;
+};
+
+export type AiConversationsListResponse = AiConversationsListResponses[keyof AiConversationsListResponses];
+
+export type AiConversationsDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/conversations/{id}';
+};
+
+export type AiConversationsDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiConversationsDeleteError = AiConversationsDeleteErrors[keyof AiConversationsDeleteErrors];
+
+export type AiConversationsDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type AiConversationsDeleteResponse = AiConversationsDeleteResponses[keyof AiConversationsDeleteResponses];
+
+export type AiConversationsGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/conversations/{id}';
+};
+
+export type AiConversationsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiConversationsGetError = AiConversationsGetErrors[keyof AiConversationsGetErrors];
+
+export type AiConversationsGetResponses = {
+    /**
+     * OK
+     */
+    200: ConversationMessages;
+};
+
+export type AiConversationsGetResponse = AiConversationsGetResponses[keyof AiConversationsGetResponses];
+
+export type AiConversationsRenameData = {
+    body: RenameConversationInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/conversations/{id}';
+};
+
+export type AiConversationsRenameErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiConversationsRenameError = AiConversationsRenameErrors[keyof AiConversationsRenameErrors];
+
+export type AiConversationsRenameResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type AiConversationsRenameResponse = AiConversationsRenameResponses[keyof AiConversationsRenameResponses];
 
 export type AiFxRefreshData = {
     body?: never;
@@ -4151,6 +5387,65 @@ export type AiSyncRunsResponses = {
 };
 
 export type AiSyncRunsResponse = AiSyncRunsResponses[keyof AiSyncRunsResponses];
+
+export type AiTranscriptionsCreateData = {
+    body: {
+        audio: Blob | File;
+        /**
+         * Agente (opcional: predeterminado)
+         */
+        agentId?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/ai/transcriptions';
+};
+
+export type AiTranscriptionsCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Presupuesto excedido
+     */
+    402: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Contenido demasiado grande
+     */
+    413: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+    /**
+     * Error del proveedor externo
+     */
+    502: ErrorResponse;
+};
+
+export type AiTranscriptionsCreateError = AiTranscriptionsCreateErrors[keyof AiTranscriptionsCreateErrors];
+
+export type AiTranscriptionsCreateResponses = {
+    /**
+     * OK
+     */
+    200: TranscriptionResult;
+};
+
+export type AiTranscriptionsCreateResponse = AiTranscriptionsCreateResponses[keyof AiTranscriptionsCreateResponses];
 
 export type AiUsageSummaryData = {
     body?: never;

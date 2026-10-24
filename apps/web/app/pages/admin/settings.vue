@@ -104,7 +104,7 @@ const timezones = typeof Intl.supportedValuesOf === 'function' ? Intl.supportedV
       <Card>
         <CardHeader><CardTitle>Correo</CardTitle><CardDescription>El transporte y sus credenciales se configuran en el despliegue (variables MAIL_*), nunca en la base de datos.</CardDescription></CardHeader>
         <CardContent class="space-y-2 text-sm">
-          <p>Transporte: <Badge variant="secondary">{{ draft.mail.transport }}</Badge></p>
+          <div>Transporte: <Badge variant="secondary">{{ draft.mail.transport }}</Badge></div>
           <p>Remitente: <code>{{ draft.mail.from }}</code></p>
           <p>Estado: <StatusBadge :status="draft.mail.configured ? 'ok' : 'degraded'" /></p>
         </CardContent>
