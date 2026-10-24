@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Integration (Vitest + PostgreSQL) and end-to-end (Playwright) suites.",
   "dependencies": {
+    "@starter/ai": "workspace:*",
     "@starter/api": "workspace:*",
     "@starter/api-client": "workspace:*",
     "@starter/auth": "workspace:*",

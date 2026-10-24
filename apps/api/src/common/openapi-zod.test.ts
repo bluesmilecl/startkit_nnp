@@ -4,7 +4,8 @@ import { inlineSchema, refOrInline, zodComponentSchemas } from './openapi-zod.js
 
 describe('zod → OpenAPI adapter', () => {
   const Item = z.object({ id: z.uuid(), name: z.string() }).meta({ id: 'TestItem' });
-  const Input = z.object({ name: z.string().min(1), tags: z.array(z.string()).default([]) }).meta({ id: 'TestItemInput' });
+  // Registered for the component test below (meta id side effect).
+  z.object({ name: z.string().min(1), tags: z.array(z.string()).default([]) }).meta({ id: 'TestItemInput' });
 
   it('references registered schemas as components', () => {
     expect(refOrInline(Item, 'output')).toEqual({ $ref: '#/components/schemas/TestItem' });

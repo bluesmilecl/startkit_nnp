@@ -544,6 +544,449 @@ export type DashboardSummary = {
     health: HealthStatus;
 };
 
+export type ProviderKey = 'openai' | 'anthropic' | 'google' | 'openai-compatible' | 'test';
+
+export type CapabilityStatus = 'yes' | 'no' | 'unknown';
+
+export type ModelFunction = 'chat' | 'embedding' | 'transcription' | 'speech' | 'image' | 'moderation' | 'other';
+
+export type AiErrorKind = 'auth' | 'quota' | 'network' | 'model_not_found' | 'invalid_request' | 'content_filter' | 'timeout' | 'unknown';
+
+export type ProviderInfo = {
+    key: ProviderKey;
+    label: string;
+    requiresBaseUrl: boolean;
+    requiresApiKey: boolean;
+    defaultBaseUrl: string | null;
+    supports: {
+        chat: boolean;
+        embeddings: boolean;
+        transcription: boolean;
+        modelListing: boolean;
+    };
+    /**
+     * false when disabled in this installation (e.g. test provider in production)
+     */
+    available: boolean;
+};
+
+export type Connection = {
+    id: string;
+    provider: ProviderKey;
+    alias: string;
+    baseUrl: string | null;
+    credentialSource: 'stored' | 'reference' | 'none';
+    /**
+     * Masked value (last 4) or the reference name; never the secret
+     */
+    credentialHint: string | null;
+    status: 'unverified' | 'ok' | 'error' | 'disabled';
+    lastErrorKind: AiErrorKind | null;
+    lastError: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    lastCheckedAt: string | null;
+    options: {
+        [key: string]: unknown;
+    };
+    modelCount: number;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+};
+
+export type CreateConnectionInput = {
+    provider: ProviderKey;
+    alias: string;
+    baseUrl?: string | null;
+    /**
+     * Alternative to apiKey: deployment secret reference
+     */
+    credentialRef?: string;
+    options?: {
+        [key: string]: unknown;
+    };
+};
+
+export type UpdateConnectionInput = {
+    alias?: string;
+    baseUrl?: string | null;
+    credentialRef?: string | null;
+    options?: {
+        [key: string]: unknown;
+    };
+    disabled?: boolean;
+};
+
+export type ConnectionTestResult = {
+    ok: boolean;
+    errorKind: AiErrorKind | null;
+    message: string;
+    latencyMs: number;
+    modelsVisible: number | null;
+};
+
+export type PriceRow = {
+    id: string;
+    provider: string;
+    modelId: string;
+    connectionId: string | null;
+    billingScope: 'direct' | 'gateway' | 'custom' | 'tier';
+    serviceTier: string | null;
+    unit: string;
+    unitQuantity: number;
+    price: UsdAmount;
+    currency: string;
+    modality: string | null;
+    source: {
+        kind: string;
+        name: string;
+        url: string | null;
+    };
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    fetchedAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    effectiveFrom: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    effectiveTo: string | null;
+};
+
+export type CatalogModel = {
+    id: string;
+    connectionId: string;
+    connectionAlias: string;
+    provider: ProviderKey;
+    modelId: string;
+    displayName: string | null;
+    family: string | null;
+    functions: Array<string>;
+    inputModalities: Array<string>;
+    outputModalities: Array<string>;
+    contextWindow: number | null;
+    maxOutputTokens: number | null;
+    embeddingDimensions: number | null;
+    capabilities: {
+        [key: string]: CapabilityStatus;
+    };
+    availability: 'available' | 'unverified' | 'unavailable' | 'deprecated';
+    source: 'provider_api' | 'catalog' | 'manual';
+    sourceUrl: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    lastVerifiedAt: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    lastSyncedAt: string | null;
+    enabled: boolean;
+    prices: Array<PriceRow>;
+};
+
+export type ModelsPage = {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+    items: Array<CatalogModel>;
+};
+
+export type ManualModelInput = {
+    connectionId: string;
+    modelId: string;
+    displayName?: string;
+    functions: Array<ModelFunction>;
+    inputModalities?: Array<string>;
+    outputModalities?: Array<string>;
+    contextWindow?: number;
+    maxOutputTokens?: number;
+    embeddingDimensions?: number;
+    capabilities?: {
+        [key: string]: CapabilityStatus;
+    };
+    /**
+     * Required evidence for manually imported data
+     */
+    sourceUrl: string;
+};
+
+export type UpdateModelInput = {
+    enabled?: boolean;
+    capabilities?: {
+        [key: string]: CapabilityStatus;
+    };
+};
+
+export type VerifyModelResult = {
+    availability: 'available' | 'unavailable' | 'unverified';
+    latencyMs: number;
+    errorKind: AiErrorKind | null;
+    message: string;
+    costUsd: UsdAmount | null;
+};
+
+export type SyncRun = {
+    id: string;
+    kind: 'prices' | 'models';
+    status: 'running' | 'succeeded' | 'failed';
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    startedAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    finishedAt: string | null;
+    stats: {
+        [key: string]: unknown;
+    } | null;
+    error: string | null;
+};
+
+export type PricesPage = {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+    items: Array<PriceRow>;
+};
+
+export type CreatePriceInput = {
+    provider: string;
+    modelId: string;
+    connectionId?: string | null;
+    billingScope?: 'direct' | 'gateway' | 'custom' | 'tier';
+    serviceTier?: string | null;
+    unit: 'input_tokens' | 'output_tokens' | 'cached_input_tokens' | 'cache_write_tokens' | 'reasoning_tokens' | 'audio_input_tokens' | 'audio_seconds' | 'images' | 'requests' | 'embedding_tokens';
+    unitQuantity?: number;
+    price: UsdAmount;
+    sourceUrl?: string | null;
+    sourceName?: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    effectiveFrom?: string;
+};
+
+export type UsageSummary = {
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    from: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    to: string;
+    totals: {
+        requests: number;
+        costUsd: UsdAmount;
+        calculatedUsd: UsdAmount;
+        estimatedUsd: UsdAmount;
+        reconciledUsd: UsdAmount;
+        unknownCostRequests: number;
+        inputTokens: number;
+        outputTokens: number;
+        errors: number;
+        p50LatencyMs: number | null;
+        p95LatencyMs: number | null;
+    };
+    daily: Array<{
+        date: string;
+        costUsd: UsdAmount;
+        cumulativeUsd: UsdAmount;
+        requests: number;
+        inputTokens: number;
+        outputTokens: number;
+        errors: number;
+    }>;
+    breakdown: Array<{
+        key: string;
+        label: string;
+        requests: number;
+        costUsd: UsdAmount;
+        unknownCostRequests: number;
+        inputTokens: number;
+        outputTokens: number;
+        errors: number;
+        avgLatencyMs: number | null;
+    }>;
+    fx: {
+        currency: 'CLP';
+        rate: string;
+        rateDate: string;
+        source: string;
+    } | null;
+};
+
+export type AiRequestRow = {
+    id: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    startedAt: string;
+    feature: string;
+    provider: string | null;
+    modelId: string | null;
+    status: string;
+    usageStatus: string;
+    costStatus: string;
+    costUsd: UsdAmount | null;
+    estimatedCostUsd: UsdAmount | null;
+    inputTokens: number | null;
+    outputTokens: number | null;
+    latencyMs: number | null;
+    attempts: number;
+    userEmail: string | null;
+    agentId: string | null;
+    conversationId: string | null;
+    errorKind: string | null;
+    requestId: string | null;
+};
+
+export type AiRequestsPage = {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+    items: Array<AiRequestRow>;
+};
+
+export type Budget = {
+    id: string;
+    name: string;
+    scopeType: 'organization' | 'user' | 'agent' | 'feature';
+    scopeId: string | null;
+    period: 'day' | 'month';
+    limitUsd: UsdAmount;
+    alertThresholds: Array<number>;
+    hardLimit: boolean;
+    enabled: boolean;
+    current: {
+        periodStart: string;
+        spentUsd: UsdAmount;
+        reservedUsd: UsdAmount;
+        percent: number;
+    };
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+};
+
+export type BudgetList = Array<Budget>;
+
+export type BudgetInput = {
+    name: string;
+    scopeType: 'organization' | 'user' | 'agent' | 'feature';
+    scopeId?: string | null;
+    period: 'day' | 'month';
+    limitUsd: UsdAmount;
+    alertThresholds?: Array<number>;
+    hardLimit?: boolean;
+    enabled?: boolean;
+};
+
+export type RecommendationInput = {
+    useCase: string;
+    requirements?: {
+        function?: ModelFunction;
+        capabilities?: Array<string>;
+        inputModalities?: Array<string>;
+        minContext?: number;
+        maxInputPricePerMillion?: UsdAmount;
+        maxOutputPricePerMillion?: UsdAmount;
+        onlyAvailable?: boolean;
+    };
+    /**
+     * Catalog model used to compare the filtered candidates (optional)
+     */
+    evaluatorModelId?: string;
+    budgetUsd?: UsdAmount;
+    maxCandidates?: number;
+};
+
+export type RecommendationResult = {
+    method: 'deterministic' | 'ai-assisted';
+    candidates: Array<{
+        modelCatalogId: string;
+        modelId: string;
+        provider: string;
+        connectionAlias: string;
+        score: number;
+        reasons: Array<string>;
+        inputPricePerMillion: UsdAmount | null;
+        outputPricePerMillion: UsdAmount | null;
+    }>;
+    recommended: Array<{
+        modelCatalogId: string;
+        rank: number;
+        rationale: string;
+    }>;
+    evaluator: {
+        modelId: string;
+        costUsd: UsdAmount | null;
+        costStatus: string;
+        error: string | null;
+    } | null;
+    excluded: number;
+};
+
+export type LabRunInput = {
+    prompts: Array<string>;
+    modelCatalogIds: Array<string>;
+    system?: string;
+    maxOutputTokens?: number;
+    budgetUsd?: UsdAmount;
+    concurrency?: number;
+};
+
+export type LabRun = {
+    id: string;
+    kind: 'comparison' | 'recommendation';
+    status: 'queued' | 'running' | 'succeeded' | 'failed' | 'cancelled';
+    input: unknown;
+    budgetUsd: UsdAmount | null;
+    spentUsd: UsdAmount | null;
+    results: Array<{
+        modelCatalogId: string;
+        modelId: string;
+        promptIndex: number;
+        text: string | null;
+        error: string | null;
+        errorKind: string | null;
+        latencyMs: number | null;
+        timeToFirstTokenMs: number | null;
+        inputTokens: number | null;
+        outputTokens: number | null;
+        costUsd: UsdAmount | null;
+        costStatus: string;
+        skipped: boolean;
+    }> | null;
+    error: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    finishedAt: string | null;
+};
+
+export type LabRunList = Array<LabRun>;
+
 export type OrganizationList = Array<OrganizationSummary>;
 
 export type OrganizationMemberList = Array<{
@@ -577,6 +1020,20 @@ export type DeleteUserResult = {
 
 export type RevokeSessionsResult = {
     revoked: number;
+};
+
+export type ConnectionList = Array<Connection>;
+
+export type ProviderList = Array<ProviderInfo>;
+
+export type SyncModelsInput = {
+    connectionId: string;
+};
+
+export type SyncRunList = Array<SyncRun>;
+
+export type SetPriceResult = {
+    result: 'unchanged' | 'created' | 'updated';
 };
 
 export type SessionList = Array<SessionSummary>;
@@ -646,6 +1103,37 @@ export type AuthRateLimit = {
     key: string;
     count: number;
     lastRequest: number;
+};
+
+export type CreateConnectionInputWritable = {
+    provider: ProviderKey;
+    alias: string;
+    baseUrl?: string | null;
+    /**
+     * Write-only. Stored encrypted (AES-256-GCM).
+     */
+    apiKey?: string;
+    /**
+     * Alternative to apiKey: deployment secret reference
+     */
+    credentialRef?: string;
+    options?: {
+        [key: string]: unknown;
+    };
+};
+
+export type UpdateConnectionInputWritable = {
+    alias?: string;
+    baseUrl?: string | null;
+    /**
+     * Rotates the stored credential
+     */
+    apiKey?: string;
+    credentialRef?: string | null;
+    options?: {
+        [key: string]: unknown;
+    };
+    disabled?: boolean;
 };
 
 export type AuthUserWritable = {
@@ -2504,6 +2992,1311 @@ export type AdminUsersRevokeSessionsResponses = {
 };
 
 export type AdminUsersRevokeSessionsResponse = AdminUsersRevokeSessionsResponses[keyof AdminUsersRevokeSessionsResponses];
+
+export type AiBudgetsListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/ai/budgets';
+};
+
+export type AiBudgetsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiBudgetsListError = AiBudgetsListErrors[keyof AiBudgetsListErrors];
+
+export type AiBudgetsListResponses = {
+    /**
+     * OK
+     */
+    200: BudgetList;
+};
+
+export type AiBudgetsListResponse = AiBudgetsListResponses[keyof AiBudgetsListResponses];
+
+export type AiBudgetsCreateData = {
+    body: BudgetInput;
+    path?: never;
+    query?: never;
+    url: '/api/ai/budgets';
+};
+
+export type AiBudgetsCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiBudgetsCreateError = AiBudgetsCreateErrors[keyof AiBudgetsCreateErrors];
+
+export type AiBudgetsCreateResponses = {
+    /**
+     * OK
+     */
+    201: Budget;
+};
+
+export type AiBudgetsCreateResponse = AiBudgetsCreateResponses[keyof AiBudgetsCreateResponses];
+
+export type AiBudgetsDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/budgets/{id}';
+};
+
+export type AiBudgetsDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiBudgetsDeleteError = AiBudgetsDeleteErrors[keyof AiBudgetsDeleteErrors];
+
+export type AiBudgetsDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type AiBudgetsDeleteResponse = AiBudgetsDeleteResponses[keyof AiBudgetsDeleteResponses];
+
+export type AiBudgetsUpdateData = {
+    body: BudgetInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/budgets/{id}';
+};
+
+export type AiBudgetsUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiBudgetsUpdateError = AiBudgetsUpdateErrors[keyof AiBudgetsUpdateErrors];
+
+export type AiBudgetsUpdateResponses = {
+    /**
+     * OK
+     */
+    200: Budget;
+};
+
+export type AiBudgetsUpdateResponse = AiBudgetsUpdateResponses[keyof AiBudgetsUpdateResponses];
+
+export type AiConnectionsListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/ai/connections';
+};
+
+export type AiConnectionsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiConnectionsListError = AiConnectionsListErrors[keyof AiConnectionsListErrors];
+
+export type AiConnectionsListResponses = {
+    /**
+     * OK
+     */
+    200: ConnectionList;
+};
+
+export type AiConnectionsListResponse = AiConnectionsListResponses[keyof AiConnectionsListResponses];
+
+export type AiConnectionsCreateData = {
+    body: CreateConnectionInputWritable;
+    path?: never;
+    query?: never;
+    url: '/api/ai/connections';
+};
+
+export type AiConnectionsCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiConnectionsCreateError = AiConnectionsCreateErrors[keyof AiConnectionsCreateErrors];
+
+export type AiConnectionsCreateResponses = {
+    /**
+     * OK
+     */
+    201: Connection;
+};
+
+export type AiConnectionsCreateResponse = AiConnectionsCreateResponses[keyof AiConnectionsCreateResponses];
+
+export type AiConnectionsDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/connections/{id}';
+};
+
+export type AiConnectionsDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiConnectionsDeleteError = AiConnectionsDeleteErrors[keyof AiConnectionsDeleteErrors];
+
+export type AiConnectionsDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type AiConnectionsDeleteResponse = AiConnectionsDeleteResponses[keyof AiConnectionsDeleteResponses];
+
+export type AiConnectionsGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/connections/{id}';
+};
+
+export type AiConnectionsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiConnectionsGetError = AiConnectionsGetErrors[keyof AiConnectionsGetErrors];
+
+export type AiConnectionsGetResponses = {
+    /**
+     * OK
+     */
+    200: Connection;
+};
+
+export type AiConnectionsGetResponse = AiConnectionsGetResponses[keyof AiConnectionsGetResponses];
+
+export type AiConnectionsUpdateData = {
+    body: UpdateConnectionInputWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/connections/{id}';
+};
+
+export type AiConnectionsUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiConnectionsUpdateError = AiConnectionsUpdateErrors[keyof AiConnectionsUpdateErrors];
+
+export type AiConnectionsUpdateResponses = {
+    /**
+     * OK
+     */
+    200: Connection;
+};
+
+export type AiConnectionsUpdateResponse = AiConnectionsUpdateResponses[keyof AiConnectionsUpdateResponses];
+
+export type AiConnectionsTestData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/connections/{id}/test';
+};
+
+export type AiConnectionsTestErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiConnectionsTestError = AiConnectionsTestErrors[keyof AiConnectionsTestErrors];
+
+export type AiConnectionsTestResponses = {
+    /**
+     * OK
+     */
+    200: ConnectionTestResult;
+};
+
+export type AiConnectionsTestResponse = AiConnectionsTestResponses[keyof AiConnectionsTestResponses];
+
+export type AiFxRefreshData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/ai/fx/refresh';
+};
+
+export type AiFxRefreshErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiFxRefreshError = AiFxRefreshErrors[keyof AiFxRefreshErrors];
+
+export type AiFxRefreshResponses = {
+    /**
+     * OK
+     */
+    202: JobAccepted;
+};
+
+export type AiFxRefreshResponse = AiFxRefreshResponses[keyof AiFxRefreshResponses];
+
+export type AiLabListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/ai/lab/runs';
+};
+
+export type AiLabListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiLabListError = AiLabListErrors[keyof AiLabListErrors];
+
+export type AiLabListResponses = {
+    /**
+     * OK
+     */
+    200: LabRunList;
+};
+
+export type AiLabListResponse = AiLabListResponses[keyof AiLabListResponses];
+
+export type AiLabCreateData = {
+    body: LabRunInput;
+    path?: never;
+    query?: never;
+    url: '/api/ai/lab/runs';
+};
+
+export type AiLabCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiLabCreateError = AiLabCreateErrors[keyof AiLabCreateErrors];
+
+export type AiLabCreateResponses = {
+    /**
+     * OK
+     */
+    201: LabRun;
+};
+
+export type AiLabCreateResponse = AiLabCreateResponses[keyof AiLabCreateResponses];
+
+export type AiLabGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/lab/runs/{id}';
+};
+
+export type AiLabGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiLabGetError = AiLabGetErrors[keyof AiLabGetErrors];
+
+export type AiLabGetResponses = {
+    /**
+     * OK
+     */
+    200: LabRun;
+};
+
+export type AiLabGetResponse = AiLabGetResponses[keyof AiLabGetResponses];
+
+export type AiModelsListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        pageSize?: number;
+        search?: string;
+        function?: ModelFunction;
+        capability?: string;
+        connectionId?: string;
+        availability?: 'available' | 'unverified' | 'unavailable' | 'deprecated';
+        sort?: 'name' | 'inputPrice' | 'context';
+    };
+    url: '/api/ai/models';
+};
+
+export type AiModelsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiModelsListError = AiModelsListErrors[keyof AiModelsListErrors];
+
+export type AiModelsListResponses = {
+    /**
+     * OK
+     */
+    200: ModelsPage;
+};
+
+export type AiModelsListResponse = AiModelsListResponses[keyof AiModelsListResponses];
+
+export type AiModelsImportData = {
+    body: ManualModelInput;
+    path?: never;
+    query?: never;
+    url: '/api/ai/models';
+};
+
+export type AiModelsImportErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiModelsImportError = AiModelsImportErrors[keyof AiModelsImportErrors];
+
+export type AiModelsImportResponses = {
+    /**
+     * OK
+     */
+    201: CatalogModel;
+};
+
+export type AiModelsImportResponse = AiModelsImportResponses[keyof AiModelsImportResponses];
+
+export type AiModelsGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/models/{id}';
+};
+
+export type AiModelsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiModelsGetError = AiModelsGetErrors[keyof AiModelsGetErrors];
+
+export type AiModelsGetResponses = {
+    /**
+     * OK
+     */
+    200: CatalogModel;
+};
+
+export type AiModelsGetResponse = AiModelsGetResponses[keyof AiModelsGetResponses];
+
+export type AiModelsUpdateData = {
+    body: UpdateModelInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/models/{id}';
+};
+
+export type AiModelsUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiModelsUpdateError = AiModelsUpdateErrors[keyof AiModelsUpdateErrors];
+
+export type AiModelsUpdateResponses = {
+    /**
+     * OK
+     */
+    200: CatalogModel;
+};
+
+export type AiModelsUpdateResponse = AiModelsUpdateResponses[keyof AiModelsUpdateResponses];
+
+export type AiModelsVerifyData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/models/{id}/verify';
+};
+
+export type AiModelsVerifyErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Presupuesto excedido
+     */
+    402: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiModelsVerifyError = AiModelsVerifyErrors[keyof AiModelsVerifyErrors];
+
+export type AiModelsVerifyResponses = {
+    /**
+     * OK
+     */
+    200: VerifyModelResult;
+};
+
+export type AiModelsVerifyResponse = AiModelsVerifyResponses[keyof AiModelsVerifyResponses];
+
+export type AiModelsSyncData = {
+    body: SyncModelsInput;
+    path?: never;
+    query?: never;
+    url: '/api/ai/models/sync';
+};
+
+export type AiModelsSyncErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiModelsSyncError = AiModelsSyncErrors[keyof AiModelsSyncErrors];
+
+export type AiModelsSyncResponses = {
+    /**
+     * OK
+     */
+    202: JobAccepted;
+};
+
+export type AiModelsSyncResponse = AiModelsSyncResponses[keyof AiModelsSyncResponses];
+
+export type AiPricesListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        pageSize?: number;
+        provider?: string;
+        modelId?: string;
+        includeHistory?: boolean;
+    };
+    url: '/api/ai/prices';
+};
+
+export type AiPricesListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiPricesListError = AiPricesListErrors[keyof AiPricesListErrors];
+
+export type AiPricesListResponses = {
+    /**
+     * OK
+     */
+    200: PricesPage;
+};
+
+export type AiPricesListResponse = AiPricesListResponses[keyof AiPricesListResponses];
+
+export type AiPricesSetData = {
+    body: CreatePriceInput;
+    path?: never;
+    query?: never;
+    url: '/api/ai/prices';
+};
+
+export type AiPricesSetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiPricesSetError = AiPricesSetErrors[keyof AiPricesSetErrors];
+
+export type AiPricesSetResponses = {
+    /**
+     * OK
+     */
+    201: SetPriceResult;
+};
+
+export type AiPricesSetResponse = AiPricesSetResponses[keyof AiPricesSetResponses];
+
+export type AiPricesSyncData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/ai/prices/sync';
+};
+
+export type AiPricesSyncErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiPricesSyncError = AiPricesSyncErrors[keyof AiPricesSyncErrors];
+
+export type AiPricesSyncResponses = {
+    /**
+     * OK
+     */
+    202: JobAccepted;
+};
+
+export type AiPricesSyncResponse = AiPricesSyncResponses[keyof AiPricesSyncResponses];
+
+export type AiProvidersListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/ai/providers';
+};
+
+export type AiProvidersListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiProvidersListError = AiProvidersListErrors[keyof AiProvidersListErrors];
+
+export type AiProvidersListResponses = {
+    /**
+     * OK
+     */
+    200: ProviderList;
+};
+
+export type AiProvidersListResponse = AiProvidersListResponses[keyof AiProvidersListResponses];
+
+export type AiRecommendationsCreateData = {
+    body: RecommendationInput;
+    path?: never;
+    query?: never;
+    url: '/api/ai/recommendations';
+};
+
+export type AiRecommendationsCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Presupuesto excedido
+     */
+    402: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiRecommendationsCreateError = AiRecommendationsCreateErrors[keyof AiRecommendationsCreateErrors];
+
+export type AiRecommendationsCreateResponses = {
+    /**
+     * OK
+     */
+    201: RecommendationResult;
+};
+
+export type AiRecommendationsCreateResponse = AiRecommendationsCreateResponses[keyof AiRecommendationsCreateResponses];
+
+export type AiSyncRunsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        kind?: 'prices' | 'models';
+    };
+    url: '/api/ai/sync-runs';
+};
+
+export type AiSyncRunsErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiSyncRunsError = AiSyncRunsErrors[keyof AiSyncRunsErrors];
+
+export type AiSyncRunsResponses = {
+    /**
+     * OK
+     */
+    200: SyncRunList;
+};
+
+export type AiSyncRunsResponse = AiSyncRunsResponses[keyof AiSyncRunsResponses];
+
+export type AiUsageSummaryData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * ISO-8601 timestamp (UTC)
+         */
+        from?: string;
+        /**
+         * ISO-8601 timestamp (UTC)
+         */
+        to?: string;
+        groupBy?: 'provider' | 'model' | 'agent' | 'user' | 'feature' | 'organization';
+        feature?: string;
+    };
+    url: '/api/ai/usage';
+};
+
+export type AiUsageSummaryErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiUsageSummaryError = AiUsageSummaryErrors[keyof AiUsageSummaryErrors];
+
+export type AiUsageSummaryResponses = {
+    /**
+     * OK
+     */
+    200: UsageSummary;
+};
+
+export type AiUsageSummaryResponse = AiUsageSummaryResponses[keyof AiUsageSummaryResponses];
+
+export type AiUsageExportData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        pageSize?: number;
+        feature?: string;
+        status?: string;
+        costStatus?: string;
+    };
+    url: '/api/ai/usage/export.csv';
+};
+
+export type AiUsageExportErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiUsageExportError = AiUsageExportErrors[keyof AiUsageExportErrors];
+
+export type AiUsageExportResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type AiUsageExportResponse = AiUsageExportResponses[keyof AiUsageExportResponses];
+
+export type AiUsageRequestsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        pageSize?: number;
+        feature?: string;
+        status?: string;
+        costStatus?: string;
+    };
+    url: '/api/ai/usage/requests';
+};
+
+export type AiUsageRequestsErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiUsageRequestsError = AiUsageRequestsErrors[keyof AiUsageRequestsErrors];
+
+export type AiUsageRequestsResponses = {
+    /**
+     * OK
+     */
+    200: AiRequestsPage;
+};
+
+export type AiUsageRequestsResponse = AiUsageRequestsResponses[keyof AiUsageRequestsResponses];
 
 export type AuthVerifyEmailWithOtpData = {
     body: {

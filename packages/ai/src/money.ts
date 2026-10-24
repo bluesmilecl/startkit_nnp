@@ -54,3 +54,12 @@ export function percent(part: string, whole: string): number {
 }
 
 export const ZERO = fromUnits(0n);
+
+/** Human display of a USD amount: 2 decimals, or up to 6 significant digits for sub-cent values. */
+export function displayUsd(value: string | null | undefined): string {
+  if (value === null || value === undefined) return 'desconocido';
+  const units = toUnits(value);
+  const abs = units < 0n ? -units : units;
+  if (abs === 0n || abs >= toUnits('0.01')) return `US$${Number(fromUnits(units)).toFixed(2)}`;
+  return `US$${Number(fromUnits(units)).toPrecision(3).replace(/0+$/, '')}`;
+}

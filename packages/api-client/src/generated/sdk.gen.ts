@@ -2,7 +2,7 @@
 
 import { client } from './client.gen.js';
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client/index.js';
-import type { AdminAuditExportData, AdminAuditExportErrors, AdminAuditExportResponses, AdminAuditListData, AdminAuditListErrors, AdminAuditListResponses, AdminDashboardData, AdminDashboardErrors, AdminDashboardResponses, AdminDiagnosticsData, AdminDiagnosticsErrors, AdminDiagnosticsResponses, AdminInvitationsCreateData, AdminInvitationsCreateErrors, AdminInvitationsCreateResponses, AdminInvitationsListData, AdminInvitationsListErrors, AdminInvitationsListResponses, AdminInvitationsResendData, AdminInvitationsResendErrors, AdminInvitationsResendResponses, AdminInvitationsRevokeData, AdminInvitationsRevokeErrors, AdminInvitationsRevokeResponses, AdminOnboardingCompleteData, AdminOnboardingCompleteErrors, AdminOnboardingCompleteResponses, AdminOrgsAddMemberData, AdminOrgsAddMemberErrors, AdminOrgsAddMemberResponses, AdminOrgsCreateData, AdminOrgsCreateErrors, AdminOrgsCreateResponses, AdminOrgsListData, AdminOrgsListErrors, AdminOrgsListResponses, AdminOrgsMembersData, AdminOrgsMembersErrors, AdminOrgsMembersResponses, AdminOrgsRemoveMemberData, AdminOrgsRemoveMemberErrors, AdminOrgsRemoveMemberResponses, AdminPermissionsListData, AdminPermissionsListErrors, AdminPermissionsListResponses, AdminPermissionsMatrixData, AdminPermissionsMatrixErrors, AdminPermissionsMatrixResponses, AdminProposalsCancelData, AdminProposalsCancelErrors, AdminProposalsCancelResponses, AdminProposalsConfirmData, AdminProposalsConfirmErrors, AdminProposalsConfirmResponses, AdminProposalsCreateData, AdminProposalsCreateErrors, AdminProposalsCreateResponses, AdminProposalsGetData, AdminProposalsGetErrors, AdminProposalsGetResponses, AdminRolesCreateData, AdminRolesCreateErrors, AdminRolesCreateResponses, AdminRolesDeleteData, AdminRolesDeleteErrors, AdminRolesDeleteResponses, AdminRolesGetData, AdminRolesGetErrors, AdminRolesGetResponses, AdminRolesListData, AdminRolesListErrors, AdminRolesListResponses, AdminRolesSetPermissionsData, AdminRolesSetPermissionsErrors, AdminRolesSetPermissionsResponses, AdminRolesUpdateData, AdminRolesUpdateErrors, AdminRolesUpdateResponses, AdminSettingsGetData, AdminSettingsGetErrors, AdminSettingsGetResponses, AdminSettingsUpdateData, AdminSettingsUpdateErrors, AdminSettingsUpdateResponses, AdminUsersAssignRoleData, AdminUsersAssignRoleErrors, AdminUsersAssignRoleResponses, AdminUsersCreateData, AdminUsersCreateErrors, AdminUsersCreateResponses, AdminUsersDeleteData, AdminUsersDeleteErrors, AdminUsersDeleteResponses, AdminUsersDisableData, AdminUsersDisableErrors, AdminUsersDisableResponses, AdminUsersEnableData, AdminUsersEnableErrors, AdminUsersEnableResponses, AdminUsersGetData, AdminUsersGetErrors, AdminUsersGetResponses, AdminUsersListData, AdminUsersListErrors, AdminUsersListResponses, AdminUsersRemoveRoleData, AdminUsersRemoveRoleErrors, AdminUsersRemoveRoleResponses, AdminUsersRevokeSessionsData, AdminUsersRevokeSessionsErrors, AdminUsersRevokeSessionsResponses, AdminUsersUpdateData, AdminUsersUpdateErrors, AdminUsersUpdateResponses, AuthGetErrorData, AuthGetErrorErrors, AuthGetErrorResponses, AuthGetOkData, AuthGetOkErrors, AuthGetOkResponses, AuthGetSessionData, AuthGetSessionErrors, AuthGetSessionPostData, AuthGetSessionPostErrors, AuthGetSessionPostResponses, AuthGetSessionResponses, AuthListUserSessionsData, AuthListUserSessionsErrors, AuthListUserSessionsResponses, AuthPostRevokeOtherSessionsData, AuthPostRevokeOtherSessionsErrors, AuthPostRevokeOtherSessionsResponses, AuthPostRevokeSessionData, AuthPostRevokeSessionErrors, AuthPostRevokeSessionResponses, AuthPostRevokeSessionsData, AuthPostRevokeSessionsErrors, AuthPostRevokeSessionsResponses, AuthSendEmailVerificationOtpData, AuthSendEmailVerificationOtpErrors, AuthSendEmailVerificationOtpResponses, AuthSignInWithEmailOtpData, AuthSignInWithEmailOtpErrors, AuthSignInWithEmailOtpResponses, AuthSignOutData, AuthSignOutErrors, AuthSignOutResponses, AuthVerifyEmailWithOtpData, AuthVerifyEmailWithOtpErrors, AuthVerifyEmailWithOtpResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthMetricsData, HealthMetricsErrors, HealthMetricsResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, MeGetData, MeGetErrors, MeGetResponses, MeSessionsListData, MeSessionsListErrors, MeSessionsListResponses, MeSessionsRevokeData, MeSessionsRevokeErrors, MeSessionsRevokeOthersData, MeSessionsRevokeOthersErrors, MeSessionsRevokeOthersResponses, MeSessionsRevokeResponses, MeSwitchOrganizationData, MeSwitchOrganizationErrors, MeSwitchOrganizationResponses, MeUpdateData, MeUpdateErrors, MeUpdateResponses, PublicSettingsData, PublicSettingsErrors, PublicSettingsResponses } from './types.gen.js';
+import type { AdminAuditExportData, AdminAuditExportErrors, AdminAuditExportResponses, AdminAuditListData, AdminAuditListErrors, AdminAuditListResponses, AdminDashboardData, AdminDashboardErrors, AdminDashboardResponses, AdminDiagnosticsData, AdminDiagnosticsErrors, AdminDiagnosticsResponses, AdminInvitationsCreateData, AdminInvitationsCreateErrors, AdminInvitationsCreateResponses, AdminInvitationsListData, AdminInvitationsListErrors, AdminInvitationsListResponses, AdminInvitationsResendData, AdminInvitationsResendErrors, AdminInvitationsResendResponses, AdminInvitationsRevokeData, AdminInvitationsRevokeErrors, AdminInvitationsRevokeResponses, AdminOnboardingCompleteData, AdminOnboardingCompleteErrors, AdminOnboardingCompleteResponses, AdminOrgsAddMemberData, AdminOrgsAddMemberErrors, AdminOrgsAddMemberResponses, AdminOrgsCreateData, AdminOrgsCreateErrors, AdminOrgsCreateResponses, AdminOrgsListData, AdminOrgsListErrors, AdminOrgsListResponses, AdminOrgsMembersData, AdminOrgsMembersErrors, AdminOrgsMembersResponses, AdminOrgsRemoveMemberData, AdminOrgsRemoveMemberErrors, AdminOrgsRemoveMemberResponses, AdminPermissionsListData, AdminPermissionsListErrors, AdminPermissionsListResponses, AdminPermissionsMatrixData, AdminPermissionsMatrixErrors, AdminPermissionsMatrixResponses, AdminProposalsCancelData, AdminProposalsCancelErrors, AdminProposalsCancelResponses, AdminProposalsConfirmData, AdminProposalsConfirmErrors, AdminProposalsConfirmResponses, AdminProposalsCreateData, AdminProposalsCreateErrors, AdminProposalsCreateResponses, AdminProposalsGetData, AdminProposalsGetErrors, AdminProposalsGetResponses, AdminRolesCreateData, AdminRolesCreateErrors, AdminRolesCreateResponses, AdminRolesDeleteData, AdminRolesDeleteErrors, AdminRolesDeleteResponses, AdminRolesGetData, AdminRolesGetErrors, AdminRolesGetResponses, AdminRolesListData, AdminRolesListErrors, AdminRolesListResponses, AdminRolesSetPermissionsData, AdminRolesSetPermissionsErrors, AdminRolesSetPermissionsResponses, AdminRolesUpdateData, AdminRolesUpdateErrors, AdminRolesUpdateResponses, AdminSettingsGetData, AdminSettingsGetErrors, AdminSettingsGetResponses, AdminSettingsUpdateData, AdminSettingsUpdateErrors, AdminSettingsUpdateResponses, AdminUsersAssignRoleData, AdminUsersAssignRoleErrors, AdminUsersAssignRoleResponses, AdminUsersCreateData, AdminUsersCreateErrors, AdminUsersCreateResponses, AdminUsersDeleteData, AdminUsersDeleteErrors, AdminUsersDeleteResponses, AdminUsersDisableData, AdminUsersDisableErrors, AdminUsersDisableResponses, AdminUsersEnableData, AdminUsersEnableErrors, AdminUsersEnableResponses, AdminUsersGetData, AdminUsersGetErrors, AdminUsersGetResponses, AdminUsersListData, AdminUsersListErrors, AdminUsersListResponses, AdminUsersRemoveRoleData, AdminUsersRemoveRoleErrors, AdminUsersRemoveRoleResponses, AdminUsersRevokeSessionsData, AdminUsersRevokeSessionsErrors, AdminUsersRevokeSessionsResponses, AdminUsersUpdateData, AdminUsersUpdateErrors, AdminUsersUpdateResponses, AiBudgetsCreateData, AiBudgetsCreateErrors, AiBudgetsCreateResponses, AiBudgetsDeleteData, AiBudgetsDeleteErrors, AiBudgetsDeleteResponses, AiBudgetsListData, AiBudgetsListErrors, AiBudgetsListResponses, AiBudgetsUpdateData, AiBudgetsUpdateErrors, AiBudgetsUpdateResponses, AiConnectionsCreateData, AiConnectionsCreateErrors, AiConnectionsCreateResponses, AiConnectionsDeleteData, AiConnectionsDeleteErrors, AiConnectionsDeleteResponses, AiConnectionsGetData, AiConnectionsGetErrors, AiConnectionsGetResponses, AiConnectionsListData, AiConnectionsListErrors, AiConnectionsListResponses, AiConnectionsTestData, AiConnectionsTestErrors, AiConnectionsTestResponses, AiConnectionsUpdateData, AiConnectionsUpdateErrors, AiConnectionsUpdateResponses, AiFxRefreshData, AiFxRefreshErrors, AiFxRefreshResponses, AiLabCreateData, AiLabCreateErrors, AiLabCreateResponses, AiLabGetData, AiLabGetErrors, AiLabGetResponses, AiLabListData, AiLabListErrors, AiLabListResponses, AiModelsGetData, AiModelsGetErrors, AiModelsGetResponses, AiModelsImportData, AiModelsImportErrors, AiModelsImportResponses, AiModelsListData, AiModelsListErrors, AiModelsListResponses, AiModelsSyncData, AiModelsSyncErrors, AiModelsSyncResponses, AiModelsUpdateData, AiModelsUpdateErrors, AiModelsUpdateResponses, AiModelsVerifyData, AiModelsVerifyErrors, AiModelsVerifyResponses, AiPricesListData, AiPricesListErrors, AiPricesListResponses, AiPricesSetData, AiPricesSetErrors, AiPricesSetResponses, AiPricesSyncData, AiPricesSyncErrors, AiPricesSyncResponses, AiProvidersListData, AiProvidersListErrors, AiProvidersListResponses, AiRecommendationsCreateData, AiRecommendationsCreateErrors, AiRecommendationsCreateResponses, AiSyncRunsData, AiSyncRunsErrors, AiSyncRunsResponses, AiUsageExportData, AiUsageExportErrors, AiUsageExportResponses, AiUsageRequestsData, AiUsageRequestsErrors, AiUsageRequestsResponses, AiUsageSummaryData, AiUsageSummaryErrors, AiUsageSummaryResponses, AuthGetErrorData, AuthGetErrorErrors, AuthGetErrorResponses, AuthGetOkData, AuthGetOkErrors, AuthGetOkResponses, AuthGetSessionData, AuthGetSessionErrors, AuthGetSessionPostData, AuthGetSessionPostErrors, AuthGetSessionPostResponses, AuthGetSessionResponses, AuthListUserSessionsData, AuthListUserSessionsErrors, AuthListUserSessionsResponses, AuthPostRevokeOtherSessionsData, AuthPostRevokeOtherSessionsErrors, AuthPostRevokeOtherSessionsResponses, AuthPostRevokeSessionData, AuthPostRevokeSessionErrors, AuthPostRevokeSessionResponses, AuthPostRevokeSessionsData, AuthPostRevokeSessionsErrors, AuthPostRevokeSessionsResponses, AuthSendEmailVerificationOtpData, AuthSendEmailVerificationOtpErrors, AuthSendEmailVerificationOtpResponses, AuthSignInWithEmailOtpData, AuthSignInWithEmailOtpErrors, AuthSignInWithEmailOtpResponses, AuthSignOutData, AuthSignOutErrors, AuthSignOutResponses, AuthVerifyEmailWithOtpData, AuthVerifyEmailWithOtpErrors, AuthVerifyEmailWithOtpResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthMetricsData, HealthMetricsErrors, HealthMetricsResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, MeGetData, MeGetErrors, MeGetResponses, MeSessionsListData, MeSessionsListErrors, MeSessionsListResponses, MeSessionsRevokeData, MeSessionsRevokeErrors, MeSessionsRevokeOthersData, MeSessionsRevokeOthersErrors, MeSessionsRevokeOthersResponses, MeSessionsRevokeResponses, MeSwitchOrganizationData, MeSwitchOrganizationErrors, MeSwitchOrganizationResponses, MeUpdateData, MeUpdateErrors, MeUpdateResponses, PublicSettingsData, PublicSettingsErrors, PublicSettingsResponses } from './types.gen.js';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -663,6 +663,557 @@ export const adminUsersRevokeSessions = <ThrowOnError extends boolean = false>(o
             type: 'apiKey'
         }],
     url: '/api/admin/users/{id}/sessions/revoke',
+    ...options
+});
+
+/**
+ * Presupuestos y consumo del período
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiBudgetsList = <ThrowOnError extends boolean = false>(options?: Options<AiBudgetsListData, ThrowOnError>): RequestResult<AiBudgetsListResponses, AiBudgetsListErrors, ThrowOnError> => (options?.client ?? client).get<AiBudgetsListResponses, AiBudgetsListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/budgets',
+    ...options
+});
+
+/**
+ * Crear presupuesto
+ *
+ * **Permiso requerido:** `ai.budgets.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiBudgetsCreate = <ThrowOnError extends boolean = false>(options: Options<AiBudgetsCreateData, ThrowOnError>): RequestResult<AiBudgetsCreateResponses, AiBudgetsCreateErrors, ThrowOnError> => (options.client ?? client).post<AiBudgetsCreateResponses, AiBudgetsCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/budgets',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Eliminar presupuesto
+ *
+ * **Permiso requerido:** `ai.budgets.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiBudgetsDelete = <ThrowOnError extends boolean = false>(options: Options<AiBudgetsDeleteData, ThrowOnError>): RequestResult<AiBudgetsDeleteResponses, AiBudgetsDeleteErrors, ThrowOnError> => (options.client ?? client).delete<AiBudgetsDeleteResponses, AiBudgetsDeleteErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/budgets/{id}',
+    ...options
+});
+
+/**
+ * Editar presupuesto
+ *
+ * **Permiso requerido:** `ai.budgets.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiBudgetsUpdate = <ThrowOnError extends boolean = false>(options: Options<AiBudgetsUpdateData, ThrowOnError>): RequestResult<AiBudgetsUpdateResponses, AiBudgetsUpdateErrors, ThrowOnError> => (options.client ?? client).put<AiBudgetsUpdateResponses, AiBudgetsUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/budgets/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Conexiones a proveedores (credenciales enmascaradas)
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiConnectionsList = <ThrowOnError extends boolean = false>(options?: Options<AiConnectionsListData, ThrowOnError>): RequestResult<AiConnectionsListResponses, AiConnectionsListErrors, ThrowOnError> => (options?.client ?? client).get<AiConnectionsListResponses, AiConnectionsListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/connections',
+    ...options
+});
+
+/**
+ * Crear conexión
+ *
+ * La clave se guarda cifrada (AES-256-GCM, clave de aplicación fuera de la base de datos) o se referencia a un secreto del despliegue (env:/file:). Los endpoints personalizados se validan contra redes privadas y metadatos.
+ *
+ * **Permiso requerido:** `ai.providers.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiConnectionsCreate = <ThrowOnError extends boolean = false>(options: Options<AiConnectionsCreateData, ThrowOnError>): RequestResult<AiConnectionsCreateResponses, AiConnectionsCreateErrors, ThrowOnError> => (options.client ?? client).post<AiConnectionsCreateResponses, AiConnectionsCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/connections',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Eliminar conexión
+ *
+ * **Permiso requerido:** `ai.providers.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiConnectionsDelete = <ThrowOnError extends boolean = false>(options: Options<AiConnectionsDeleteData, ThrowOnError>): RequestResult<AiConnectionsDeleteResponses, AiConnectionsDeleteErrors, ThrowOnError> => (options.client ?? client).delete<AiConnectionsDeleteResponses, AiConnectionsDeleteErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/connections/{id}',
+    ...options
+});
+
+/**
+ * Detalle de conexión
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiConnectionsGet = <ThrowOnError extends boolean = false>(options: Options<AiConnectionsGetData, ThrowOnError>): RequestResult<AiConnectionsGetResponses, AiConnectionsGetErrors, ThrowOnError> => (options.client ?? client).get<AiConnectionsGetResponses, AiConnectionsGetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/connections/{id}',
+    ...options
+});
+
+/**
+ * Editar o rotar credencial
+ *
+ * **Permiso requerido:** `ai.providers.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiConnectionsUpdate = <ThrowOnError extends boolean = false>(options: Options<AiConnectionsUpdateData, ThrowOnError>): RequestResult<AiConnectionsUpdateResponses, AiConnectionsUpdateErrors, ThrowOnError> => (options.client ?? client).patch<AiConnectionsUpdateResponses, AiConnectionsUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/connections/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Probar conexión
+ *
+ * Lista modelos con la credencial (sin costo) y clasifica errores: autenticación, cuota, red o endpoint/modelo inexistente.
+ *
+ * **Permiso requerido:** `ai.providers.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiConnectionsTest = <ThrowOnError extends boolean = false>(options: Options<AiConnectionsTestData, ThrowOnError>): RequestResult<AiConnectionsTestResponses, AiConnectionsTestErrors, ThrowOnError> => (options.client ?? client).post<AiConnectionsTestResponses, AiConnectionsTestErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/connections/{id}/test',
+    ...options
+});
+
+/**
+ * Actualizar tasa USD→CLP de visualización
+ *
+ * **Permiso requerido:** `ai.usage.read`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiFxRefresh = <ThrowOnError extends boolean = false>(options?: Options<AiFxRefreshData, ThrowOnError>): RequestResult<AiFxRefreshResponses, AiFxRefreshErrors, ThrowOnError> => (options?.client ?? client).post<AiFxRefreshResponses, AiFxRefreshErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/fx/refresh',
+    ...options
+});
+
+/**
+ * Ejecuciones recientes del laboratorio
+ *
+ * **Permiso requerido:** `ai.lab.use`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiLabList = <ThrowOnError extends boolean = false>(options?: Options<AiLabListData, ThrowOnError>): RequestResult<AiLabListResponses, AiLabListErrors, ThrowOnError> => (options?.client ?? client).get<AiLabListResponses, AiLabListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/lab/runs',
+    ...options
+});
+
+/**
+ * Comparar modelos con un conjunto de prompts (trabajo durable)
+ *
+ * Ejecuta en el worker bajo un presupuesto y concurrencia máximos; registra latencia, tiempo hasta el primer token, consumo y costo de cada llamada.
+ *
+ * **Permiso requerido:** `ai.lab.use`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiLabCreate = <ThrowOnError extends boolean = false>(options: Options<AiLabCreateData, ThrowOnError>): RequestResult<AiLabCreateResponses, AiLabCreateErrors, ThrowOnError> => (options.client ?? client).post<AiLabCreateResponses, AiLabCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/lab/runs',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Resultados de una ejecución
+ *
+ * **Permiso requerido:** `ai.lab.use`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiLabGet = <ThrowOnError extends boolean = false>(options: Options<AiLabGetData, ThrowOnError>): RequestResult<AiLabGetResponses, AiLabGetErrors, ThrowOnError> => (options.client ?? client).get<AiLabGetResponses, AiLabGetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/lab/runs/{id}',
+    ...options
+});
+
+/**
+ * Catálogo de modelos con capacidades y tarifas vigentes
+ *
+ * Filtros por nombre, función, capacidad (estado "yes") y disponibilidad. Una capacidad no verificada figura como "unknown".
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiModelsList = <ThrowOnError extends boolean = false>(options?: Options<AiModelsListData, ThrowOnError>): RequestResult<AiModelsListResponses, AiModelsListErrors, ThrowOnError> => (options?.client ?? client).get<AiModelsListResponses, AiModelsListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/models',
+    ...options
+});
+
+/**
+ * Importar modelo manualmente (requiere fuente)
+ *
+ * **Permiso requerido:** `ai.models.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiModelsImport = <ThrowOnError extends boolean = false>(options: Options<AiModelsImportData, ThrowOnError>): RequestResult<AiModelsImportResponses, AiModelsImportErrors, ThrowOnError> => (options.client ?? client).post<AiModelsImportResponses, AiModelsImportErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/models',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Ficha de modelo
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiModelsGet = <ThrowOnError extends boolean = false>(options: Options<AiModelsGetData, ThrowOnError>): RequestResult<AiModelsGetResponses, AiModelsGetErrors, ThrowOnError> => (options.client ?? client).get<AiModelsGetResponses, AiModelsGetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/models/{id}',
+    ...options
+});
+
+/**
+ * Habilitar/deshabilitar o corregir capacidades
+ *
+ * **Permiso requerido:** `ai.models.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiModelsUpdate = <ThrowOnError extends boolean = false>(options: Options<AiModelsUpdateData, ThrowOnError>): RequestResult<AiModelsUpdateResponses, AiModelsUpdateErrors, ThrowOnError> => (options.client ?? client).patch<AiModelsUpdateResponses, AiModelsUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/models/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Verificar disponibilidad con una llamada mínima
+ *
+ * Aparecer en un catálogo no implica acceso: esta llamada explícita (con costo registrado) es la única que marca el modelo como disponible.
+ *
+ * **Permiso requerido:** `ai.models.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiModelsVerify = <ThrowOnError extends boolean = false>(options: Options<AiModelsVerifyData, ThrowOnError>): RequestResult<AiModelsVerifyResponses, AiModelsVerifyErrors, ThrowOnError> => (options.client ?? client).post<AiModelsVerifyResponses, AiModelsVerifyErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/models/{id}/verify',
+    ...options
+});
+
+/**
+ * Sincronizar catálogo de una conexión (trabajo durable)
+ *
+ * **Permiso requerido:** `ai.models.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiModelsSync = <ThrowOnError extends boolean = false>(options: Options<AiModelsSyncData, ThrowOnError>): RequestResult<AiModelsSyncResponses, AiModelsSyncErrors, ThrowOnError> => (options.client ?? client).post<AiModelsSyncResponses, AiModelsSyncErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/models/sync',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Tarifas vigentes (o historial)
+ *
+ * Cada tarifa conserva fuente, fecha de consulta, vigencia, moneda, unidad y ámbito de facturación.
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiPricesList = <ThrowOnError extends boolean = false>(options?: Options<AiPricesListData, ThrowOnError>): RequestResult<AiPricesListResponses, AiPricesListErrors, ThrowOnError> => (options?.client ?? client).get<AiPricesListResponses, AiPricesListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/prices',
+    ...options
+});
+
+/**
+ * Registrar tarifa manual o acuerdo personalizado
+ *
+ * Una nueva tarifa cierra la vigencia de la anterior; el historial y las estimaciones ya calculadas no se recalculan.
+ *
+ * **Permiso requerido:** `ai.models.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiPricesSet = <ThrowOnError extends boolean = false>(options: Options<AiPricesSetData, ThrowOnError>): RequestResult<AiPricesSetResponses, AiPricesSetErrors, ThrowOnError> => (options.client ?? client).post<AiPricesSetResponses, AiPricesSetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/prices',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Sincronizar tarifas desde el catálogo estructurado (trabajo durable)
+ *
+ * **Permiso requerido:** `ai.models.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiPricesSync = <ThrowOnError extends boolean = false>(options?: Options<AiPricesSyncData, ThrowOnError>): RequestResult<AiPricesSyncResponses, AiPricesSyncErrors, ThrowOnError> => (options?.client ?? client).post<AiPricesSyncResponses, AiPricesSyncErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/prices/sync',
+    ...options
+});
+
+/**
+ * Adaptadores de proveedores disponibles
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiProvidersList = <ThrowOnError extends boolean = false>(options?: Options<AiProvidersListData, ThrowOnError>): RequestResult<AiProvidersListResponses, AiProvidersListErrors, ThrowOnError> => (options?.client ?? client).get<AiProvidersListResponses, AiProvidersListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/providers',
+    ...options
+});
+
+/**
+ * Recomendar modelos para un caso de uso
+ *
+ * Filtra candidatos con requisitos verificables y puntuación determinista; si se indica un evaluador configurado, este solo ordena esos candidatos (respuesta validada, IDs ajenos rechazados) y su costo queda registrado.
+ *
+ * **Permiso requerido:** `ai.lab.use`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiRecommendationsCreate = <ThrowOnError extends boolean = false>(options: Options<AiRecommendationsCreateData, ThrowOnError>): RequestResult<AiRecommendationsCreateResponses, AiRecommendationsCreateErrors, ThrowOnError> => (options.client ?? client).post<AiRecommendationsCreateResponses, AiRecommendationsCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/recommendations',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Ejecuciones recientes de sincronización de modelos y tarifas
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiSyncRuns = <ThrowOnError extends boolean = false>(options?: Options<AiSyncRunsData, ThrowOnError>): RequestResult<AiSyncRunsResponses, AiSyncRunsErrors, ThrowOnError> => (options?.client ?? client).get<AiSyncRunsResponses, AiSyncRunsErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/sync-runs',
+    ...options
+});
+
+/**
+ * Consumo y costos agregados
+ *
+ * Separa costo calculado, estimado y conciliado. Las solicitudes sin tarifa conocida se cuentan como costo desconocido (nunca cero). Moneda base USD; la conversión a CLP es solo visual.
+ *
+ * **Permiso requerido:** `ai.usage.read`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiUsageSummary = <ThrowOnError extends boolean = false>(options?: Options<AiUsageSummaryData, ThrowOnError>): RequestResult<AiUsageSummaryResponses, AiUsageSummaryErrors, ThrowOnError> => (options?.client ?? client).get<AiUsageSummaryResponses, AiUsageSummaryErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/usage',
+    ...options
+});
+
+/**
+ * Exportar libro de consumo a CSV (máx. 10.000 filas)
+ *
+ * **Permiso requerido:** `ai.usage.read`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiUsageExport = <ThrowOnError extends boolean = false>(options?: Options<AiUsageExportData, ThrowOnError>): RequestResult<AiUsageExportResponses, AiUsageExportErrors, ThrowOnError> => (options?.client ?? client).get<AiUsageExportResponses, AiUsageExportErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/usage/export.csv',
+    ...options
+});
+
+/**
+ * Libro de consumo (solicitudes lógicas)
+ *
+ * **Permiso requerido:** `ai.usage.read`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiUsageRequests = <ThrowOnError extends boolean = false>(options?: Options<AiUsageRequestsData, ThrowOnError>): RequestResult<AiUsageRequestsResponses, AiUsageRequestsErrors, ThrowOnError> => (options?.client ?? client).get<AiUsageRequestsResponses, AiUsageRequestsErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/usage/requests',
     ...options
 });
 

@@ -20,6 +20,10 @@
     }
   },
   "stack": {
+    "@ai-sdk/anthropic": "4.0.87",
+    "@ai-sdk/google": "4.0.104",
+    "@ai-sdk/openai": "4.0.101",
+    "@ai-sdk/openai-compatible": "3.0.77",
     "@ai-sdk/vue": "4.0.152",
     "@hey-api/openapi-ts": "0.99.0",
     "@nestjs/core": "12.2.0",
@@ -31,6 +35,7 @@
     "drizzle-kit": "0.31.11",
     "drizzle-orm": "0.45.4",
     "nuxt": "4.6.2",
+    "pg-boss": "12.38.0",
     "reka-ui": "2.11.0",
     "shadcn-nuxt": "2.8.2",
     "tailwindcss": "4.3.3",
@@ -39,7 +44,11 @@
     "vue": "3.5.44",
     "zod": "4.6.7"
   },
-  "images": [],
+  "images": [
+    "caddy:2.11.7-alpine",
+    "ghcr.io/axllent/mailpit:v1.32.0",
+    "pgvector/pgvector:0.8.7-pg18-trixie"
+  ],
   "modules": {
     "organizations": "optional",
     "ai": "default-on",

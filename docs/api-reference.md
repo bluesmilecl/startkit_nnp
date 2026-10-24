@@ -19,6 +19,11 @@ Swagger UI: `/api/docs` (según `OPENAPI_DOCS`). Documento JSON: `/api/docs-json
 - [admin-settings](#admin-settings) (3)
 - [admin-system](#admin-system) (2)
 - [admin-users](#admin-users) (10)
+- [ai-connections](#ai-connections) (7)
+- [ai-lab](#ai-lab) (4)
+- [ai-models](#ai-models) (7)
+- [ai-prices](#ai-prices) (3)
+- [ai-usage](#ai-usage) (8)
 - [auth](#auth) (12)
 - [health](#health) (3)
 - [me](#me) (6)
@@ -499,6 +504,417 @@ Autorización delegable: no se pueden asignar roles de jerarquía igual o superi
 
 **Permiso requerido:** `users.disable`.
 
+## ai-connections
+
+### `GET /api/ai/connections`
+
+- **operationId:** `ai_connections_list`
+- **Resumen:** Conexiones a proveedores (credenciales enmascaradas)
+- **200**: OK — `application/json` `ConnectionList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/connections`
+
+- **operationId:** `ai_connections_create`
+- **Resumen:** Crear conexión
+- **Cuerpo** (`application/json`): `CreateConnectionInput`
+- **201**: OK — `application/json` `Connection`
+- **Errores:** 400, 401, 403, 409, 422, 500 (`ErrorResponse`)
+
+La clave se guarda cifrada (AES-256-GCM, clave de aplicación fuera de la base de datos) o se referencia a un secreto del despliegue (env:/file:). Los endpoints personalizados se validan contra redes privadas y metadatos.
+
+**Permiso requerido:** `ai.providers.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `DELETE /api/ai/connections/{id}`
+
+- **operationId:** `ai_connections_delete`
+- **Resumen:** Eliminar conexión
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.providers.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/connections/{id}`
+
+- **operationId:** `ai_connections_get`
+- **Resumen:** Detalle de conexión
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `Connection`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `PATCH /api/ai/connections/{id}`
+
+- **operationId:** `ai_connections_update`
+- **Resumen:** Editar o rotar credencial
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `UpdateConnectionInput`
+- **200**: OK — `application/json` `Connection`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.providers.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/connections/{id}/test`
+
+- **operationId:** `ai_connections_test`
+- **Resumen:** Probar conexión
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `ConnectionTestResult`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+Lista modelos con la credencial (sin costo) y clasifica errores: autenticación, cuota, red o endpoint/modelo inexistente.
+
+**Permiso requerido:** `ai.providers.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/providers`
+
+- **operationId:** `ai_providers_list`
+- **Resumen:** Adaptadores de proveedores disponibles
+- **200**: OK — `application/json` `ProviderList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `ai` debe estar habilitado.
+
+## ai-lab
+
+### `GET /api/ai/lab/runs`
+
+- **operationId:** `ai_lab_list`
+- **Resumen:** Ejecuciones recientes del laboratorio
+- **200**: OK — `application/json` `LabRunList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.lab.use`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/lab/runs`
+
+- **operationId:** `ai_lab_create`
+- **Resumen:** Comparar modelos con un conjunto de prompts (trabajo durable)
+- **Cuerpo** (`application/json`): `LabRunInput`
+- **201**: OK — `application/json` `LabRun`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Ejecuta en el worker bajo un presupuesto y concurrencia máximos; registra latencia, tiempo hasta el primer token, consumo y costo de cada llamada.
+
+**Permiso requerido:** `ai.lab.use`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/lab/runs/{id}`
+
+- **operationId:** `ai_lab_get`
+- **Resumen:** Resultados de una ejecución
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `LabRun`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.lab.use`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/recommendations`
+
+- **operationId:** `ai_recommendations_create`
+- **Resumen:** Recomendar modelos para un caso de uso
+- **Cuerpo** (`application/json`): `RecommendationInput`
+- **201**: OK — `application/json` `RecommendationResult`
+- **Errores:** 400, 401, 402, 403, 422, 500 (`ErrorResponse`)
+
+Filtra candidatos con requisitos verificables y puntuación determinista; si se indica un evaluador configurado, este solo ordena esos candidatos (respuesta validada, IDs ajenos rechazados) y su costo queda registrado.
+
+**Permiso requerido:** `ai.lab.use`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+## ai-models
+
+### `GET /api/ai/models`
+
+- **operationId:** `ai_models_list`
+- **Resumen:** Catálogo de modelos con capacidades y tarifas vigentes
+- **Parámetros:**
+  - `page` (query): `integer`
+  - `pageSize` (query): `integer`
+  - `search` (query): `string`
+  - `function` (query): `string`
+  - `capability` (query): `string`
+  - `connectionId` (query): `uuid`
+  - `availability` (query): `available` \| `unverified` \| `unavailable` \| `deprecated`
+  - `sort` (query): `name` \| `inputPrice` \| `context`
+- **200**: OK — `application/json` `ModelsPage`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Filtros por nombre, función, capacidad (estado "yes") y disponibilidad. Una capacidad no verificada figura como "unknown".
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/models`
+
+- **operationId:** `ai_models_import`
+- **Resumen:** Importar modelo manualmente (requiere fuente)
+- **Cuerpo** (`application/json`): `ManualModelInput`
+- **201**: OK — `application/json` `CatalogModel`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.models.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/models/{id}`
+
+- **operationId:** `ai_models_get`
+- **Resumen:** Ficha de modelo
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `CatalogModel`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `PATCH /api/ai/models/{id}`
+
+- **operationId:** `ai_models_update`
+- **Resumen:** Habilitar/deshabilitar o corregir capacidades
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `UpdateModelInput`
+- **200**: OK — `application/json` `CatalogModel`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.models.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/models/{id}/verify`
+
+- **operationId:** `ai_models_verify`
+- **Resumen:** Verificar disponibilidad con una llamada mínima
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `VerifyModelResult`
+- **Errores:** 400, 401, 402, 403, 404, 422, 500 (`ErrorResponse`)
+
+Aparecer en un catálogo no implica acceso: esta llamada explícita (con costo registrado) es la única que marca el modelo como disponible.
+
+**Permiso requerido:** `ai.models.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/models/sync`
+
+- **operationId:** `ai_models_sync`
+- **Resumen:** Sincronizar catálogo de una conexión (trabajo durable)
+- **Cuerpo** (`application/json`): `SyncModelsInput`
+- **202**: OK — `application/json` `JobAccepted`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.models.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/sync-runs`
+
+- **operationId:** `ai_sync_runs`
+- **Resumen:** Ejecuciones recientes de sincronización de modelos y tarifas
+- **Parámetros:**
+  - `kind` (query): `prices` \| `models`
+- **200**: OK — `application/json` `SyncRunList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `ai` debe estar habilitado.
+
+## ai-prices
+
+### `GET /api/ai/prices`
+
+- **operationId:** `ai_prices_list`
+- **Resumen:** Tarifas vigentes (o historial)
+- **Parámetros:**
+  - `page` (query): `integer`
+  - `pageSize` (query): `integer`
+  - `provider` (query): `string`
+  - `modelId` (query): `string`
+  - `includeHistory` (query): `boolean`
+- **200**: OK — `application/json` `PricesPage`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Cada tarifa conserva fuente, fecha de consulta, vigencia, moneda, unidad y ámbito de facturación.
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/prices`
+
+- **operationId:** `ai_prices_set`
+- **Resumen:** Registrar tarifa manual o acuerdo personalizado
+- **Cuerpo** (`application/json`): `CreatePriceInput`
+- **201**: OK — `application/json` `SetPriceResult`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Una nueva tarifa cierra la vigencia de la anterior; el historial y las estimaciones ya calculadas no se recalculan.
+
+**Permiso requerido:** `ai.models.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/prices/sync`
+
+- **operationId:** `ai_prices_sync`
+- **Resumen:** Sincronizar tarifas desde el catálogo estructurado (trabajo durable)
+- **202**: OK — `application/json` `JobAccepted`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.models.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+## ai-usage
+
+### `GET /api/ai/budgets`
+
+- **operationId:** `ai_budgets_list`
+- **Resumen:** Presupuestos y consumo del período
+- **200**: OK — `application/json` `BudgetList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/budgets`
+
+- **operationId:** `ai_budgets_create`
+- **Resumen:** Crear presupuesto
+- **Cuerpo** (`application/json`): `BudgetInput`
+- **201**: OK — `application/json` `Budget`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.budgets.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `DELETE /api/ai/budgets/{id}`
+
+- **operationId:** `ai_budgets_delete`
+- **Resumen:** Eliminar presupuesto
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.budgets.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `PUT /api/ai/budgets/{id}`
+
+- **operationId:** `ai_budgets_update`
+- **Resumen:** Editar presupuesto
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `BudgetInput`
+- **200**: OK — `application/json` `Budget`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.budgets.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `POST /api/ai/fx/refresh`
+
+- **operationId:** `ai_fx_refresh`
+- **Resumen:** Actualizar tasa USD→CLP de visualización
+- **202**: OK — `application/json` `JobAccepted`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.usage.read`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/usage`
+
+- **operationId:** `ai_usage_summary`
+- **Resumen:** Consumo y costos agregados
+- **Parámetros:**
+  - `from` (query): `date-time`
+  - `to` (query): `date-time`
+  - `groupBy` (query): `provider` \| `model` \| `agent` \| `user` \| `feature` \| `organization`
+  - `feature` (query): `string`
+- **200**: OK — `application/json` `UsageSummary`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Separa costo calculado, estimado y conciliado. Las solicitudes sin tarifa conocida se cuentan como costo desconocido (nunca cero). Moneda base USD; la conversión a CLP es solo visual.
+
+**Permiso requerido:** `ai.usage.read`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/usage/export.csv`
+
+- **operationId:** `ai_usage_export`
+- **Resumen:** Exportar libro de consumo a CSV (máx. 10.000 filas)
+- **Parámetros:**
+  - `page` (query): `integer`
+  - `pageSize` (query): `integer`
+  - `feature` (query): `string`
+  - `status` (query): `string`
+  - `costStatus` (query): `string`
+- **200**: OK — `text/csv` `string`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.usage.read`.
+
+**Módulo:** `ai` debe estar habilitado.
+
+### `GET /api/ai/usage/requests`
+
+- **operationId:** `ai_usage_requests`
+- **Resumen:** Libro de consumo (solicitudes lógicas)
+- **Parámetros:**
+  - `page` (query): `integer`
+  - `pageSize` (query): `integer`
+  - `feature` (query): `string`
+  - `status` (query): `string`
+  - `costStatus` (query): `string`
+- **200**: OK — `application/json` `AiRequestsPage`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.usage.read`.
+
+**Módulo:** `ai` debe estar habilitado.
+
 ## auth
 
 ### `POST /api/auth/email-otp/check-verification-otp`
@@ -711,5 +1127,5 @@ Comprueba base de datos y migraciones. pgvector solo se verifica si RAG está ha
 
 ## Esquemas
 
-64 esquemas en `components.schemas` (ver `openapi.json`).
+98 esquemas en `components.schemas` (ver `openapi.json`).
 

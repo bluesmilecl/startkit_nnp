@@ -117,11 +117,12 @@ export class JobQueue {
    * (pg-boss singleton semantics) so duplicated requests never create duplicated work.
    */
   async send<T extends object>(name: QueueName, data: T, opts: { idempotencyKey?: string; startAfter?: Date | number; priority?: number } = {}): Promise<string | null> {
-    return this.boss.send(name, data, {
-      singletonKey: opts.idempotencyKey,
-      startAfter: opts.startAfter,
-      priority: opts.priority,
-    });
+    // pg-boss validates present keys, so undefined options are omitted rather than sent.
+    const options: Record<string, unknown> = {};
+    if (opts.idempotencyKey) options.singletonKey = opts.idempotencyKey;
+    if (opts.startAfter !== undefined) options.startAfter = opts.startAfter;
+    if (opts.priority !== undefined) options.priority = opts.priority;
+    return this.boss.send(name, data, options);
   }
 
   async work<T>(name: QueueName, handler: JobHandler<T>, opts: { concurrency?: number; pollingIntervalSeconds?: number } = {}): Promise<string> {
