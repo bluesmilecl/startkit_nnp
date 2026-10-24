@@ -70,6 +70,7 @@ export class RetrievalService {
         let queryEmbedding: number[] | null = null;
         const caps = store.capabilities();
         const m = method === 'fulltext' && !caps.fullText ? 'vector' : method === 'hybrid' && !caps.hybrid && first.conn.kind === 'api' ? 'vector' : method;
+        if (m !== method) warnings.push(`${first.conn.name} no soporta búsqueda ${method === 'hybrid' ? 'híbrida' : 'de texto completo'}; se usó búsqueda vectorial`);
         if (m !== 'fulltext' && first.p && first.conn.kind !== 'api') {
           const r = await this.deps.ai.runtime.embed(
             { organizationId: actor.organizationId, userId: actor.userId, agentId: o.agentId ?? null, conversationId: o.conversationId ?? null, feature: 'rag_query' },

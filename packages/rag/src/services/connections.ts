@@ -1,4 +1,5 @@
 import { assertAllowedEndpoint } from '@starter/ai';
+import { RAG_PRIVATE_HINT } from '../parsing/fetch.js';
 import { assertCan, recordAudit, type Actor } from '@starter/auth';
 import { maskSecret } from '@starter/config';
 import { AppError, type CreateRagConnectionInput, type RagConnection } from '@starter/contracts';
@@ -95,7 +96,7 @@ export class RagConnectionsService {
       if (!secret) throw AppError.validation('Indica la cadena de conexión o una referencia a secreto');
     } else {
       if (!input.baseUrl) throw AppError.validation('Indica la URL base del servicio de recuperación');
-      await assertAllowedEndpoint(input.baseUrl, { allowPrivate: this.deps.env.RAG_FETCH_ALLOW_PRIVATE });
+      await assertAllowedEndpoint(input.baseUrl, { allowPrivate: this.deps.env.RAG_FETCH_ALLOW_PRIVATE, privateHint: RAG_PRIVATE_HINT });
       config.baseUrl = input.baseUrl.replace(/\/$/, '');
       secret = await this.secretFields(input);
     }
@@ -130,7 +131,7 @@ export class RagConnectionsService {
     const patch: Partial<typeof ragConnections.$inferInsert> = {};
     if (input.name) patch.name = input.name;
     if (input.baseUrl && row.kind === 'api') {
-      await assertAllowedEndpoint(input.baseUrl, { allowPrivate: this.deps.env.RAG_FETCH_ALLOW_PRIVATE });
+      await assertAllowedEndpoint(input.baseUrl, { allowPrivate: this.deps.env.RAG_FETCH_ALLOW_PRIVATE, privateHint: RAG_PRIVATE_HINT });
       config.baseUrl = input.baseUrl.replace(/\/$/, '');
     }
     const secret = await this.secretFields({ kind: row.kind, connectionUrl: input.connectionUrl, token: input.token, credentialRef: input.credentialRef });

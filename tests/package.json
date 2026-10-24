@@ -14,6 +14,7 @@
     "@starter/db": "workspace:*",
     "@starter/jobs": "workspace:*",
     "@starter/mail": "workspace:*",
+    "@starter/rag": "workspace:*",
     "@starter/storage": "workspace:*",
     "pg": "8.23.1"
   },

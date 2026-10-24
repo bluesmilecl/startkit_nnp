@@ -142,7 +142,8 @@ export interface RagStore {
   deleteDocument(id: string): Promise<{ storageKey: string | null }>;
   deleteCollection(collectionId: string): Promise<{ storageKeys: string[] }>;
   // Browse side (only when capabilities().browse)
-  listDocuments(q: { collectionId?: string; collectionIds: string[]; status?: string; search?: string; page: number; pageSize: number }): Promise<{ items: StoredDocument[]; total: number }>;
+  /** `principal` filters by document ACL; null lists everything (knowledge managers). */
+  listDocuments(q: { collectionId?: string; collectionIds: string[]; status?: string; search?: string; page: number; pageSize: number; principal?: Principal | null }): Promise<{ items: StoredDocument[]; total: number }>;
   getDocument(id: string): Promise<StoredDocument | null>;
   findDocument(collectionId: string, externalId: string): Promise<StoredDocument | null>;
   documentChunks(id: string, indexVersionId: string | null, limit: number): Promise<{ id: string; ordinal: number; text: string; heading: string | null; page: number | null; tokenCount: number | null }[]>;

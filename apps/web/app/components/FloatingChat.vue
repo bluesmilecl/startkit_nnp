@@ -106,7 +106,16 @@ async function rate(m: ChatMessage, rating: 1 | -1) {
   const previous = ratings[m.id];
   ratings[m.id] = rating;
   try {
-    await aiMessagesFeedback({ client: api, path: { id: m.id }, body: { rating } });
+    // The answer is persisted when its stream closes; retry briefly if it is not stored yet.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await aiMessagesFeedback({ client: api, path: { id: m.id }, body: { rating } });
+        break;
+      } catch (err) {
+        if (attempt >= 3 || apiError(err).code !== 'NOT_FOUND') throw err;
+        await new Promise((r) => setTimeout(r, 700));
+      }
+    }
   } catch (err) {
     if (previous) ratings[m.id] = previous;
     else delete ratings[m.id];

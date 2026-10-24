@@ -210,7 +210,7 @@ function pct(v: number | null) {
             <Field>
               <FieldLabel>Colecciones</FieldLabel>
               <CollectionsSelect v-model="form.collectionIds" />
-              <FieldDescription>Se aplican los permisos por colección y por documento de tu cuenta.</FieldDescription>
+              <FieldDescription>Los permisos por documento de tu cuenta se aplican siempre; el chat además respeta los permisos de cada colección.</FieldDescription>
             </Field>
           </CardContent>
         </Card>

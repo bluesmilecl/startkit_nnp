@@ -1,6 +1,9 @@
 import { assertAllowedEndpoint } from '@starter/ai';
 import { AppError } from '@starter/contracts';
 
+/** Shown when a URL resolves to a private network and RAG_FETCH_ALLOW_PRIVATE is off. */
+export const RAG_PRIVATE_HINT = 'habilita RAG_FETCH_ALLOW_PRIVATE solo para fuentes y servicios internos de confianza';
+
 export interface FetchedResource {
   url: string;
   status: number;
@@ -20,7 +23,7 @@ export async function safeFetch(rawUrl: string, opts: { allowPrivate: boolean; m
     const u = new URL(url);
     if (u.protocol !== 'https:' && u.protocol !== 'http:') throw AppError.validation('Solo se permiten URLs http(s)');
     // http is accepted for public sites; the address policy is what prevents SSRF.
-    await assertAllowedEndpoint(u.protocol === 'http:' ? url.replace(/^http:/, 'https:') : url, { allowPrivate: opts.allowPrivate });
+    await assertAllowedEndpoint(u.protocol === 'http:' ? url.replace(/^http:/, 'https:') : url, { allowPrivate: opts.allowPrivate, privateHint: RAG_PRIVATE_HINT });
     const res = await fetch(url, {
       redirect: 'manual',
       headers: { 'user-agent': 'StarterKit-RAG/1.0 (+https://github.com)', accept: opts.accept ?? 'text/html,application/xhtml+xml,text/plain,text/markdown,application/pdf,application/xml;q=0.9,*/*;q=0.5' },

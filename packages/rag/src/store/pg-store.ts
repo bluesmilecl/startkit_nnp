@@ -1,5 +1,5 @@
 import pg from 'pg';
-import type { ChunkInput, DocumentInput, IndexSpace, RagStore, SearchHit, SearchInput, StoreCapabilities, StoreDiagnostic, StoredDocument, DiagnosticCheck } from './types.js';
+import type { ChunkInput, DocumentInput, IndexSpace, Principal, RagStore, SearchHit, SearchInput, StoreCapabilities, StoreDiagnostic, StoredDocument, DiagnosticCheck } from './types.js';
 
 const SCHEMA_RE = /^[a-z_][a-z0-9_]{0,40}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -301,9 +301,13 @@ export class PgVectorStore implements RagStore {
     return { storageKeys: rows.map((r) => r.storage_key).filter((k): k is string => !!k) };
   }
 
-  async listDocuments(q: { collectionId?: string; collectionIds: string[]; status?: string; search?: string; page: number; pageSize: number }) {
+  async listDocuments(q: { collectionId?: string; collectionIds: string[]; status?: string; search?: string; page: number; pageSize: number; principal?: Principal | null }) {
     const where = [`collection_id = any($1::uuid[])`, `deleted_at is null`];
     const values: unknown[] = [q.collectionId ? [q.collectionId] : q.collectionIds];
+    if (q.principal) {
+      values.push(q.principal.roleKeys, q.principal.userId);
+      where.push(`((cardinality(acl_roles) = 0 and cardinality(acl_users) = 0) or acl_roles && $${values.length - 1}::text[] or $${values.length}::uuid = any(acl_users))`);
+    }
     if (q.status) {
       values.push(q.status);
       where.push(`status = $${values.length}`);

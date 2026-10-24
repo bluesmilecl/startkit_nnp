@@ -655,6 +655,9 @@ importers:
       '@starter/mail':
         specifier: workspace:*
         version: link:../packages/mail
+      '@starter/rag':
+        specifier: workspace:*
+        version: link:../packages/rag
       '@starter/storage':
         specifier: workspace:*
         version: link:../packages/storage

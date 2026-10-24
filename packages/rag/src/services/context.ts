@@ -1,5 +1,6 @@
 import type { AiDeps, AiServices } from '@starter/ai';
 import { assertAllowedEndpoint } from '@starter/ai';
+import { RAG_PRIVATE_HINT } from '../parsing/fetch.js';
 import { resolveSecretRef } from '@starter/config';
 import { AppError } from '@starter/contracts';
 import { type ragConnections } from '@starter/db';
@@ -71,7 +72,7 @@ export class StoreRegistry {
         timeoutMs: row.timeoutMs,
         externalRefs: new Map(Object.entries(config.externalRefs ?? {})),
         assertUrl: async (u) => {
-          await assertAllowedEndpoint(u, { allowPrivate });
+          await assertAllowedEndpoint(u, { allowPrivate, privateHint: RAG_PRIVATE_HINT });
         },
         capabilities: caps && Object.keys(caps).length ? caps : null,
       });

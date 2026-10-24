@@ -19,7 +19,7 @@ export function isPublicAddress(ip: string): boolean {
  * address must be public unless AI_ALLOW_PRIVATE_ENDPOINTS (self-hosted models) is set. Cloud
  * metadata endpoints are always blocked.
  */
-export async function assertAllowedEndpoint(raw: string, opts: { allowPrivate: boolean }): Promise<URL> {
+export async function assertAllowedEndpoint(raw: string, opts: { allowPrivate: boolean; privateHint?: string }): Promise<URL> {
   let url: URL;
   try {
     url = new URL(raw);
@@ -39,7 +39,7 @@ export async function assertAllowedEndpoint(raw: string, opts: { allowPrivate: b
   for (const a of addresses) {
     if (a.address === '169.254.169.254') throw AppError.validation('Endpoint no permitido');
     if (!opts.allowPrivate && !isPublicAddress(a.address)) {
-      throw AppError.validation('El endpoint apunta a una red privada; habilita AI_ALLOW_PRIVATE_ENDPOINTS para modelos autoalojados');
+      throw AppError.validation(`El endpoint apunta a una red privada; ${opts.privateHint ?? 'habilita AI_ALLOW_PRIVATE_ENDPOINTS para modelos autoalojados'}`);
     }
   }
   return url;

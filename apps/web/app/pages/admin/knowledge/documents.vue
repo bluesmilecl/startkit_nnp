@@ -79,7 +79,7 @@ const pages = computed(() => page.value?.pageCount ?? 1);
 
 <template>
   <div class="space-y-6">
-    <PageHeader title="Documentos" description="Todo lo indexado en las colecciones que puedes leer. Los documentos con permisos por rol solo aparecen a quienes tienen esos roles." />
+    <PageHeader title="Documentos" description="Lo indexado en las colecciones que puedes leer. Los documentos restringidos por rol solo los ven esos roles y quienes administran el conocimiento." />
 
     <div class="flex flex-wrap gap-2">
       <Input v-model="search" placeholder="Buscar por título o URL" class="w-full sm:w-72" aria-label="Buscar documentos" data-testid="docs-search" />

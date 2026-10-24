@@ -38,6 +38,23 @@ export function canReadCollection(actor: Actor, c: Pick<CollectionRow, 'visibili
 
 export const roleKeys = (actor: Actor) => [...new Set(actor.roles.map((r) => r.key))];
 
+/** Collection visibility in management views: restricted collections only for their roles/users. */
+export function canSeeCollection(actor: Actor, c: Pick<CollectionRow, 'visibility' | 'aclRoles' | 'aclUsers'>): boolean {
+  if (actor.permissions.has('rag.collections.manage')) return true;
+  if (!actor.permissions.has('rag.collections.read') && !actor.permissions.has('rag.documents.read')) return false;
+  if (c.visibility === 'organization') return true;
+  const keys = roleKeys(actor);
+  return c.aclUsers.includes(actor.userId) || c.aclRoles.some((r) => keys.includes(r));
+}
+
+/** Document ACL for browsing; knowledge managers see every document of the collections they manage. */
+export function canReadDocument(actor: Actor, d: Pick<StoredDocument, 'aclRoles' | 'aclUsers'>): boolean {
+  if (actor.permissions.has('rag.collections.manage')) return true;
+  if (!d.aclRoles.length && !d.aclUsers.length) return true;
+  const keys = roleKeys(actor);
+  return d.aclUsers.includes(actor.userId) || d.aclRoles.some((r) => keys.includes(r));
+}
+
 export class CollectionsService {
   constructor(
     private readonly deps: RagDeps,
@@ -98,7 +115,7 @@ export class CollectionsService {
   async list(actor: Actor, q: { page?: number; pageSize?: number; search?: string }) {
     if (!actor.permissions.has('rag.collections.manage')) assertCan(actor, 'rag.collections.read');
     const rows = await this.baseQuery(and(eq(ragCollections.organizationId, actor.organizationId), q.search ? ilike(ragCollections.name, `%${q.search}%`) : undefined));
-    const visible = rows.filter((r) => actor.permissions.has('rag.collections.manage') || actor.permissions.has('rag.collections.read') || canReadCollection(actor, r.c));
+    const visible = rows.filter((r) => canSeeCollection(actor, r.c));
     const page = Math.max(1, q.page ?? 1);
     const pageSize = Math.min(100, q.pageSize ?? 20);
     const items = await this.toDtos(visible.slice((page - 1) * pageSize, page * pageSize));
@@ -114,6 +131,7 @@ export class CollectionsService {
   async get(actor: Actor, id: string) {
     if (!actor.permissions.has('rag.collections.manage')) assertCan(actor, 'rag.collections.read');
     const r = await this.findRow(actor.organizationId, id);
+    if (!canSeeCollection(actor, r.c)) throw AppError.notFound('Colección');
     return (await this.toDtos([r]))[0]!;
   }
 
@@ -411,7 +429,7 @@ export class DocumentsService {
     };
   }
 
-  /** Lists documents of readable collections; document ACLs are shown, never bypassed in search. */
+  /** Lists documents of readable collections, filtered by document ACL unless the actor manages knowledge. */
   async list(actor: Actor, q: { page?: number; pageSize?: number; collectionId?: string; status?: string; search?: string }) {
     assertCan(actor, 'rag.documents.read');
     const readable = await this.collections.readable(actor, q.collectionId ? [q.collectionId] : null, true);
@@ -424,7 +442,8 @@ export class DocumentsService {
     for (const group of byConn.values()) {
       const store = this.stores.get(group[0]!.conn);
       if (!store.capabilities().browse) continue;
-      const res = await store.listDocuments({ collectionIds: group.map((g) => g.c.id), status: q.status, search: q.search, page, pageSize });
+      const principal = actor.permissions.has('rag.collections.manage') ? null : { userId: actor.userId, roleKeys: roleKeys(actor) };
+      const res = await store.listDocuments({ collectionIds: group.map((g) => g.c.id), status: q.status, search: q.search, page, pageSize, principal });
       total += res.total;
       items.push(...res.items.map((d) => this.dto(d, group.find((g) => g.c.id === d.collectionId)?.c.name ?? '')));
     }
@@ -436,7 +455,7 @@ export class DocumentsService {
     if (!r) throw AppError.notFound('Documento');
     const store = this.stores.get(r.conn);
     const d = await store.getDocument(id);
-    if (!d || d.collectionId !== collectionId) throw AppError.notFound('Documento');
+    if (!d || d.collectionId !== collectionId || !canReadDocument(actor, d)) throw AppError.notFound('Documento');
     return { r, store, d };
   }
 
