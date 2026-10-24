@@ -1,0 +1,15 @@
+packages:
+  - apps/*
+  - packages/*
+  - tooling/*
+
+# Dependencies allowed to run install scripts (pnpm blocks all others by default).
+allowBuilds:
+  esbuild: true
+  '@parcel/watcher': true
+  sharp: true
+  vue-demi: true
+  unrs-resolver: true
+  '@tailwindcss/oxide': true
+  # Telemetry postinstall from swagger-ui-dist: explicitly not allowed.
+  '@scarf/scarf': false

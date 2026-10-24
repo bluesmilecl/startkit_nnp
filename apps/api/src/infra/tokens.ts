@@ -1,0 +1,7 @@
+export const ENV = Symbol('ENV');
+export const DB = Symbol('DB');
+export const SECRET_BOX = Symbol('SECRET_BOX');
+export const MAILER = Symbol('MAILER');
+export const FEATURES = Symbol('FEATURES');
+export const AUTH = Symbol('AUTH');
+export const ACCESS_DEPS = Symbol('ACCESS_DEPS');

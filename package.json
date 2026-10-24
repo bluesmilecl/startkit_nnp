@@ -1,0 +1,43 @@
+{
+  "name": "starter-kit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Starter Kit Nuxt + NestJS IA: auth, roles, panel, AI providers, costs, agents and optional RAG.",
+  "type": "module",
+  "packageManager": "pnpm@12.15.0",
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "scripts": {
+    "build": "pnpm build:ts && pnpm --filter @starter/web build",
+    "build:ts": "tsc -b tsconfig.json",
+    "clean": "pnpm -r exec rm -rf dist .output .nuxt *.tsbuildinfo",
+    "dev": "node scripts/dev.mjs",
+    "typecheck": "tsc -b tsconfig.json && pnpm --filter @starter/web typecheck",
+    "lint": "eslint .",
+    "test": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "db:generate": "pnpm --filter @starter/db generate",
+    "db:migrate": "node packages/db/dist/cli/migrate.js",
+    "db:seed": "node packages/db/dist/cli/seed.js",
+    "api:docs:generate": "node apps/api/dist/scripts/generate-openapi.js",
+    "api:client:generate": "pnpm --filter @starter/api-client generate",
+    "api:contract:check": "node scripts/contract-check.mjs",
+    "docs:check": "node scripts/docs-check.mjs",
+    "starter": "node tooling/create-starter/dist/cli.js",
+    "verify": "node scripts/verify.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
+    "concurrently": "10.0.6",
+    "eslint": "10.13.0",
+    "globals": "17.13.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0",
+    "vitest": "5.0.5"
+  }
+}

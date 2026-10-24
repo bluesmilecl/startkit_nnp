@@ -1,0 +1,19 @@
+{
+  "name": "@starter/mail",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+  },
+  "scripts": { "build": "tsc -b" },
+  "dependencies": {
+    "@starter/config": "workspace:*",
+    "@starter/observability": "workspace:*",
+    "nodemailer": "10.2.1",
+    "resend": "6.34.1"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "8.0.2"
+  }
+}
