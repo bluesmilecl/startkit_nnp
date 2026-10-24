@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { applyPlan, planModule, type ModuleSpec } from '@starter/generator';
 import { findRoot } from '../lib/project.js';
 import { ask, c, choose, CliError, line, title } from '../lib/ui.js';
@@ -34,7 +36,7 @@ export async function generateModule(key: string | undefined, opts: GenerateOpti
   console.log(c.dim(`  permisos ${plan.names.snake}.read / ${plan.names.snake}.manage · tabla ${plan.names.snake} · ruta /admin/${plan.names.kebab} · API /api/${plan.names.kebab}`));
   if (opts.dryRun) {
     for (const f of plan.files) line('info', `crearía ${f.path}`);
-    for (const p of plan.patches) line('info', `modificaría ${p.path}`, p.description);
+    for (const p of plan.patches) if (!p.optional || existsSync(join(root, p.path))) line('info', `modificaría ${p.path}`, p.description);
     return 0;
   }
   let result;

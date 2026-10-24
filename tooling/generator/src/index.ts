@@ -45,6 +45,8 @@ export interface PatchPlan {
   path: string;
   description: string;
   apply: (source: string) => string | null;
+  /** Skipped (not an error) when the file does not exist, e.g. PROJECT.md before a project is adopted. */
+  optional?: boolean;
 }
 export interface ModulePlan {
   names: Names;
@@ -195,6 +197,15 @@ export function planModule(root: string, spec: ModuleSpec): ModulePlan {
       },
     },
     {
+      path: 'PROJECT.md',
+      optional: true,
+      description: 'registrar el módulo en el contexto del proyecto',
+      apply: (s) =>
+        s.includes(`/admin/${n.kebab}\``)
+          ? s
+          : insertAfter(/<!-- modules:[^\n]*-->\n/, `| ${n.label} | \`/admin/${n.kebab}\` · \`/api/${n.kebab}\` | \`${n.snake}.read\`, \`${n.snake}.manage\` | generado desde Proyectos |\n`)(s),
+    },
+    {
       path: 'apps/web/app/utils/navigation.ts',
       description: 'agregar la entrada al menú lateral',
       apply: (s) => {
@@ -244,6 +255,7 @@ export function applyPlan(root: string, plan: ModulePlan, opts: { force?: boolea
   for (const patch of plan.patches) {
     const p = join(root, patch.path);
     const before = existsSync(p) ? readFileSync(p, 'utf8') : null;
+    if (before === null && patch.optional) continue;
     const after = before === null ? null : patch.apply(before);
     if (after === null) result.manual.push(`${patch.path}: ${patch.description}`);
     else if (after !== before) {

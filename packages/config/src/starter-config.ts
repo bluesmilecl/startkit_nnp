@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MAIL_TRANSPORTS } from './env.js';
 
 /**
  * Exportable project configuration (starter.config.json). It never contains secrets,
@@ -44,10 +45,10 @@ export const starterConfigSchema = z
       .default({ mode: 'docker' }),
     mail: z
       .object({
-        transport: z.enum(['smtp', 'resend', 'log']).default('smtp'),
+        transport: z.enum(MAIL_TRANSPORTS).default('resend'),
         from: z.string().optional(),
       })
-      .default({ transport: 'smtp' }),
+      .default({ transport: 'resend' }),
     ai: z
       .object({
         connectionRef: ref.nullable().default(null),

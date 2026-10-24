@@ -69,14 +69,14 @@ también pueden crearse desde `/admin/users` (con o sin correo de invitación).
 
 ## Correo transaccional
 
-| `MAIL_TRANSPORT` | Uso | Variables |
-| --- | --- | --- |
-| `smtp` | Desarrollo con Mailpit (`smtp://localhost:1025`) o cualquier servidor SMTP. | `SMTP_URL`, `MAIL_FROM` |
-| `resend` | Producción con Resend. | `RESEND_API_KEY`, `MAIL_FROM` |
-| `log` | Solo desarrollo: escribe el mensaje en el log de la API. Rechazado con `NODE_ENV=production`. | — |
+Resend por defecto; también SMTP (servidor propio o de cualquier proveedor), Postmark, SendGrid,
+Mailgun y Brevo. Se cambia con `pnpm starter mail use <proveedor>` y se prueba con
+`pnpm starter mail test <correo>`. Variables, ejemplos y estado de verificación en
+[mail.md](mail.md). El transporte `log` es solo para desarrollo y se rechaza con
+`NODE_ENV=production`.
 
-`pnpm starter doctor` comprueba que el servidor SMTP acepte conexiones. Si los códigos no llegan,
-revisa [troubleshooting.md](troubleshooting.md#no-llega-el-código-otp).
+`pnpm starter doctor` y `/admin/diagnostics` revisan las credenciales del proveedor. Si los códigos
+no llegan, revisa [troubleshooting.md](troubleshooting.md#no-llega-el-código-otp).
 
 ## Sesiones
 

@@ -3,6 +3,7 @@ import { basename } from 'node:path';
 import { parseArgs } from 'node:util';
 import { create } from './commands/create.js';
 import { init } from './commands/init.js';
+import { mailTest, mailUse } from './commands/mail.js';
 import { doctor } from './commands/doctor.js';
 import { generateModule } from './commands/generate.js';
 import { aiConnect, aiSync, configValidate, docsCheck, ownerAssign, ragDoctor, ragReindex } from './commands/ops.js';
@@ -24,9 +25,15 @@ ${c.bold('Comandos')}
       --yes  --no-install  --no-git
   init                       Prepara este clon sin preguntas: .env con secretos únicos y starter.config.json
       --owner <correo> [--modules ai,rag] [--db docker|external --database-url <url>]
-      [--mail smtp|resend|log] [--pg-port 5433] [--test-ai]   (nunca sobrescribe un .env)
+      [--mail auto|resend|smtp|postmark|sendgrid|mailgun|brevo] [--mail-from "App <no-reply@dominio>"]
+      [--pg-port 5433] [--mailpit-port 8026 --mailpit-smtp-port 1026] [--test-ai]
+      [--new "Nombre del proyecto"]   (proyecto propio: nombre, Docker aislado, remoto starter, PROJECT.md)
+      (nunca sobrescribe un .env; auto = Resend si existe RESEND_API_KEY)
   doctor                     Diagnóstico de entorno, configuración, base, migraciones, propietario, correo, IA y RAG
   config validate [archivo]  Valida starter.config.json (esquema y ausencia de secretos)
+  mail use <proveedor>       Cambia el correo: resend, smtp (servidor propio), postmark, sendgrid, mailgun, brevo
+      [--mail-from "App <no-reply@dominio>"]   (las claves se leen de la terminal y quedan en .env)
+  mail test <correo>         Envía un correo de prueba con la configuración actual
   ai connect                 Conecta un proveedor de IA desde la terminal (clave en una variable de entorno)
       --provider openai|anthropic|google|openai-compatible|test [--alias a] [--base-url url]
       [--api-key-env VARIABLE] [--chat-model <id>] [--no-sync]
@@ -81,6 +88,10 @@ async function main(argv: string[]): Promise<number> {
       'api-key-env': { type: 'string' },
       'chat-model': { type: 'string' },
       'no-sync': { type: 'boolean' },
+      'mail-from': { type: 'string' },
+      new: { type: 'string' },
+      'mailpit-port': { type: 'string' },
+      'mailpit-smtp-port': { type: 'string' },
     },
   });
   if (values.version) {
@@ -90,13 +101,13 @@ async function main(argv: string[]): Promise<number> {
   }
   // Invoked as `create-ecortes-app [dir]` (pnpm create): the default command is create.
   const invokedAsCreate = /create-ecortes-app/.test(basename(process.argv[1] ?? ''));
-  const known = new Set(['create', 'init', 'doctor', 'config', 'ai', 'rag', 'generate', 'docs', 'owner', 'secrets', 'help']);
+  const known = new Set(['create', 'init', 'mail', 'doctor', 'config', 'ai', 'rag', 'generate', 'docs', 'owner', 'secrets', 'help']);
   const [cmd, sub, arg] = invokedAsCreate && !known.has(positionals[0] ?? '') ? ['create', ...positionals] : positionals;
   if (values.help || !cmd || cmd === 'help') {
     console.log(HELP);
     return values.help || cmd === 'help' ? 0 : 1;
   }
-  switch (`${cmd}${['config', 'ai', 'rag', 'generate', 'docs', 'owner', 'secrets'].includes(cmd) ? ` ${sub ?? ''}` : ''}`) {
+  switch (`${cmd}${['config', 'ai', 'rag', 'generate', 'docs', 'owner', 'secrets', 'mail'].includes(cmd) ? ` ${sub ?? ''}` : ''}`) {
     case 'create':
       await create({
         dir: sub,
@@ -121,9 +132,17 @@ async function main(argv: string[]): Promise<number> {
         db: values.db,
         databaseUrl: values['database-url'],
         mail: values.mail,
+        mailFrom: values['mail-from'],
+        newProject: values.new,
+        mailpitPort: values['mailpit-port'],
+        mailpitSmtpPort: values['mailpit-smtp-port'],
         pgPort: values['pg-port'],
         testAi: values['test-ai'],
       });
+    case 'mail use':
+      return mailUse(arg, { from: values['mail-from'] });
+    case 'mail test':
+      return mailTest(arg);
     case 'doctor':
       return doctor();
     case 'config validate':

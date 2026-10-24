@@ -123,7 +123,7 @@ resumen(@CurrentActor() actor: Actor, @ZParams() p: z.infer<typeof IdParams>) {
   `DataTable` (tabla o tarjetas) para listas, `FormFields`/`FormDialog` sobre el contrato Zod para
   formularios, `FormWizard` para altas por pasos, `ActionMenu`, `AppAlert`, `useNotify` e íconos
   semánticos (`AppIcon`). La página de Proyectos es el ejemplo completo y la skill
-  [construir vistas](../skills/build-ui/SKILL.md) resume las recetas.
+  [construir vistas](../.claude/skills/build-ui/SKILL.md) resume las recetas.
 
 ## Herramientas del chat
 

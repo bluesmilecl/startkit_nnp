@@ -36,12 +36,14 @@ anterior.
 
 ## Proyecto derivado del starter
 
-Si creaste tu aplicación con `create-ecortes-app`, tu repositorio es independiente. Para traer
-cambios del starter:
+Si lo creaste con `node scripts/quickstart.mjs --new "<Nombre>"` sobre un clon, el starter ya es
+el remoto `starter` y tu proyecto comparte su historial: las actualizaciones son una fusión normal.
+Con `create-ecortes-app` (copia sin historial) agrega el remoto tú y fusiona con
+`--allow-unrelated-histories` la primera vez. Para traer cambios del starter:
 
-1. Agrega el starter como remoto: `git remote add starter <url>` y `git fetch starter`.
+1. `git remote add starter <url>` si aún no existe, y `git fetch starter --tags`.
 2. Crea una rama y fusiona la etiqueta deseada: `git merge vX.Y.Z` (o aplica los *commits*
-   puntuales con `git cherry-pick`).
+   puntuales con `git cherry-pick`). `PROJECT.md` es solo tuyo: el starter no lo trae.
 3. Resuelve conflictos priorizando tus módulos de negocio; las zonas del starter que normalmente
    no modificas son `packages/*`, `apps/api/src/common`, `apps/api/src/modules/{auth,admin,ai,agents,rag,system,health}`,
    `docker/` y `scripts/`.

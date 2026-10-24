@@ -17522,11 +17522,15 @@
           "transport": {
             "type": "string",
             "enum": [
-              "smtp",
               "resend",
+              "smtp",
+              "postmark",
+              "sendgrid",
+              "mailgun",
+              "brevo",
               "log"
             ],
-            "description": "Configured through deployment environment"
+            "description": "Configured through deployment environment (MAIL_TRANSPORT); see docs/mail.md"
           },
           "from": {
             "type": "string"

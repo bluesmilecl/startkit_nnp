@@ -103,7 +103,7 @@ const timezones = typeof Intl.supportedValuesOf === 'function' ? Intl.supportedV
     </TabsContent>
     <TabsContent value="mail">
       <Card>
-        <CardHeader><CardTitle>Correo</CardTitle><CardDescription>El transporte y sus credenciales se configuran en el despliegue (variables MAIL_*), nunca en la base de datos.</CardDescription></CardHeader>
+        <CardHeader><CardTitle>Correo</CardTitle><CardDescription>El proveedor y sus credenciales se configuran en el despliegue (variables MAIL_*, o <code>pnpm starter mail use resend</code>), nunca en la base de datos.</CardDescription></CardHeader>
         <CardContent class="space-y-2 text-sm">
           <div>Transporte: <Badge variant="secondary">{{ draft.mail.transport }}</Badge></div>
           <p>Remitente: <code>{{ draft.mail.from }}</code></p>

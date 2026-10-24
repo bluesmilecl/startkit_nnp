@@ -13,7 +13,7 @@
 
 ```bash
 git clone https://github.com/bluesmilecl/startkit_nnp mi-app && cd mi-app
-node scripts/quickstart.mjs --owner tu@empresa.cl [--test-ai] [--ai openai --chat-model <id>] [--db external --database-url …]
+node scripts/quickstart.mjs --new "Mi App" --owner tu@empresa.cl [--test-ai] [--ai openai --chat-model <id>] [--db external --database-url …]
 pnpm dev
 ```
 
@@ -23,6 +23,23 @@ compila, ejecuta `pnpm starter init` (crea `.env` con secretos únicos si no exi
 sobrescribe), levanta la infraestructura, migra, ejecuta `pnpm starter doctor` y, si se pide,
 `pnpm starter ai connect`. Termina con `QUICKSTART_RESULT=ok|error` y guarda la salida en
 `quickstart.log`. Guía paso a paso y problemas frecuentes: [INSTALL.md](../INSTALL.md).
+
+Con `--new "<Nombre>"` (o `pnpm starter init --new "<Nombre>"` sobre un clon ya instalado) el clon
+pasa a ser un proyecto propio: renombra el paquete, usa un proyecto Docker con su nombre
+(`COMPOSE_PROJECT_NAME`, contenedores y volúmenes propios; Mailpit toma otros puertos si 8025/1025
+están ocupados), deja el repositorio del starter como remoto `starter` y crea `PROJECT.md`, el
+contexto del proyecto que `CLAUDE.md` y `GEMINI.md` importan. Conserva el historial de git, así
+las mejoras del starter se fusionan sin conflictos de historia ([upgrades.md](upgrades.md)).
+
+| Opción | Descripción |
+| --- | --- |
+| `--new "<Nombre>"` | Proyecto propio basado en el starter (ver arriba). |
+| `--owner <correo>` | Propietario inicial: recibe el primer código de acceso. |
+| `--modules ai,rag,organizations` | Módulos activos (por defecto `ai,rag`; `''` para ninguno). |
+| `--mail auto\|resend\|smtp\|…` y `--mail-from` | Correo ([mail.md](mail.md)); `auto` usa Resend si existe `RESEND_API_KEY`, si no Mailpit. |
+| `--test-ai` · `--ai <proveedor> --chat-model <id>` | Chat sin claves (solo desarrollo) · proveedor real con la clave en su variable. |
+| `--db external --database-url …` | PostgreSQL propio en lugar de Docker. |
+| `--reset-db` · `--start` | Borra la base local anterior del mismo proyecto · ejecuta `pnpm dev` al terminar. |
 
 ## Opción B: instalador en una carpeta nueva (`create-ecortes-app`)
 
@@ -40,7 +57,7 @@ El instalador:
 2. Genera `.env` desde `.env.example` con **secretos únicos** (`BETTER_AUTH_SECRET`,
    `APP_ENCRYPTION_KEY`, contraseñas de PostgreSQL) y permisos `600`.
 3. Escribe `starter.config.json` (configuración exportable **sin secretos**, validada con el
-   esquema de `@starter/config`) y renombra el paquete.
+   esquema de `@starter/config`), renombra el paquete, fija el proyecto Docker y crea `PROJECT.md`.
 4. Inicializa git (`git init` + `git add`; el primer commit lo haces tú) y ejecuta `pnpm install`.
 
 Opciones (`pnpm starter --help`):
@@ -51,7 +68,7 @@ Opciones (`pnpm starter --help`):
 | `--name`, `--owner <correo>` | Nombre visible y correo del propietario inicial. |
 | `--modules ai,rag,organizations` | Módulos activos (`rag` requiere `ai`). |
 | `--db docker\|external` / `--database-url` | PostgreSQL en Docker o externo. |
-| `--mail smtp\|resend\|log` | Transporte de correo (`log` solo en desarrollo). |
+| `--mail auto\|resend\|smtp\|postmark\|sendgrid\|mailgun\|brevo\|log` | Correo ([mail.md](mail.md)); `auto` usa Resend si existe `RESEND_API_KEY`. |
 | `--yes`, `--no-install`, `--no-git` | Modo no interactivo y pasos opcionales. |
 
 ## Opción C: manual
@@ -150,7 +167,7 @@ docker compose --env-file .env -f docker/compose.yaml -f docker/compose.producti
 - Con `--profile edge` y `SITE_ADDRESS=app.tu-dominio.cl`, Caddy obtiene HTTPS automáticamente. Si
   usas tu propio ingress, enruta `/api` → `api:3001` y `/` → `web:3000` en el **mismo origen**.
 - Requisitos del entorno en producción (validados al arrancar): `MAIL_TRANSPORT` distinto de `log`,
-  proveedor de prueba desactivado, `RESEND_API_KEY` si usas Resend, `S3_BUCKET` si usas S3.
+  proveedor de prueba desactivado, la clave del proveedor de correo elegido, `S3_BUCKET` si usas S3.
 
 Detalle de perfiles y servicios en [docker.md](docker.md). Problemas frecuentes en
 [troubleshooting.md](troubleshooting.md).

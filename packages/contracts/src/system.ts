@@ -30,7 +30,7 @@ export const AuthSettings = z
 
 export const MailSettings = z
   .object({
-    transport: z.enum(['smtp', 'resend', 'log']).meta({ description: 'Configured through deployment environment' }),
+    transport: z.enum(['resend', 'smtp', 'postmark', 'sendgrid', 'mailgun', 'brevo', 'log']).meta({ description: 'Configured through deployment environment (MAIL_TRANSPORT); see docs/mail.md' }),
     from: z.string(),
     configured: z.boolean(),
   })

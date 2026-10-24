@@ -70,5 +70,13 @@ describe('module generator', () => {
     expect(catalog).toContain("viewer: ['ai.chat', 'projects.read', 'ordenes_compra.read']");
     // Missing anchors are reported for manual work instead of corrupting the file.
     expect(perms.apply('export const PERMISSIONS = {};')).toBeNull();
+
+    // Projects created from the starter keep their own module list in PROJECT.md (optional file).
+    const context = plan.patches.find((p) => p.path === 'PROJECT.md')!;
+    expect(context.optional).toBe(true);
+    const marker = '| Módulo | Rutas | Permisos | Notas |\n| --- | --- | --- | --- |\n<!-- modules: el generador agrega una fila por módulo -->\n';
+    const once = context.apply(marker)!;
+    expect(once).toContain("| Órdenes de compra | `/admin/ordenes-compra` · `/api/ordenes-compra` | `ordenes_compra.read`, `ordenes_compra.manage` |");
+    expect(context.apply(once)).toBe(once);
   });
 });

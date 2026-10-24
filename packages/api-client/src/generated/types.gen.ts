@@ -341,9 +341,9 @@ export type AuthSettings = {
 
 export type MailSettings = {
     /**
-     * Configured through deployment environment
+     * Configured through deployment environment (MAIL_TRANSPORT); see docs/mail.md
      */
-    transport: 'smtp' | 'resend' | 'log';
+    transport: 'resend' | 'smtp' | 'postmark' | 'sendgrid' | 'mailgun' | 'brevo' | 'log';
     from: string;
     configured: boolean;
 };

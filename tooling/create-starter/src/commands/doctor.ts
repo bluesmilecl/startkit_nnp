@@ -1,6 +1,5 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { connect } from 'node:net';
 import { join } from 'node:path';
 import { findRoot, loadEnv, readJson } from '../lib/project.js';
 import { c, line, title, type Level } from '../lib/ui.js';
@@ -17,19 +16,6 @@ const run = (cmd: string, args: string[]) => {
   const r = spawnSync(cmd, args, { encoding: 'utf8' });
   return r.status === 0 ? r.stdout.trim() : null;
 };
-
-function tcp(host: string, port: number, timeoutMs = 2000): Promise<boolean> {
-  return new Promise((resolve) => {
-    const socket = connect({ host, port });
-    const done = (ok: boolean) => {
-      socket.destroy();
-      resolve(ok);
-    };
-    socket.setTimeout(timeoutMs, () => done(false));
-    socket.once('connect', () => done(true));
-    socket.once('error', () => done(false));
-  });
-}
 
 /**
  * Read-only installation check: runtime, configuration, database, migrations, owner, mail, AI
@@ -122,11 +108,13 @@ export async function doctor(): Promise<number> {
     } finally {
       await handle.close();
     }
-    if (env.MAIL_TRANSPORT === 'smtp' && env.SMTP_URL) {
-      const u = new URL(env.SMTP_URL);
-      const ok = await tcp(u.hostname, Number(u.port || 25));
-      add(ok ? 'ok' : 'warn', `SMTP ${u.hostname}:${u.port || 25}`, ok ? 'acepta conexiones' : 'no responde (los códigos OTP no llegarán)');
-    } else add('info', `Correo: ${env.MAIL_TRANSPORT}`);
+    if (env.MAIL_TRANSPORT === 'log') add(env.NODE_ENV === 'production' ? 'fail' : 'info', 'Correo: log', 'solo desarrollo: los mensajes quedan en el log');
+    else {
+      const { createMailer } = await import('@starter/mail');
+      const check = await createMailer(env).verify();
+      add(check.ok ? 'ok' : 'warn', `Correo: ${env.MAIL_TRANSPORT}`, `${check.detail ?? ''}${check.ok ? '' : ' (los códigos de acceso no llegarán)'}`);
+      if (env.NODE_ENV === 'production' && /@localhost>?$/.test(env.MAIL_FROM)) add('warn', `MAIL_FROM=${env.MAIL_FROM}`, 'usa un remitente de tu dominio verificado');
+    }
     for (const ch of checks.splice(0)) line(ch.level, ch.label, ch.detail);
   }
 

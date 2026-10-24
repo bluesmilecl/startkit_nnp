@@ -6,7 +6,7 @@ import { basename, join, relative, resolve } from 'node:path';
 import { ask, c, choose, CliError, confirm, line, title } from '../lib/ui.js';
 
 /** Never copied from the template: VCS data, dependencies, builds, local data and secrets. */
-const EXCLUDE = new Set(['.git', 'node_modules', 'dist', '.nuxt', '.output', 'test-results', 'playwright-report', 'storage-data', '.env', '.env.e2e', 'verify-report.md', '.turbo', 'coverage']);
+const EXCLUDE = new Set(['.git', 'settings.local.json', 'PROJECT.md', 'node_modules', 'dist', '.nuxt', '.output', 'test-results', 'playwright-report', 'storage-data', '.env', '.env.e2e', 'verify-report.md', '.turbo', 'coverage']);
 
 export interface CreateOptions {
   dir?: string;
@@ -78,17 +78,52 @@ export function renderEnv(example: string, values: Record<string, string>): stri
   return out.join('\n');
 }
 
+/** Mirrors MAIL_TRANSPORTS of @starter/config (a unit test keeps them equal); usable before building. */
+export const MAIL_CHOICES = ['resend', 'smtp', 'postmark', 'sendgrid', 'mailgun', 'brevo', 'log'] as const;
+export type MailChoice = (typeof MAIL_CHOICES)[number];
+
+/** Variables of each transport copied from the shell into .env (keys never go to starter.config.json). */
+export const MAIL_ENV: Record<MailChoice, string[]> = {
+  resend: ['RESEND_API_KEY'],
+  smtp: ['SMTP_URL', 'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASSWORD', 'SMTP_SECURE'],
+  postmark: ['POSTMARK_SERVER_TOKEN'],
+  sendgrid: ['SENDGRID_API_KEY'],
+  mailgun: ['MAILGUN_API_KEY', 'MAILGUN_DOMAIN', 'MAILGUN_REGION'],
+  brevo: ['BREVO_API_KEY'],
+  log: [],
+};
+
+/** `auto`: Resend when its key is available (the recommended default), local Mailpit otherwise. */
+export function resolveMail(choice: string | undefined, env: Record<string, string | undefined> = process.env): MailChoice {
+  const c = (choice ?? 'auto').toLowerCase();
+  if (c === 'auto') return env.RESEND_API_KEY ? 'resend' : 'smtp';
+  if (!(MAIL_CHOICES as readonly string[]).includes(c)) throw new CliError(`Correo desconocido: ${c} (usa auto, ${MAIL_CHOICES.join(', ')})`);
+  return c as MailChoice;
+}
+
+/** Sender used when none is given: Resend's test address works before verifying a domain. */
+export function defaultMailFrom(name: string, mail: MailChoice): string {
+  return mail === 'resend' ? `${name} <onboarding@resend.dev>` : `${name} <no-reply@localhost>`;
+}
+
 export interface InstallationChoices {
   name: string;
   owner: string;
   modules: Set<string>;
   db: 'docker' | 'external';
   databaseUrl: string;
-  mail: 'smtp' | 'resend' | 'log';
+  mail: MailChoice;
+  /** "Nombre <correo@dominio>" of outgoing mail. */
+  mailFrom?: string;
   /** Host port of the local PostgreSQL container (when 5432 is taken). */
   pgPort?: number;
   /** Development only: enables the deterministic AI provider to try the chat without keys. */
   testAi?: boolean;
+  /** Docker Compose project (containers and volumes); one per project on the same machine. */
+  composeProject?: string;
+  /** Host ports of the local Mailpit when 8025/1025 are taken by another installation. */
+  mailpitPort?: number;
+  mailpitSmtpPort?: number;
 }
 
 /** Per-installation .env values. Secrets are generated here and written only to .env. */
@@ -107,13 +142,22 @@ export function installationEnv(o: InstallationChoices): Record<string, string> 
     FEATURE_ORGANIZATIONS: String(o.modules.has('organizations')),
     AI_TEST_PROVIDER_ENABLED: String(!!o.testAi),
     MAIL_TRANSPORT: o.mail,
+    MAIL_FROM: o.mailFrom ?? defaultMailFrom(o.name, o.mail),
+    ...mailSecrets(o.mail),
     POSTGRES_PASSWORD: pgPassword,
     POSTGRES_APP_PASSWORD: appPassword,
     RAG_POSTGRES_PASSWORD: secret(18, 'hex'),
     ...(o.pgPort ? { POSTGRES_PORT: String(o.pgPort) } : {}),
+    ...(o.composeProject ? { COMPOSE_PROJECT_NAME: o.composeProject } : {}),
+    ...(o.mailpitPort ? { MAILPIT_PORT: String(o.mailpitPort) } : {}),
+    ...(o.mailpitSmtpPort ? { MAILPIT_SMTP_PORT: String(o.mailpitSmtpPort), ...(o.mail === 'smtp' ? { SMTP_URL: `smtp://localhost:${o.mailpitSmtpPort}` } : {}) } : {}),
     DATABASE_URL: o.db === 'external' ? o.databaseUrl : `postgres://starter_app:${appPassword}@localhost:${port}/starter`,
     DATABASE_MIGRATION_URL: o.db === 'external' ? '' : `postgres://starter:${pgPassword}@localhost:${port}/starter`,
   };
+}
+
+function mailSecrets(mail: MailChoice, env: Record<string, string | undefined> = process.env): Record<string, string> {
+  return Object.fromEntries(MAIL_ENV[mail].filter((k) => env[k]).map((k) => [k, env[k]!]));
 }
 
 /** Exportable configuration (no secrets), validated with the @starter/config schema. */
@@ -167,7 +211,7 @@ export async function create(opts: CreateOptions): Promise<void> {
   const db = (opts.db ?? (await choose('Base de datos', ['docker', 'external'] as const, 'docker'))) as 'docker' | 'external';
   const databaseUrl = db === 'external' ? (opts.databaseUrl ?? (await ask('DATABASE_URL de PostgreSQL 18 con pgvector', ''))) : '';
   if (db === 'external' && !/^postgres(ql)?:\/\//.test(databaseUrl)) throw new CliError('Indica una DATABASE_URL postgres:// válida para la base externa');
-  const mail = (opts.mail ?? (await choose('Correo transaccional', ['smtp', 'resend', 'log'] as const, 'smtp'))) as 'smtp' | 'resend' | 'log';
+  const mail = resolveMail(opts.mail ?? (await choose('Correo transaccional', ['auto', ...MAIL_CHOICES] as const, 'auto')));
   const from = opts.from ?? defaultTemplate();
   if (!from) throw new CliError('Indica la plantilla con --from <carpeta|repositorio git>');
 
@@ -180,12 +224,11 @@ export async function create(opts: CreateOptions): Promise<void> {
   fetchTemplate(from, dir, opts.ref);
   line('ok', 'Plantilla copiada', dir);
 
-  await writeInstallation(dir, { name, owner, modules, db, databaseUrl, mail });
+  await writeInstallation(dir, { name, owner, modules, db, databaseUrl, mail, composeProject: slugify(name) });
   line('ok', '.env con secretos únicos', 'permisos 600, fuera de git');
   line('ok', 'starter.config.json', 'configuración exportable sin secretos');
-  const pkgPath = join(dir, 'package.json');
-  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as Record<string, unknown>;
-  writeFileSync(pkgPath, `${JSON.stringify({ ...pkg, name: slugify(name), version: '0.1.0' }, null, 2)}\n`);
+  const { adoptProject } = await import('./project.js');
+  adoptProject(dir, { name, owner, modules, mail, mailFrom: defaultMailFrom(name, mail), db }, { git: false });
 
   if (opts.git !== false && !existsSync(join(dir, '.git'))) {
     try {
@@ -214,5 +257,5 @@ export async function create(opts: CreateOptions): Promise<void> {
     'pnpm dev',
   ];
   for (const s of steps) console.log(`  ${c.cyan('$')} ${s}`);
-  console.log(`\n  Ingresa en http://localhost:3000 con ${owner || 'el correo de OWNER_EMAIL'}; el código llega a ${mail === 'smtp' ? 'Mailpit (http://localhost:8025)' : mail === 'log' ? 'los logs de la API (solo desarrollo)' : 'tu bandeja (Resend)'}.`);
+  console.log(`\n  Ingresa en http://localhost:3000 con ${owner || 'el correo de OWNER_EMAIL'}; el código llega a ${mail === 'smtp' ? 'Mailpit (http://localhost:8025)' : mail === 'log' ? 'los logs de la API (solo desarrollo)' : `tu bandeja (${mail})`}.`);
 }

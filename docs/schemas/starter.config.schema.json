@@ -105,16 +105,20 @@
     },
     "mail": {
       "default": {
-        "transport": "smtp"
+        "transport": "resend"
       },
       "type": "object",
       "properties": {
         "transport": {
-          "default": "smtp",
+          "default": "resend",
           "type": "string",
           "enum": [
-            "smtp",
             "resend",
+            "smtp",
+            "postmark",
+            "sendgrid",
+            "mailgun",
+            "brevo",
             "log"
           ]
         },

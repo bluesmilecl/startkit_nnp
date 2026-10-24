@@ -15,6 +15,24 @@ const csv = z
   );
 
 /**
+ * Mail transports. `resend` is the recommended default; `smtp` works with your own server or any
+ * provider's SMTP; the other APIs need only their key (docs/mail.md). `log` is development only.
+ */
+export const MAIL_TRANSPORTS = ['resend', 'smtp', 'postmark', 'sendgrid', 'mailgun', 'brevo', 'log'] as const;
+export type MailTransport = (typeof MAIL_TRANSPORTS)[number];
+
+/** Variables each transport needs (validated at startup, written by `starter mail use`). */
+export const MAIL_TRANSPORT_KEYS: Record<MailTransport, string[]> = {
+  resend: ['RESEND_API_KEY'],
+  smtp: [],
+  postmark: ['POSTMARK_SERVER_TOKEN'],
+  sendgrid: ['SENDGRID_API_KEY'],
+  mailgun: ['MAILGUN_API_KEY', 'MAILGUN_DOMAIN'],
+  brevo: ['BREVO_API_KEY'],
+  log: [],
+};
+
+/**
  * Environment contract shared by api, worker, CLI and web (server side only).
  * Secrets are read here and never exported to client bundles.
  */
@@ -52,10 +70,23 @@ export const envSchema = z.object({
   OTP_RESEND_SECONDS: z.coerce.number().int().min(0).max(3600).default(60),
   SESSION_EXPIRES_DAYS: z.coerce.number().int().min(1).max(365).default(7),
 
-  MAIL_TRANSPORT: z.enum(['smtp', 'resend', 'log']).default('smtp'),
+  MAIL_TRANSPORT: z.enum(MAIL_TRANSPORTS).default('smtp'),
   MAIL_FROM: z.string().default('Starter Kit <no-reply@localhost>'),
+  /** SMTP as a URL (smtp://user:pass@host:587) or, more comfortably, with the SMTP_HOST… fields. */
   SMTP_URL: z.string().default('smtp://localhost:1025'),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASSWORD: z.string().optional(),
+  /** TLS from the first byte (port 465). Without it, STARTTLS is used when the server offers it. */
+  SMTP_SECURE: bool.optional(),
   RESEND_API_KEY: z.string().optional(),
+  POSTMARK_SERVER_TOKEN: z.string().optional(),
+  SENDGRID_API_KEY: z.string().optional(),
+  MAILGUN_API_KEY: z.string().optional(),
+  MAILGUN_DOMAIN: z.string().optional(),
+  MAILGUN_REGION: z.enum(['us', 'eu']).default('us'),
+  BREVO_API_KEY: z.string().optional(),
 
   STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),
   STORAGE_LOCAL_DIR: z.string().default('./storage-data'),
@@ -113,10 +144,11 @@ export function parseEnv(source: Record<string, string | undefined> = process.en
     throw new EnvValidationError([{ path: 'S3_BUCKET', message: 'required when STORAGE_DRIVER=s3' }]);
   }
   if (env.NODE_ENV === 'production' && env.MAIL_TRANSPORT === 'log') {
-    throw new EnvValidationError([{ path: 'MAIL_TRANSPORT', message: 'log transport would expose codes in logs; use smtp or resend' }]);
+    throw new EnvValidationError([{ path: 'MAIL_TRANSPORT', message: 'log transport would expose codes in logs; use resend, smtp or another provider' }]);
   }
-  if (env.MAIL_TRANSPORT === 'resend' && !env.RESEND_API_KEY) {
-    throw new EnvValidationError([{ path: 'RESEND_API_KEY', message: 'required when MAIL_TRANSPORT=resend' }]);
+  const missingMail = MAIL_TRANSPORT_KEYS[env.MAIL_TRANSPORT].filter((k) => !env[k as keyof typeof env]);
+  if (missingMail.length) {
+    throw new EnvValidationError(missingMail.map((k) => ({ path: k, message: `required when MAIL_TRANSPORT=${env.MAIL_TRANSPORT}` })));
   }
   return env;
 }

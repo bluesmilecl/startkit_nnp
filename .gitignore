@@ -20,3 +20,4 @@ blob-report/
 !.vscode/extensions.json
 verify-report.md
 .env.e2e
+.claude/settings.local.json

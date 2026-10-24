@@ -2,7 +2,9 @@
 
 Este archivo es para agentes (Claude Code u otros) que modifican este repositorio. Léelo completo antes de cambiar código. La documentación humana está en [README.md](README.md) y [docs/](docs/).
 
-**¿Solo instalar?** Sigue [INSTALL.md](INSTALL.md): `node scripts/quickstart.mjs --owner <correo>` (idempotente, termina con `QUICKSTART_RESULT=ok|error`).
+**¿Solo instalar?** Sigue [INSTALL.md](INSTALL.md): `node scripts/quickstart.mjs --owner <correo>` (idempotente, termina con `QUICKSTART_RESULT=ok|error`). Para un **proyecto nuevo** basado en el starter agrega `--new "<Nombre>"`.
+
+**¿Proyecto creado desde el starter?** Su contexto propio (qué hace, configuración, módulos, decisiones) está en `PROJECT.md`, en la raíz: léelo primero, manda sobre este archivo en lo que es del negocio, y actualízalo cuando agregues módulos o tomes decisiones. Este archivo sigue siendo la referencia técnica.
 
 ## Mapa rápido
 
@@ -20,6 +22,7 @@ Este archivo es para agentes (Claude Code u otros) que modifican este repositori
 | Vistas del panel | `apps/web/app/pages/admin/**`, navegación en `apps/web/app/utils/navigation.ts` |
 | Kit de interfaz (formularios, asistente, tablas/tarjetas, gráficos, carrusel, menús, avisos, modales, íconos) | `packages/ui/app/components/common/**`, `charts/**`, `composables/**`, `lib/icons.ts`; guía en [docs/frontend-components.md](docs/frontend-components.md); catálogo vivo en `/admin/components` |
 | Variables de entorno | `packages/config/src/env.ts` y `.env.example` |
+| Correo (Resend, SMTP, Postmark, SendGrid, Mailgun, Brevo) | `packages/mail/src/mailer.ts`; `pnpm starter mail use` y `mail test`; guía en [docs/mail.md](docs/mail.md) |
 | Módulo de referencia | **Proyectos**: contrato, tabla, `apps/api/src/modules/projects`, `apps/web/app/pages/admin/projects`, `tests/e2e/projects.spec.ts` |
 
 ## Comandos que debes usar
@@ -86,4 +89,4 @@ pnpm verify                        # verificación completa
 
 ## Skills
 
-Instrucciones paso a paso para tareas frecuentes en [skills/](skills/): [instalar](skills/install-starter/SKILL.md), [extender](skills/extend-starter/SKILL.md), [construir vistas](skills/build-ui/SKILL.md), [configurar IA](skills/configure-ai/SKILL.md) y [administrar conocimiento](skills/manage-rag/SKILL.md).
+Instrucciones paso a paso para tareas frecuentes en [.claude/skills/](.claude/skills/): [instalar](.claude/skills/install-starter/SKILL.md), [extender](.claude/skills/extend-starter/SKILL.md), [construir vistas](.claude/skills/build-ui/SKILL.md), [configurar IA](.claude/skills/configure-ai/SKILL.md) y [administrar conocimiento](.claude/skills/manage-rag/SKILL.md).

@@ -27,6 +27,13 @@ describe('env', () => {
     expect(() => parseEnv({ ...base, NODE_ENV: 'production', AI_TEST_PROVIDER_ENABLED: 'true' })).toThrow(/production/);
     expect(() => parseEnv({ ...base, NODE_ENV: 'production', MAIL_TRANSPORT: 'log' })).toThrow(/log transport/);
   });
+
+  it('requires the keys of the chosen mail transport', () => {
+    expect(() => parseEnv({ ...base, MAIL_TRANSPORT: 'resend' })).toThrow(/RESEND_API_KEY/);
+    expect(() => parseEnv({ ...base, MAIL_TRANSPORT: 'mailgun', MAILGUN_API_KEY: 'k' })).toThrow(/MAILGUN_DOMAIN/);
+    expect(parseEnv({ ...base, MAIL_TRANSPORT: 'brevo', BREVO_API_KEY: 'k' }).MAIL_TRANSPORT).toBe('brevo');
+    expect(parseEnv({ ...base, SMTP_HOST: 'smtp.empresa.cl', SMTP_PORT: '465', SMTP_SECURE: 'true' })).toMatchObject({ SMTP_PORT: 465, SMTP_SECURE: true });
+  });
 });
 
 describe('SecretBox', () => {

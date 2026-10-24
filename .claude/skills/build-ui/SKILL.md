@@ -5,10 +5,10 @@ description: Construye vistas del panel con el kit de interfaz del starter (form
 
 # Construir vistas con el kit
 
-Guía completa con la API de cada componente: [docs/frontend-components.md](../../docs/frontend-components.md).
+Guía completa con la API de cada componente: [docs/frontend-components.md](../../../docs/frontend-components.md).
 Ejemplos vivos con su código: `/admin/components` (`?tab=forms`, `wizard`, `data`, `charts`,
 `carousel`, `actions`, `feedback`, `icons`). Referencia en uso real:
-[`pages/admin/projects/index.vue`](../../apps/web/app/pages/admin/projects/index.vue).
+[`pages/admin/projects/index.vue`](../../../apps/web/app/pages/admin/projects/index.vue).
 
 ## Antes de escribir
 
@@ -58,7 +58,7 @@ para rankings), `DonutChart`.
 **Detalle**: `await useApiData(`cliente-${id}`, () => …, { fatal: [404] })`: un id inexistente
 muestra la página de error en español (con estado 404 también en SSR).
 
-**Errores** ([docs/errors.md](../../docs/errors.md)): cargas con `useApiData` + `LoadError`;
+**Errores** ([docs/errors.md](../../../docs/errors.md)): cargas con `useApiData` + `LoadError`;
 acciones con `try { … } catch (err) { notify.error(err) }` (mensaje de la API + código de solicitud,
 `{ retry }` para «Reintentar»); formularios con `form.handleSubmit` (errores por campo). Para
 decidir por tipo usa `normalizeError(err).code`, nunca el texto. Nunca `toast.error(err.message)`.

@@ -15,8 +15,9 @@ conexiones de conocimiento. En producción revisa también `/admin/diagnostics`.
    `/admin/invitations` o define `OWNER_EMAIL` para el propietario.
 3. **Espera entre reenvíos**: si pides otro código antes de `OTP_RESEND_SECONDS` (60 s por
    defecto) recibes `OTP_RESEND_COOLDOWN` con los segundos restantes.
-4. **Producción**: `MAIL_TRANSPORT=resend` requiere `RESEND_API_KEY`; revisa los logs `mail` de la
-   API (`otp e-mail failed`). El transporte `log` no se admite en producción.
+4. **Proveedor**: `pnpm starter mail test <correo>` envía un mensaje y muestra el motivo del rechazo
+   (clave inválida, dominio sin verificar). Con `onboarding@resend.dev` como remitente, Resend solo
+   entrega al correo de tu cuenta. Revisa también los logs `mail` de la API. Ver [mail.md](mail.md).
 5. Código rechazado: vence a los 5 minutos y se invalida tras 5 intentos; pide uno nuevo.
 
 ## La API no arranca: "Invalid environment configuration"
@@ -28,8 +29,8 @@ El mensaje lista cada variable inválida. Casos típicos:
 | `BETTER_AUTH_SECRET must be at least 32 characters` | Genera uno con `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. |
 | `APP_ENCRYPTION_KEY must be 32 bytes encoded as base64` | `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`. |
 | `AI_TEST_PROVIDER_ENABLED: must be false in production` | El proveedor de prueba nunca se habilita en producción. |
-| `MAIL_TRANSPORT: log transport would expose codes in logs` | Usa `smtp` o `resend` en producción. |
-| `RESEND_API_KEY: required when MAIL_TRANSPORT=resend` / `S3_BUCKET: required…` | Completa la variable del servicio elegido. |
+| `MAIL_TRANSPORT: log transport would expose codes in logs` | Usa Resend, SMTP u otro proveedor en producción ([mail.md](mail.md)). |
+| `RESEND_API_KEY: required when MAIL_TRANSPORT=resend` (o la clave de otro proveedor) / `S3_BUCKET: required…` | Completa la variable del servicio elegido; `pnpm starter mail use <proveedor>` lo hace por ti. |
 
 Las variables vacías se tratan como no definidas (aplican los valores por defecto).
 

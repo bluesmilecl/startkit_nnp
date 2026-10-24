@@ -105,7 +105,7 @@ docker compose --env-file .env -f docker/compose.yaml logs -f api worker
 
 - Versiones fijas de todas las imágenes (las de terceros están fijadas en `compose.yaml`; las
   propias se publican por etiqueta y digest inmutable desde el flujo de *release*). Nunca `latest`.
-- `NODE_ENV=production`, `MAIL_TRANSPORT=smtp|resend`, `AI_TEST_PROVIDER_ENABLED=false` (el
+- `NODE_ENV=production`, `MAIL_TRANSPORT` real (Resend por defecto; ver [mail.md](mail.md)), `AI_TEST_PROVIDER_ENABLED=false` (el
   arranque falla si no).
 - `APP_URL` con HTTPS y el dominio real; `TRUSTED_ORIGINS` solo si hay orígenes adicionales.
 - `OPENAPI_DOCS=protected` (permiso `api.docs`) o `disabled`.

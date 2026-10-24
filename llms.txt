@@ -6,7 +6,7 @@ Antes de modificar código, lee AGENTS.md: reglas de seguridad (sin secretos en 
 
 ## Empezar
 
-- [INSTALL.md](INSTALL.md): instalación en un comando para personas y agentes (`node scripts/quickstart.mjs --owner <correo>`), variantes, checklist y problemas frecuentes
+- [INSTALL.md](INSTALL.md): instalación en un comando para personas y agentes (`node scripts/quickstart.mjs --owner <correo>`; proyecto propio con `--new "<Nombre>"`), correo, variantes, checklist y problemas frecuentes
 - [README](README.md): qué incluye, inicio rápido y comandos
 - [AGENTS.md](AGENTS.md): guía para agentes de código
 - [Instalación](docs/installation.md): requisitos, create-ecortes-app, primer ingreso, producción
@@ -15,6 +15,7 @@ Antes de modificar código, lee AGENTS.md: reglas de seguridad (sin secretos en 
 ## Identidad y acceso
 
 - [Autenticación](docs/authentication.md): OTP, sesiones, invitaciones, propietario
+- [Correo](docs/mail.md): Resend (predeterminado), SMTP propio o de cualquier proveedor, Postmark, SendGrid, Mailgun y Brevo; `pnpm starter mail use|test`
 - [Permisos](docs/permissions.md): catálogo, roles por defecto y reglas de jerarquía
 - [Herramientas de administración del chat](docs/admin-tools.md): herramientas, propuestas y confirmación
 
@@ -45,11 +46,11 @@ Antes de modificar código, lee AGENTS.md: reglas de seguridad (sin secretos en 
 
 ## Skills
 
-- [Instalar](skills/install-starter/SKILL.md)
-- [Extender](skills/extend-starter/SKILL.md)
-- [Construir vistas](skills/build-ui/SKILL.md)
-- [Configurar IA](skills/configure-ai/SKILL.md)
-- [Administrar conocimiento](skills/manage-rag/SKILL.md)
+- [Instalar](.claude/skills/install-starter/SKILL.md)
+- [Extender](.claude/skills/extend-starter/SKILL.md)
+- [Construir vistas](.claude/skills/build-ui/SKILL.md)
+- [Configurar IA](.claude/skills/configure-ai/SKILL.md)
+- [Administrar conocimiento](.claude/skills/manage-rag/SKILL.md)
 
 ## Archivos de referencia
 

@@ -5,7 +5,8 @@ description: Agrega módulos de negocio, endpoints, permisos, vistas, herramient
 
 # Extender el starter
 
-Lee primero `AGENTS.md` (reglas no negociables y definición de terminado).
+Lee primero `AGENTS.md` (reglas no negociables y definición de terminado) y, si existe,
+`PROJECT.md` (contexto del proyecto: qué hace, módulos propios y decisiones).
 
 ## Módulo de negocio completo (recomendado)
 
@@ -15,7 +16,7 @@ pnpm starter generate module clientes --entity Customer --label "Clientes" --sin
 pnpm starter generate module ordenes-compra --entity PurchaseOrder --label "Órdenes de compra" --singular "Orden de compra" --gender f --dry-run
 ```
 
-Genera desde el módulo de referencia **Proyectos**: contrato Zod, tabla Drizzle, módulo Nest (controlador + servicio con auditoría, concurrencia optimista y paginación en el servidor), vista con DataTable, prueba E2E; además agrega permisos `<clave>.read/.manage`, los asigna a los roles por defecto y crea la entrada del menú. Nunca sobrescribe archivos sin `--force`.
+Genera desde el módulo de referencia **Proyectos**: contrato Zod, tabla Drizzle, módulo Nest (controlador + servicio con auditoría, concurrencia optimista y paginación en el servidor), vista con DataTable, prueba E2E; además agrega permisos `<clave>.read/.manage`, los asigna a los roles por defecto y crea la entrada del menú; en un proyecto con `PROJECT.md` agrega la fila del módulo. Nunca sobrescribe archivos sin `--force`.
 
 Después:
 
@@ -26,14 +27,14 @@ pnpm api:docs:generate && pnpm api:client:generate
 pnpm typecheck && pnpm test:e2e tests/e2e/<clave>.spec.ts
 ```
 
-Luego ajusta columnas en `packages/db/src/schema/<clave>.ts`, el contrato en `packages/contracts/src/<clave>.ts` y la vista.
+Luego ajusta columnas en `packages/db/src/schema/<clave>.ts`, el contrato en `packages/contracts/src/<clave>.ts` y la vista, y anota en la columna «Notas» de `PROJECT.md` qué hace el módulo.
 
 ## Endpoint nuevo en un módulo existente
 
 1. Define entrada/salida en `packages/contracts/src/…` con `.meta({ id })` para nombrarlos en OpenAPI.
 2. En el controlador: `@Endpoint({ operationId, summary, permission, feature?, body/query/params, response: { status?, schema }, errors: [...] })` y `@ZBody()/@ZQuery()/@ZParams()`.
 3. En el servicio: `assertCan(actor, 'permiso')`, filtra siempre por `actor.organizationId`, registra `recordAudit` en mutaciones.
-4. Errores ([docs/errors.md](../../docs/errors.md)): lanza `AppError` del catálogo (`notFound('Cliente')`, `field('rut', 'Ya existe…', 'CONFLICT')`, `notConfigured`, `upstream({ retryable })`), nunca `new Error`. Unicidad con un índice único con nombre y `isUniqueViolation(err, '<indice>')`, no con un `SELECT` previo.
+4. Errores ([docs/errors.md](../../../docs/errors.md)): lanza `AppError` del catálogo (`notFound('Cliente')`, `field('rut', 'Ya existe…', 'CONFLICT')`, `notConfigured`, `upstream({ retryable })`), nunca `new Error`. Unicidad con un índice único con nombre y `isUniqueViolation(err, '<indice>')`, no con un `SELECT` previo.
 5. Regenera OpenAPI/cliente y usa la función generada en la web (`unwrap(miOperacion({ client: useApi(), ... }))`), con `useApiData` + `LoadError` para cargas y `notify.error(err)` para acciones.
 6. Prueba: integración (servicio) y E2E (permiso denegado devuelve 403 con `code: 'FORBIDDEN'`; duplicado devuelve 409 en el campo).
 
@@ -54,4 +55,4 @@ Cola y política en `packages/jobs/src/index.ts`; manejador en `apps/worker/src/
 
 ## Vistas
 
-Usa el kit de interfaz: sigue la skill [construir vistas](../build-ui/SKILL.md) y la guía [docs/frontend-components.md](../../docs/frontend-components.md) (catálogo vivo en `/admin/components`). `<ClientOnly>` para `Select` con datos asíncronos, sin `Badge` dentro de `<p>`, textos en español, accesibilidad (labels, `aria-*`).
+Usa el kit de interfaz: sigue la skill [construir vistas](../build-ui/SKILL.md) y la guía [docs/frontend-components.md](../../../docs/frontend-components.md) (catálogo vivo en `/admin/components`). `<ClientOnly>` para `Select` con datos asíncronos, sin `Badge` dentro de `<p>`, textos en español, accesibilidad (labels, `aria-*`).
