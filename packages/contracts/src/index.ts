@@ -6,3 +6,4 @@ export * from './errors.js';
 export * from './ai.js';
 export * from './agents.js';
 export * from './rag.js';
+export * from './projects.js';

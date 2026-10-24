@@ -29,6 +29,7 @@ Swagger UI: `/api/docs` (según `OPENAPI_DOCS`). Documento JSON: `/api/docs-json
 - [auth](#auth) (12)
 - [health](#health) (3)
 - [me](#me) (6)
+- [projects](#projects) (5)
 - [public](#public) (1)
 - [rag-collections](#rag-collections) (16)
 - [rag-connections](#rag-connections) (10)
@@ -1414,6 +1415,72 @@ Comprueba base de datos y migraciones. pgvector solo se verifica si RAG está ha
 
 **Acceso:** cualquier sesión válida.
 
+## projects
+
+### `GET /api/projects`
+
+- **operationId:** `projects_list`
+- **Resumen:** Listar proyectos
+- **Parámetros:**
+  - `page` (query): `integer`
+  - `pageSize` (query): `integer`
+  - `search` (query): `string`
+  - `status` (query): `string`
+  - `sort` (query): `name` \| `createdAt` \| `updatedAt`
+  - `direction` (query): `asc` \| `desc`
+- **200**: OK — `application/json` `ProjectsPage`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Búsqueda por nombre o descripción, filtro por estado, orden y paginación en el servidor.
+
+**Permiso requerido:** `projects.read`.
+
+### `POST /api/projects`
+
+- **operationId:** `projects_create`
+- **Resumen:** Crear proyecto
+- **Cuerpo** (`application/json`): `CreateProjectInput`
+- **201**: OK — `application/json` `Project`
+- **Errores:** 400, 401, 403, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `projects.manage`.
+
+### `DELETE /api/projects/{id}`
+
+- **operationId:** `projects_delete`
+- **Resumen:** Eliminar proyecto
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `projects.manage`.
+
+### `GET /api/projects/{id}`
+
+- **operationId:** `projects_get`
+- **Resumen:** Proyecto
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `Project`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `projects.read`.
+
+### `PATCH /api/projects/{id}`
+
+- **operationId:** `projects_update`
+- **Resumen:** Editar, archivar o restaurar un proyecto
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `UpdateProjectInput`
+- **200**: OK — `application/json` `Project`
+- **Errores:** 400, 401, 403, 404, 409, 412, 422, 500 (`ErrorResponse`)
+
+Requiere la versión leída; si otra persona lo modificó entre tanto responde 412 y no aplica cambios.
+
+**Permiso requerido:** `projects.manage`.
+
 ## public
 
 ### `GET /api/public/settings`
@@ -1964,5 +2031,5 @@ Búsqueda vectorial, de texto completo o híbrida (RRF) sobre las colecciones au
 
 ## Esquemas
 
-160 esquemas en `components.schemas` (ver `openapi.json`).
+165 esquemas en `components.schemas` (ver `openapi.json`).
 

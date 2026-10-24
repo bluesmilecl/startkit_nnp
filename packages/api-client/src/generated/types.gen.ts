@@ -1900,6 +1900,59 @@ export type FeedbackInput = {
     comment?: string;
 };
 
+export type ProjectStatus = 'active' | 'archived';
+
+export type Project = {
+    id: string;
+    name: string;
+    description: string | null;
+    status: ProjectStatus;
+    /**
+     * Optimistic concurrency token; send it back when updating
+     */
+    version: number;
+    createdBy: {
+        id: string;
+        name: string | null;
+        email: string;
+    } | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    archivedAt: string | null;
+};
+
+export type ProjectsPage = {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+    items: Array<Project>;
+};
+
+export type CreateProjectInput = {
+    name: string;
+    description?: string | null;
+};
+
+export type UpdateProjectInput = {
+    name?: string;
+    description?: string | null;
+    status?: ProjectStatus;
+    /**
+     * Current version (from the last read); a mismatch returns 412
+     */
+    version: number;
+};
+
 export type OrganizationList = Array<OrganizationSummary>;
 
 export type OrganizationMemberList = Array<{
@@ -7417,6 +7470,248 @@ export type MeSessionsRevokeOthersResponses = {
 };
 
 export type MeSessionsRevokeOthersResponse = MeSessionsRevokeOthersResponses[keyof MeSessionsRevokeOthersResponses];
+
+export type ProjectsListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        pageSize?: number;
+        search?: string;
+        status?: ProjectStatus;
+        sort?: 'name' | 'createdAt' | 'updatedAt';
+        direction?: 'asc' | 'desc';
+    };
+    url: '/api/projects';
+};
+
+export type ProjectsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type ProjectsListError = ProjectsListErrors[keyof ProjectsListErrors];
+
+export type ProjectsListResponses = {
+    /**
+     * OK
+     */
+    200: ProjectsPage;
+};
+
+export type ProjectsListResponse = ProjectsListResponses[keyof ProjectsListResponses];
+
+export type ProjectsCreateData = {
+    body: CreateProjectInput;
+    path?: never;
+    query?: never;
+    url: '/api/projects';
+};
+
+export type ProjectsCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type ProjectsCreateError = ProjectsCreateErrors[keyof ProjectsCreateErrors];
+
+export type ProjectsCreateResponses = {
+    /**
+     * OK
+     */
+    201: Project;
+};
+
+export type ProjectsCreateResponse = ProjectsCreateResponses[keyof ProjectsCreateResponses];
+
+export type ProjectsDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/projects/{id}';
+};
+
+export type ProjectsDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type ProjectsDeleteError = ProjectsDeleteErrors[keyof ProjectsDeleteErrors];
+
+export type ProjectsDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type ProjectsDeleteResponse = ProjectsDeleteResponses[keyof ProjectsDeleteResponses];
+
+export type ProjectsGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/projects/{id}';
+};
+
+export type ProjectsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type ProjectsGetError = ProjectsGetErrors[keyof ProjectsGetErrors];
+
+export type ProjectsGetResponses = {
+    /**
+     * OK
+     */
+    200: Project;
+};
+
+export type ProjectsGetResponse = ProjectsGetResponses[keyof ProjectsGetResponses];
+
+export type ProjectsUpdateData = {
+    body: UpdateProjectInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/projects/{id}';
+};
+
+export type ProjectsUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Precondición fallida (versión desactualizada)
+     */
+    412: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type ProjectsUpdateError = ProjectsUpdateErrors[keyof ProjectsUpdateErrors];
+
+export type ProjectsUpdateResponses = {
+    /**
+     * OK
+     */
+    200: Project;
+};
+
+export type ProjectsUpdateResponse = ProjectsUpdateResponses[keyof ProjectsUpdateResponses];
 
 export type PublicSettingsData = {
     body?: never;
