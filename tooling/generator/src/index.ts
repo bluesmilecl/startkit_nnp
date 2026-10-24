@@ -114,12 +114,12 @@ export function transform(source: string, n: Names): string {
     [/Projects/g, n.entityPlural],
     [/Project/g, n.entity],
     // Table, index and operation ids (snake_case)
-    [/pgTable\('projects'/g, `pgTable('${n.snake}'`],
+    [/pgTable\((\s*)'projects'/g, (_m, ws) => `pgTable(${ws!}'${n.snake}'`],
     [/projects_/g, `${n.snake}_`],
     // Module-relative imports and file names (kebab-case)
     [/\.\/projects\./g, `./${n.kebab}.`],
     // Permission keys, audit actions and permission groups
-    [/projects\.(read|manage|create|update|archive|restore|delete)\b/g, (_m, a) => `${n.snake}.${a!}`],
+    [/(['"`])projects\.(read|manage|create|update|archive|restore|delete)\b/g, (_m, q, a) => `${q!}${n.snake}.${a!}`],
     [/group: 'projects'/g, `group: '${n.snake}'`],
     // Routes, tags and cache keys (kebab-case)
     [/\/projects\b/g, `/${n.kebab}`],

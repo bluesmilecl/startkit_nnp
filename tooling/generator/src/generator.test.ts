@@ -21,6 +21,8 @@ describe('module generator', () => {
         "import { ProjectsService } from './projects.service.js'; projectsList({ client }); '/api/projects'",
         "recordAudit(db, actor, { action: 'projects.archive', resourceType: 'project' }); data-testid=\"project-new\" id=\"pj-name\"",
         "toast.success('Proyecto creado'); 'Nuevo proyecto'; 'Aún no hay proyectos'",
+        "export const projects = pgTable(\n  'projects',\n  {});",
+        'return this.projects.create(actor, body); can("projects.manage")',
       ].join('\n'),
       n,
     );
@@ -32,6 +34,8 @@ describe('module generator', () => {
     expect(out).toContain("action: 'ordenes_compra.archive', resourceType: 'purchase_order'");
     expect(out).toContain('data-testid="purchase-order-new" id="oc-name"');
     expect(out).toContain("toast.success('Orden de compra creada'); 'Nueva orden de compra'; 'Aún no hay órdenes de compra'");
+    expect(out).toContain("pgTable(\n  'ordenes_compra',");
+    expect(out).toContain('return this.ordenesCompra.create(actor, body); can("ordenes_compra.manage")');
     expect(out).not.toMatch(/project|Project|proyecto/i);
   });
 
