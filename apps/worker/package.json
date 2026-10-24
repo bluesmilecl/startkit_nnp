@@ -17,6 +17,7 @@
     "@starter/jobs": "workspace:*",
     "@starter/mail": "workspace:*",
     "@starter/observability": "workspace:*",
+    "@starter/rag": "workspace:*",
     "@starter/storage": "workspace:*"
   },
   "files": [

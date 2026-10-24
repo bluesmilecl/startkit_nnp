@@ -1,6 +1,6 @@
 import { loadActor } from '@starter/auth';
 import { createAiServices, fetchClpRate, type AiServices } from '@starter/ai';
-import { fxRates } from '@starter/db';
+import { and, attachments, eq, fxRates, lt, sql } from '@starter/db';
 import { QUEUES } from '@starter/jobs';
 import { createLogger } from '@starter/observability';
 import type { WorkerContext } from '../context.js';
@@ -51,5 +51,12 @@ export async function registerAiHandlers(ctx: WorkerContext, ai: AiServices): Pr
   onMaintenance(async () => {
     const released = await ai.budgets.expireStale();
     if (released) log.info({ released }, 'stale budget reservations released');
+    // Uploads never attached to a message (abandoned composer) are removed after 24 h.
+    const orphans = await ctx.db.db
+      .delete(attachments)
+      .where(and(eq(attachments.status, 'uploaded'), lt(attachments.createdAt, sql`now() - interval '24 hours'`)))
+      .returning({ key: attachments.storageKey });
+    for (const o of orphans) await ctx.storage.delete(o.key).catch(() => {});
+    if (orphans.length) log.info({ removed: orphans.length }, 'orphan chat uploads removed');
   });
 }

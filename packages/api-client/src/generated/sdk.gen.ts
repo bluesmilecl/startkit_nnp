@@ -2,7 +2,7 @@
 
 import { client } from './client.gen.js';
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type ServerSentEventsResult, type TDataShape } from './client/index.js';
-import type { AdminAuditExportData, AdminAuditExportErrors, AdminAuditExportResponses, AdminAuditListData, AdminAuditListErrors, AdminAuditListResponses, AdminDashboardData, AdminDashboardErrors, AdminDashboardResponses, AdminDiagnosticsData, AdminDiagnosticsErrors, AdminDiagnosticsResponses, AdminInvitationsCreateData, AdminInvitationsCreateErrors, AdminInvitationsCreateResponses, AdminInvitationsListData, AdminInvitationsListErrors, AdminInvitationsListResponses, AdminInvitationsResendData, AdminInvitationsResendErrors, AdminInvitationsResendResponses, AdminInvitationsRevokeData, AdminInvitationsRevokeErrors, AdminInvitationsRevokeResponses, AdminOnboardingCompleteData, AdminOnboardingCompleteErrors, AdminOnboardingCompleteResponses, AdminOrgsAddMemberData, AdminOrgsAddMemberErrors, AdminOrgsAddMemberResponses, AdminOrgsCreateData, AdminOrgsCreateErrors, AdminOrgsCreateResponses, AdminOrgsListData, AdminOrgsListErrors, AdminOrgsListResponses, AdminOrgsMembersData, AdminOrgsMembersErrors, AdminOrgsMembersResponses, AdminOrgsRemoveMemberData, AdminOrgsRemoveMemberErrors, AdminOrgsRemoveMemberResponses, AdminPermissionsListData, AdminPermissionsListErrors, AdminPermissionsListResponses, AdminPermissionsMatrixData, AdminPermissionsMatrixErrors, AdminPermissionsMatrixResponses, AdminProposalsCancelData, AdminProposalsCancelErrors, AdminProposalsCancelResponses, AdminProposalsConfirmData, AdminProposalsConfirmErrors, AdminProposalsConfirmResponses, AdminProposalsCreateData, AdminProposalsCreateErrors, AdminProposalsCreateResponses, AdminProposalsGetData, AdminProposalsGetErrors, AdminProposalsGetResponses, AdminRolesCreateData, AdminRolesCreateErrors, AdminRolesCreateResponses, AdminRolesDeleteData, AdminRolesDeleteErrors, AdminRolesDeleteResponses, AdminRolesGetData, AdminRolesGetErrors, AdminRolesGetResponses, AdminRolesListData, AdminRolesListErrors, AdminRolesListResponses, AdminRolesSetPermissionsData, AdminRolesSetPermissionsErrors, AdminRolesSetPermissionsResponses, AdminRolesUpdateData, AdminRolesUpdateErrors, AdminRolesUpdateResponses, AdminSettingsGetData, AdminSettingsGetErrors, AdminSettingsGetResponses, AdminSettingsUpdateData, AdminSettingsUpdateErrors, AdminSettingsUpdateResponses, AdminUsersAssignRoleData, AdminUsersAssignRoleErrors, AdminUsersAssignRoleResponses, AdminUsersCreateData, AdminUsersCreateErrors, AdminUsersCreateResponses, AdminUsersDeleteData, AdminUsersDeleteErrors, AdminUsersDeleteResponses, AdminUsersDisableData, AdminUsersDisableErrors, AdminUsersDisableResponses, AdminUsersEnableData, AdminUsersEnableErrors, AdminUsersEnableResponses, AdminUsersGetData, AdminUsersGetErrors, AdminUsersGetResponses, AdminUsersListData, AdminUsersListErrors, AdminUsersListResponses, AdminUsersRemoveRoleData, AdminUsersRemoveRoleErrors, AdminUsersRemoveRoleResponses, AdminUsersRevokeSessionsData, AdminUsersRevokeSessionsErrors, AdminUsersRevokeSessionsResponses, AdminUsersUpdateData, AdminUsersUpdateErrors, AdminUsersUpdateResponses, AiAgentsCreateData, AiAgentsCreateErrors, AiAgentsCreateResponses, AiAgentsDiscardDraftData, AiAgentsDiscardDraftErrors, AiAgentsDiscardDraftResponses, AiAgentsGetData, AiAgentsGetErrors, AiAgentsGetResponses, AiAgentsListData, AiAgentsListErrors, AiAgentsListResponses, AiAgentsPublishData, AiAgentsPublishErrors, AiAgentsPublishResponses, AiAgentsRollbackData, AiAgentsRollbackErrors, AiAgentsRollbackResponses, AiAgentsSaveDraftData, AiAgentsSaveDraftErrors, AiAgentsSaveDraftResponses, AiAgentsTestData, AiAgentsTestErrors, AiAgentsTestResponses, AiAgentsUpdateData, AiAgentsUpdateErrors, AiAgentsUpdateResponses, AiAgentsValidateData, AiAgentsValidateErrors, AiAgentsValidateResponses, AiAttachmentsContentData, AiAttachmentsContentErrors, AiAttachmentsContentResponses, AiAttachmentsDeleteData, AiAttachmentsDeleteErrors, AiAttachmentsDeleteResponses, AiAttachmentsUploadData, AiAttachmentsUploadErrors, AiAttachmentsUploadResponses, AiBudgetsCreateData, AiBudgetsCreateErrors, AiBudgetsCreateResponses, AiBudgetsDeleteData, AiBudgetsDeleteErrors, AiBudgetsDeleteResponses, AiBudgetsListData, AiBudgetsListErrors, AiBudgetsListResponses, AiBudgetsUpdateData, AiBudgetsUpdateErrors, AiBudgetsUpdateResponses, AiChatAgentData, AiChatAgentErrors, AiChatAgentResponses, AiChatStreamData, AiChatStreamErrors, AiChatStreamResponse, AiChatStreamResponses, AiConnectionsCreateData, AiConnectionsCreateErrors, AiConnectionsCreateResponses, AiConnectionsDeleteData, AiConnectionsDeleteErrors, AiConnectionsDeleteResponses, AiConnectionsGetData, AiConnectionsGetErrors, AiConnectionsGetResponses, AiConnectionsListData, AiConnectionsListErrors, AiConnectionsListResponses, AiConnectionsTestData, AiConnectionsTestErrors, AiConnectionsTestResponses, AiConnectionsUpdateData, AiConnectionsUpdateErrors, AiConnectionsUpdateResponses, AiConversationsDeleteData, AiConversationsDeleteErrors, AiConversationsDeleteResponses, AiConversationsGetData, AiConversationsGetErrors, AiConversationsGetResponses, AiConversationsListData, AiConversationsListErrors, AiConversationsListResponses, AiConversationsRenameData, AiConversationsRenameErrors, AiConversationsRenameResponses, AiFxRefreshData, AiFxRefreshErrors, AiFxRefreshResponses, AiLabCreateData, AiLabCreateErrors, AiLabCreateResponses, AiLabGetData, AiLabGetErrors, AiLabGetResponses, AiLabListData, AiLabListErrors, AiLabListResponses, AiModelsGetData, AiModelsGetErrors, AiModelsGetResponses, AiModelsImportData, AiModelsImportErrors, AiModelsImportResponses, AiModelsListData, AiModelsListErrors, AiModelsListResponses, AiModelsSyncData, AiModelsSyncErrors, AiModelsSyncResponses, AiModelsUpdateData, AiModelsUpdateErrors, AiModelsUpdateResponses, AiModelsVerifyData, AiModelsVerifyErrors, AiModelsVerifyResponses, AiPricesListData, AiPricesListErrors, AiPricesListResponses, AiPricesSetData, AiPricesSetErrors, AiPricesSetResponses, AiPricesSyncData, AiPricesSyncErrors, AiPricesSyncResponses, AiProvidersListData, AiProvidersListErrors, AiProvidersListResponses, AiRecommendationsCreateData, AiRecommendationsCreateErrors, AiRecommendationsCreateResponses, AiSyncRunsData, AiSyncRunsErrors, AiSyncRunsResponses, AiTranscriptionsCreateData, AiTranscriptionsCreateErrors, AiTranscriptionsCreateResponses, AiUsageExportData, AiUsageExportErrors, AiUsageExportResponses, AiUsageRequestsData, AiUsageRequestsErrors, AiUsageRequestsResponses, AiUsageSummaryData, AiUsageSummaryErrors, AiUsageSummaryResponses, AuthGetErrorData, AuthGetErrorErrors, AuthGetErrorResponses, AuthGetOkData, AuthGetOkErrors, AuthGetOkResponses, AuthGetSessionData, AuthGetSessionErrors, AuthGetSessionPostData, AuthGetSessionPostErrors, AuthGetSessionPostResponses, AuthGetSessionResponses, AuthListUserSessionsData, AuthListUserSessionsErrors, AuthListUserSessionsResponses, AuthPostRevokeOtherSessionsData, AuthPostRevokeOtherSessionsErrors, AuthPostRevokeOtherSessionsResponses, AuthPostRevokeSessionData, AuthPostRevokeSessionErrors, AuthPostRevokeSessionResponses, AuthPostRevokeSessionsData, AuthPostRevokeSessionsErrors, AuthPostRevokeSessionsResponses, AuthSendEmailVerificationOtpData, AuthSendEmailVerificationOtpErrors, AuthSendEmailVerificationOtpResponses, AuthSignInWithEmailOtpData, AuthSignInWithEmailOtpErrors, AuthSignInWithEmailOtpResponses, AuthSignOutData, AuthSignOutErrors, AuthSignOutResponses, AuthVerifyEmailWithOtpData, AuthVerifyEmailWithOtpErrors, AuthVerifyEmailWithOtpResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthMetricsData, HealthMetricsErrors, HealthMetricsResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, MeGetData, MeGetErrors, MeGetResponses, MeSessionsListData, MeSessionsListErrors, MeSessionsListResponses, MeSessionsRevokeData, MeSessionsRevokeErrors, MeSessionsRevokeOthersData, MeSessionsRevokeOthersErrors, MeSessionsRevokeOthersResponses, MeSessionsRevokeResponses, MeSwitchOrganizationData, MeSwitchOrganizationErrors, MeSwitchOrganizationResponses, MeUpdateData, MeUpdateErrors, MeUpdateResponses, PublicSettingsData, PublicSettingsErrors, PublicSettingsResponses } from './types.gen.js';
+import type { AdminAuditExportData, AdminAuditExportErrors, AdminAuditExportResponses, AdminAuditListData, AdminAuditListErrors, AdminAuditListResponses, AdminDashboardData, AdminDashboardErrors, AdminDashboardResponses, AdminDiagnosticsData, AdminDiagnosticsErrors, AdminDiagnosticsResponses, AdminInvitationsCreateData, AdminInvitationsCreateErrors, AdminInvitationsCreateResponses, AdminInvitationsListData, AdminInvitationsListErrors, AdminInvitationsListResponses, AdminInvitationsResendData, AdminInvitationsResendErrors, AdminInvitationsResendResponses, AdminInvitationsRevokeData, AdminInvitationsRevokeErrors, AdminInvitationsRevokeResponses, AdminOnboardingCompleteData, AdminOnboardingCompleteErrors, AdminOnboardingCompleteResponses, AdminOrgsAddMemberData, AdminOrgsAddMemberErrors, AdminOrgsAddMemberResponses, AdminOrgsCreateData, AdminOrgsCreateErrors, AdminOrgsCreateResponses, AdminOrgsListData, AdminOrgsListErrors, AdminOrgsListResponses, AdminOrgsMembersData, AdminOrgsMembersErrors, AdminOrgsMembersResponses, AdminOrgsRemoveMemberData, AdminOrgsRemoveMemberErrors, AdminOrgsRemoveMemberResponses, AdminPermissionsListData, AdminPermissionsListErrors, AdminPermissionsListResponses, AdminPermissionsMatrixData, AdminPermissionsMatrixErrors, AdminPermissionsMatrixResponses, AdminProposalsCancelData, AdminProposalsCancelErrors, AdminProposalsCancelResponses, AdminProposalsConfirmData, AdminProposalsConfirmErrors, AdminProposalsConfirmResponses, AdminProposalsCreateData, AdminProposalsCreateErrors, AdminProposalsCreateResponses, AdminProposalsGetData, AdminProposalsGetErrors, AdminProposalsGetResponses, AdminRolesCreateData, AdminRolesCreateErrors, AdminRolesCreateResponses, AdminRolesDeleteData, AdminRolesDeleteErrors, AdminRolesDeleteResponses, AdminRolesGetData, AdminRolesGetErrors, AdminRolesGetResponses, AdminRolesListData, AdminRolesListErrors, AdminRolesListResponses, AdminRolesSetPermissionsData, AdminRolesSetPermissionsErrors, AdminRolesSetPermissionsResponses, AdminRolesUpdateData, AdminRolesUpdateErrors, AdminRolesUpdateResponses, AdminSettingsGetData, AdminSettingsGetErrors, AdminSettingsGetResponses, AdminSettingsUpdateData, AdminSettingsUpdateErrors, AdminSettingsUpdateResponses, AdminUsersAssignRoleData, AdminUsersAssignRoleErrors, AdminUsersAssignRoleResponses, AdminUsersCreateData, AdminUsersCreateErrors, AdminUsersCreateResponses, AdminUsersDeleteData, AdminUsersDeleteErrors, AdminUsersDeleteResponses, AdminUsersDisableData, AdminUsersDisableErrors, AdminUsersDisableResponses, AdminUsersEnableData, AdminUsersEnableErrors, AdminUsersEnableResponses, AdminUsersGetData, AdminUsersGetErrors, AdminUsersGetResponses, AdminUsersListData, AdminUsersListErrors, AdminUsersListResponses, AdminUsersRemoveRoleData, AdminUsersRemoveRoleErrors, AdminUsersRemoveRoleResponses, AdminUsersRevokeSessionsData, AdminUsersRevokeSessionsErrors, AdminUsersRevokeSessionsResponses, AdminUsersUpdateData, AdminUsersUpdateErrors, AdminUsersUpdateResponses, AiAgentsCreateData, AiAgentsCreateErrors, AiAgentsCreateResponses, AiAgentsDiscardDraftData, AiAgentsDiscardDraftErrors, AiAgentsDiscardDraftResponses, AiAgentsGetData, AiAgentsGetErrors, AiAgentsGetResponses, AiAgentsListData, AiAgentsListErrors, AiAgentsListResponses, AiAgentsPublishData, AiAgentsPublishErrors, AiAgentsPublishResponses, AiAgentsRollbackData, AiAgentsRollbackErrors, AiAgentsRollbackResponses, AiAgentsSaveDraftData, AiAgentsSaveDraftErrors, AiAgentsSaveDraftResponses, AiAgentsTestData, AiAgentsTestErrors, AiAgentsTestResponses, AiAgentsUpdateData, AiAgentsUpdateErrors, AiAgentsUpdateResponses, AiAgentsValidateData, AiAgentsValidateErrors, AiAgentsValidateResponses, AiAttachmentsContentData, AiAttachmentsContentErrors, AiAttachmentsContentResponses, AiAttachmentsDeleteData, AiAttachmentsDeleteErrors, AiAttachmentsDeleteResponses, AiAttachmentsUploadData, AiAttachmentsUploadErrors, AiAttachmentsUploadResponses, AiBudgetsCreateData, AiBudgetsCreateErrors, AiBudgetsCreateResponses, AiBudgetsDeleteData, AiBudgetsDeleteErrors, AiBudgetsDeleteResponses, AiBudgetsListData, AiBudgetsListErrors, AiBudgetsListResponses, AiBudgetsUpdateData, AiBudgetsUpdateErrors, AiBudgetsUpdateResponses, AiChatAgentData, AiChatAgentErrors, AiChatAgentResponses, AiChatStreamData, AiChatStreamErrors, AiChatStreamResponse, AiChatStreamResponses, AiConnectionsCreateData, AiConnectionsCreateErrors, AiConnectionsCreateResponses, AiConnectionsDeleteData, AiConnectionsDeleteErrors, AiConnectionsDeleteResponses, AiConnectionsGetData, AiConnectionsGetErrors, AiConnectionsGetResponses, AiConnectionsListData, AiConnectionsListErrors, AiConnectionsListResponses, AiConnectionsTestData, AiConnectionsTestErrors, AiConnectionsTestResponses, AiConnectionsUpdateData, AiConnectionsUpdateErrors, AiConnectionsUpdateResponses, AiConversationsDeleteData, AiConversationsDeleteErrors, AiConversationsDeleteResponses, AiConversationsGetData, AiConversationsGetErrors, AiConversationsGetResponses, AiConversationsListData, AiConversationsListErrors, AiConversationsListResponses, AiConversationsRenameData, AiConversationsRenameErrors, AiConversationsRenameResponses, AiFxRefreshData, AiFxRefreshErrors, AiFxRefreshResponses, AiLabCreateData, AiLabCreateErrors, AiLabCreateResponses, AiLabGetData, AiLabGetErrors, AiLabGetResponses, AiLabListData, AiLabListErrors, AiLabListResponses, AiMessagesFeedbackData, AiMessagesFeedbackErrors, AiMessagesFeedbackResponses, AiModelsGetData, AiModelsGetErrors, AiModelsGetResponses, AiModelsImportData, AiModelsImportErrors, AiModelsImportResponses, AiModelsListData, AiModelsListErrors, AiModelsListResponses, AiModelsSyncData, AiModelsSyncErrors, AiModelsSyncResponses, AiModelsUpdateData, AiModelsUpdateErrors, AiModelsUpdateResponses, AiModelsVerifyData, AiModelsVerifyErrors, AiModelsVerifyResponses, AiPricesListData, AiPricesListErrors, AiPricesListResponses, AiPricesSetData, AiPricesSetErrors, AiPricesSetResponses, AiPricesSyncData, AiPricesSyncErrors, AiPricesSyncResponses, AiProvidersListData, AiProvidersListErrors, AiProvidersListResponses, AiRecommendationsCreateData, AiRecommendationsCreateErrors, AiRecommendationsCreateResponses, AiSyncRunsData, AiSyncRunsErrors, AiSyncRunsResponses, AiTranscriptionsCreateData, AiTranscriptionsCreateErrors, AiTranscriptionsCreateResponses, AiUsageExportData, AiUsageExportErrors, AiUsageExportResponses, AiUsageRequestsData, AiUsageRequestsErrors, AiUsageRequestsResponses, AiUsageSummaryData, AiUsageSummaryErrors, AiUsageSummaryResponses, AuthGetErrorData, AuthGetErrorErrors, AuthGetErrorResponses, AuthGetOkData, AuthGetOkErrors, AuthGetOkResponses, AuthGetSessionData, AuthGetSessionErrors, AuthGetSessionPostData, AuthGetSessionPostErrors, AuthGetSessionPostResponses, AuthGetSessionResponses, AuthListUserSessionsData, AuthListUserSessionsErrors, AuthListUserSessionsResponses, AuthPostRevokeOtherSessionsData, AuthPostRevokeOtherSessionsErrors, AuthPostRevokeOtherSessionsResponses, AuthPostRevokeSessionData, AuthPostRevokeSessionErrors, AuthPostRevokeSessionResponses, AuthPostRevokeSessionsData, AuthPostRevokeSessionsErrors, AuthPostRevokeSessionsResponses, AuthSendEmailVerificationOtpData, AuthSendEmailVerificationOtpErrors, AuthSendEmailVerificationOtpResponses, AuthSignInWithEmailOtpData, AuthSignInWithEmailOtpErrors, AuthSignInWithEmailOtpResponses, AuthSignOutData, AuthSignOutErrors, AuthSignOutResponses, AuthVerifyEmailWithOtpData, AuthVerifyEmailWithOtpErrors, AuthVerifyEmailWithOtpResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthMetricsData, HealthMetricsErrors, HealthMetricsResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, MeGetData, MeGetErrors, MeGetResponses, MeSessionsListData, MeSessionsListErrors, MeSessionsListResponses, MeSessionsRevokeData, MeSessionsRevokeErrors, MeSessionsRevokeOthersData, MeSessionsRevokeOthersErrors, MeSessionsRevokeOthersResponses, MeSessionsRevokeResponses, MeSwitchOrganizationData, MeSwitchOrganizationErrors, MeSwitchOrganizationResponses, MeUpdateData, MeUpdateErrors, MeUpdateResponses, PublicSettingsData, PublicSettingsErrors, PublicSettingsResponses, RagAnalyticsData, RagAnalyticsErrors, RagAnalyticsResponses, RagCollectionsCreateData, RagCollectionsCreateErrors, RagCollectionsCreateResponses, RagCollectionsDeleteData, RagCollectionsDeleteErrors, RagCollectionsDeleteResponses, RagCollectionsGetData, RagCollectionsGetErrors, RagCollectionsGetResponses, RagCollectionsListData, RagCollectionsListErrors, RagCollectionsListResponses, RagCollectionsReindexData, RagCollectionsReindexErrors, RagCollectionsReindexResponses, RagCollectionsUpdateData, RagCollectionsUpdateErrors, RagCollectionsUpdateResponses, RagConnectionsActivateData, RagConnectionsActivateErrors, RagConnectionsActivateResponses, RagConnectionsCreateData, RagConnectionsCreateErrors, RagConnectionsCreateResponses, RagConnectionsDeleteData, RagConnectionsDeleteErrors, RagConnectionsDeleteResponses, RagConnectionsDiagnoseData, RagConnectionsDiagnoseErrors, RagConnectionsDiagnoseResponses, RagConnectionsGetData, RagConnectionsGetErrors, RagConnectionsGetResponses, RagConnectionsListData, RagConnectionsListErrors, RagConnectionsListResponses, RagConnectionsUpdateData, RagConnectionsUpdateErrors, RagConnectionsUpdateResponses, RagDocumentsDeleteData, RagDocumentsDeleteErrors, RagDocumentsDeleteResponses, RagDocumentsGetData, RagDocumentsGetErrors, RagDocumentsGetResponses, RagDocumentsListData, RagDocumentsListErrors, RagDocumentsListResponses, RagDocumentsReprocessData, RagDocumentsReprocessErrors, RagDocumentsReprocessResponses, RagDocumentsUploadData, RagDocumentsUploadErrors, RagDocumentsUploadResponses, RagEvaluationsCreateData, RagEvaluationsCreateErrors, RagEvaluationsCreateResponses, RagEvaluationsDeleteData, RagEvaluationsDeleteErrors, RagEvaluationsDeleteResponses, RagEvaluationsListData, RagEvaluationsListErrors, RagEvaluationsListResponses, RagEvaluationsRateData, RagEvaluationsRateErrors, RagEvaluationsRateResponses, RagEvaluationsRunData, RagEvaluationsRunErrors, RagEvaluationsRunResponses, RagEvaluationsRunsData, RagEvaluationsRunsErrors, RagEvaluationsRunsResponses, RagEvaluationsUpdateData, RagEvaluationsUpdateErrors, RagEvaluationsUpdateResponses, RagJobsCancelData, RagJobsCancelErrors, RagJobsCancelResponses, RagJobsGetData, RagJobsGetErrors, RagJobsGetResponses, RagJobsListData, RagJobsListErrors, RagJobsListResponses, RagJobsRetryData, RagJobsRetryErrors, RagJobsRetryResponses, RagProfilesCreateData, RagProfilesCreateErrors, RagProfilesCreateResponses, RagProfilesDeleteData, RagProfilesDeleteErrors, RagProfilesDeleteResponses, RagProfilesListData, RagProfilesListErrors, RagProfilesListResponses, RagSearchData, RagSearchErrors, RagSearchResponses, RagSourcesCreateData, RagSourcesCreateErrors, RagSourcesCreateResponses, RagSourcesDeleteData, RagSourcesDeleteErrors, RagSourcesDeleteResponses, RagSourcesListData, RagSourcesListErrors, RagSourcesListResponses, RagSourcesSyncData, RagSourcesSyncErrors, RagSourcesSyncResponses, RagSourcesUpdateData, RagSourcesUpdateErrors, RagSourcesUpdateResponses } from './types.gen.js';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -1309,6 +1309,27 @@ export const aiLabGet = <ThrowOnError extends boolean = false>(options: Options<
 });
 
 /**
+ * Valorar una respuesta del asistente
+ *
+ * **Permiso requerido:** `ai.chat`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const aiMessagesFeedback = <ThrowOnError extends boolean = false>(options: Options<AiMessagesFeedbackData, ThrowOnError>): RequestResult<AiMessagesFeedbackResponses, AiMessagesFeedbackErrors, ThrowOnError> => (options.client ?? client).post<AiMessagesFeedbackResponses, AiMessagesFeedbackErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/ai/messages/{id}/feedback',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Catálogo de modelos con capacidades y tarifas vigentes
  *
  * Filtros por nombre, función, capacidad (estado "yes") y disponibilidad. Una capacidad no verificada figura como "unknown".
@@ -1872,3 +1893,735 @@ export const meSessionsRevokeOthers = <ThrowOnError extends boolean = false>(opt
  * **Acceso:** público.
  */
 export const publicSettings = <ThrowOnError extends boolean = false>(options?: Options<PublicSettingsData, ThrowOnError>): RequestResult<PublicSettingsResponses, PublicSettingsErrors, ThrowOnError> => (options?.client ?? client).get<PublicSettingsResponses, PublicSettingsErrors, ThrowOnError>({ url: '/api/public/settings', ...options });
+
+/**
+ * Analítica de conocimiento (consultas, abstención, latencia, ingesta, costos, retroalimentación)
+ *
+ * **Permiso requerido:** `rag.analytics.read`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragAnalytics = <ThrowOnError extends boolean = false>(options?: Options<RagAnalyticsData, ThrowOnError>): RequestResult<RagAnalyticsResponses, RagAnalyticsErrors, ThrowOnError> => (options?.client ?? client).get<RagAnalyticsResponses, RagAnalyticsErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/analytics',
+    ...options
+});
+
+/**
+ * Colecciones de conocimiento
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragCollectionsList = <ThrowOnError extends boolean = false>(options?: Options<RagCollectionsListData, ThrowOnError>): RequestResult<RagCollectionsListResponses, RagCollectionsListErrors, ThrowOnError> => (options?.client ?? client).get<RagCollectionsListResponses, RagCollectionsListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections',
+    ...options
+});
+
+/**
+ * Crear colección
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragCollectionsCreate = <ThrowOnError extends boolean = false>(options: Options<RagCollectionsCreateData, ThrowOnError>): RequestResult<RagCollectionsCreateResponses, RagCollectionsCreateErrors, ThrowOnError> => (options.client ?? client).post<RagCollectionsCreateResponses, RagCollectionsCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Eliminar colección (purga durable de documentos, vectores y archivos)
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragCollectionsDelete = <ThrowOnError extends boolean = false>(options: Options<RagCollectionsDeleteData, ThrowOnError>): RequestResult<RagCollectionsDeleteResponses, RagCollectionsDeleteErrors, ThrowOnError> => (options.client ?? client).delete<RagCollectionsDeleteResponses, RagCollectionsDeleteErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections/{id}',
+    ...options
+});
+
+/**
+ * Colección con estadísticas
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragCollectionsGet = <ThrowOnError extends boolean = false>(options: Options<RagCollectionsGetData, ThrowOnError>): RequestResult<RagCollectionsGetResponses, RagCollectionsGetErrors, ThrowOnError> => (options.client ?? client).get<RagCollectionsGetResponses, RagCollectionsGetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections/{id}',
+    ...options
+});
+
+/**
+ * Editar colección (incluye permisos de acceso)
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragCollectionsUpdate = <ThrowOnError extends boolean = false>(options: Options<RagCollectionsUpdateData, ThrowOnError>): RequestResult<RagCollectionsUpdateResponses, RagCollectionsUpdateErrors, ThrowOnError> => (options.client ?? client).patch<RagCollectionsUpdateResponses, RagCollectionsUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Subir documento (PDF, Markdown, HTML o texto)
+ *
+ * Validado por contenido, almacenado y luego indexado por un trabajo durable. aclRoles/aclUsers (separados por coma) restringen el documento.
+ *
+ * **Permiso requerido:** `rag.sources.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragDocumentsUpload = <ThrowOnError extends boolean = false>(options: Options<RagDocumentsUploadData, ThrowOnError>): RequestResult<RagDocumentsUploadResponses, RagDocumentsUploadErrors, ThrowOnError> => (options.client ?? client).post<RagDocumentsUploadResponses, RagDocumentsUploadErrors, ThrowOnError>({
+    ...formDataBodySerializer,
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections/{id}/documents',
+    ...options,
+    headers: {
+        'Content-Type': null,
+        ...options.headers
+    }
+});
+
+/**
+ * Eliminar documento (vectores y archivo, trabajo durable)
+ *
+ * **Permiso requerido:** `rag.documents.delete`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragDocumentsDelete = <ThrowOnError extends boolean = false>(options: Options<RagDocumentsDeleteData, ThrowOnError>): RequestResult<RagDocumentsDeleteResponses, RagDocumentsDeleteErrors, ThrowOnError> => (options.client ?? client).delete<RagDocumentsDeleteResponses, RagDocumentsDeleteErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections/{id}/documents/{documentId}',
+    ...options
+});
+
+/**
+ * Documento con sus fragmentos
+ *
+ * **Permiso requerido:** `rag.documents.read`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragDocumentsGet = <ThrowOnError extends boolean = false>(options: Options<RagDocumentsGetData, ThrowOnError>): RequestResult<RagDocumentsGetResponses, RagDocumentsGetErrors, ThrowOnError> => (options.client ?? client).get<RagDocumentsGetResponses, RagDocumentsGetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections/{id}/documents/{documentId}',
+    ...options
+});
+
+/**
+ * Volver a procesar un documento
+ *
+ * **Permiso requerido:** `rag.sources.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragDocumentsReprocess = <ThrowOnError extends boolean = false>(options: Options<RagDocumentsReprocessData, ThrowOnError>): RequestResult<RagDocumentsReprocessResponses, RagDocumentsReprocessErrors, ThrowOnError> => (options.client ?? client).post<RagDocumentsReprocessResponses, RagDocumentsReprocessErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections/{id}/documents/{documentId}/reprocess',
+    ...options
+});
+
+/**
+ * Reindexar (mismo perfil o cambio de modelo)
+ *
+ * Construye una versión nueva del índice en segundo plano y cambia atómicamente al terminar; las búsquedas siguen usando la versión activa.
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragCollectionsReindex = <ThrowOnError extends boolean = false>(options: Options<RagCollectionsReindexData, ThrowOnError>): RequestResult<RagCollectionsReindexResponses, RagCollectionsReindexErrors, ThrowOnError> => (options.client ?? client).post<RagCollectionsReindexResponses, RagCollectionsReindexErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections/{id}/reindex',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Fuentes de una colección
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragSourcesList = <ThrowOnError extends boolean = false>(options: Options<RagSourcesListData, ThrowOnError>): RequestResult<RagSourcesListResponses, RagSourcesListErrors, ThrowOnError> => (options.client ?? client).get<RagSourcesListResponses, RagSourcesListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections/{id}/sources',
+    ...options
+});
+
+/**
+ * Agregar fuente (URL, sitemap o texto)
+ *
+ * Las URL se descargan con protección SSRF, límites de tamaño y tiempo. La sincronización se ejecuta como trabajo durable.
+ *
+ * **Permiso requerido:** `rag.sources.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragSourcesCreate = <ThrowOnError extends boolean = false>(options: Options<RagSourcesCreateData, ThrowOnError>): RequestResult<RagSourcesCreateResponses, RagSourcesCreateErrors, ThrowOnError> => (options.client ?? client).post<RagSourcesCreateResponses, RagSourcesCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/collections/{id}/sources',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Conexiones de conocimiento (interna, PostgreSQL externo, API)
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragConnectionsList = <ThrowOnError extends boolean = false>(options?: Options<RagConnectionsListData, ThrowOnError>): RequestResult<RagConnectionsListResponses, RagConnectionsListErrors, ThrowOnError> => (options?.client ?? client).get<RagConnectionsListResponses, RagConnectionsListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/connections',
+    ...options
+});
+
+/**
+ * Crear conexión de conocimiento
+ *
+ * Las credenciales (cadena de conexión o token) se guardan cifradas o se referencian a secretos del despliegue y nunca se devuelven.
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragConnectionsCreate = <ThrowOnError extends boolean = false>(options: Options<RagConnectionsCreateData, ThrowOnError>): RequestResult<RagConnectionsCreateResponses, RagConnectionsCreateErrors, ThrowOnError> => (options.client ?? client).post<RagConnectionsCreateResponses, RagConnectionsCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/connections',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Eliminar conexión sin colecciones
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragConnectionsDelete = <ThrowOnError extends boolean = false>(options: Options<RagConnectionsDeleteData, ThrowOnError>): RequestResult<RagConnectionsDeleteResponses, RagConnectionsDeleteErrors, ThrowOnError> => (options.client ?? client).delete<RagConnectionsDeleteResponses, RagConnectionsDeleteErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/connections/{id}',
+    ...options
+});
+
+/**
+ * Conexión de conocimiento
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragConnectionsGet = <ThrowOnError extends boolean = false>(options: Options<RagConnectionsGetData, ThrowOnError>): RequestResult<RagConnectionsGetResponses, RagConnectionsGetErrors, ThrowOnError> => (options.client ?? client).get<RagConnectionsGetResponses, RagConnectionsGetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/connections/{id}',
+    ...options
+});
+
+/**
+ * Editar o rotar credencial
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragConnectionsUpdate = <ThrowOnError extends boolean = false>(options: Options<RagConnectionsUpdateData, ThrowOnError>): RequestResult<RagConnectionsUpdateResponses, RagConnectionsUpdateErrors, ThrowOnError> => (options.client ?? client).patch<RagConnectionsUpdateResponses, RagConnectionsUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/connections/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Preparar el almacén (extensión, esquema, migraciones, permisos)
+ *
+ * Solo en conexiones administradas por el starter. Si falta un privilegio, el diagnóstico devuelve los pasos manuales exactos.
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragConnectionsActivate = <ThrowOnError extends boolean = false>(options: Options<RagConnectionsActivateData, ThrowOnError>): RequestResult<RagConnectionsActivateResponses, RagConnectionsActivateErrors, ThrowOnError> => (options.client ?? client).post<RagConnectionsActivateResponses, RagConnectionsActivateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/connections/{id}/activate',
+    ...options
+});
+
+/**
+ * Diagnóstico de solo lectura (pgvector, esquema, privilegios, capacidades)
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragConnectionsDiagnose = <ThrowOnError extends boolean = false>(options: Options<RagConnectionsDiagnoseData, ThrowOnError>): RequestResult<RagConnectionsDiagnoseResponses, RagConnectionsDiagnoseErrors, ThrowOnError> => (options.client ?? client).post<RagConnectionsDiagnoseResponses, RagConnectionsDiagnoseErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/connections/{id}/diagnose',
+    ...options
+});
+
+/**
+ * Documentos de las colecciones autorizadas
+ *
+ * **Permiso requerido:** `rag.documents.read`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragDocumentsList = <ThrowOnError extends boolean = false>(options?: Options<RagDocumentsListData, ThrowOnError>): RequestResult<RagDocumentsListResponses, RagDocumentsListErrors, ThrowOnError> => (options?.client ?? client).get<RagDocumentsListResponses, RagDocumentsListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/documents',
+    ...options
+});
+
+/**
+ * Conjuntos de evaluación
+ *
+ * **Permiso requerido:** `rag.playground.use`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragEvaluationsList = <ThrowOnError extends boolean = false>(options?: Options<RagEvaluationsListData, ThrowOnError>): RequestResult<RagEvaluationsListResponses, RagEvaluationsListErrors, ThrowOnError> => (options?.client ?? client).get<RagEvaluationsListResponses, RagEvaluationsListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/evaluations',
+    ...options
+});
+
+/**
+ * Crear conjunto de evaluación
+ *
+ * **Permiso requerido:** `rag.playground.use`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragEvaluationsCreate = <ThrowOnError extends boolean = false>(options: Options<RagEvaluationsCreateData, ThrowOnError>): RequestResult<RagEvaluationsCreateResponses, RagEvaluationsCreateErrors, ThrowOnError> => (options.client ?? client).post<RagEvaluationsCreateResponses, RagEvaluationsCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/evaluations',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Eliminar conjunto de evaluación
+ *
+ * **Permiso requerido:** `rag.playground.use`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragEvaluationsDelete = <ThrowOnError extends boolean = false>(options: Options<RagEvaluationsDeleteData, ThrowOnError>): RequestResult<RagEvaluationsDeleteResponses, RagEvaluationsDeleteErrors, ThrowOnError> => (options.client ?? client).delete<RagEvaluationsDeleteResponses, RagEvaluationsDeleteErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/evaluations/{id}',
+    ...options
+});
+
+/**
+ * Editar conjunto de evaluación
+ *
+ * **Permiso requerido:** `rag.playground.use`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragEvaluationsUpdate = <ThrowOnError extends boolean = false>(options: Options<RagEvaluationsUpdateData, ThrowOnError>): RequestResult<RagEvaluationsUpdateResponses, RagEvaluationsUpdateErrors, ThrowOnError> => (options.client ?? client).put<RagEvaluationsUpdateResponses, RagEvaluationsUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/evaluations/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Calificación humana de un caso
+ *
+ * **Permiso requerido:** `rag.playground.use`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragEvaluationsRate = <ThrowOnError extends boolean = false>(options: Options<RagEvaluationsRateData, ThrowOnError>): RequestResult<RagEvaluationsRateResponses, RagEvaluationsRateErrors, ThrowOnError> => (options.client ?? client).post<RagEvaluationsRateResponses, RagEvaluationsRateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/evaluations/{id}/ratings',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Resultados por configuración (recall@k, latencia, costo)
+ *
+ * **Permiso requerido:** `rag.playground.use`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragEvaluationsRuns = <ThrowOnError extends boolean = false>(options: Options<RagEvaluationsRunsData, ThrowOnError>): RequestResult<RagEvaluationsRunsResponses, RagEvaluationsRunsErrors, ThrowOnError> => (options.client ?? client).get<RagEvaluationsRunsResponses, RagEvaluationsRunsErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/evaluations/{id}/runs',
+    ...options
+});
+
+/**
+ * Ejecutar evaluación con una configuración
+ *
+ * **Permiso requerido:** `rag.playground.use`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragEvaluationsRun = <ThrowOnError extends boolean = false>(options: Options<RagEvaluationsRunData, ThrowOnError>): RequestResult<RagEvaluationsRunResponses, RagEvaluationsRunErrors, ThrowOnError> => (options.client ?? client).post<RagEvaluationsRunResponses, RagEvaluationsRunErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/evaluations/{id}/runs',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Trabajos de indexación con etapa, progreso y costo
+ *
+ * **Permiso requerido:** `rag.jobs.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragJobsList = <ThrowOnError extends boolean = false>(options?: Options<RagJobsListData, ThrowOnError>): RequestResult<RagJobsListResponses, RagJobsListErrors, ThrowOnError> => (options?.client ?? client).get<RagJobsListResponses, RagJobsListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/jobs',
+    ...options
+});
+
+/**
+ * Trabajo
+ *
+ * **Permiso requerido:** `rag.jobs.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragJobsGet = <ThrowOnError extends boolean = false>(options: Options<RagJobsGetData, ThrowOnError>): RequestResult<RagJobsGetResponses, RagJobsGetErrors, ThrowOnError> => (options.client ?? client).get<RagJobsGetResponses, RagJobsGetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/jobs/{id}',
+    ...options
+});
+
+/**
+ * Cancelar (en cola: inmediato; en curso: en el siguiente punto seguro)
+ *
+ * **Permiso requerido:** `rag.jobs.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragJobsCancel = <ThrowOnError extends boolean = false>(options: Options<RagJobsCancelData, ThrowOnError>): RequestResult<RagJobsCancelResponses, RagJobsCancelErrors, ThrowOnError> => (options.client ?? client).post<RagJobsCancelResponses, RagJobsCancelErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/jobs/{id}/cancel',
+    ...options
+});
+
+/**
+ * Reintentar trabajo fallido o cancelado
+ *
+ * **Permiso requerido:** `rag.jobs.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragJobsRetry = <ThrowOnError extends boolean = false>(options: Options<RagJobsRetryData, ThrowOnError>): RequestResult<RagJobsRetryResponses, RagJobsRetryErrors, ThrowOnError> => (options.client ?? client).post<RagJobsRetryResponses, RagJobsRetryErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/jobs/{id}/retry',
+    ...options
+});
+
+/**
+ * Perfiles de embeddings
+ *
+ * **Acceso:** cualquier sesión válida.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragProfilesList = <ThrowOnError extends boolean = false>(options?: Options<RagProfilesListData, ThrowOnError>): RequestResult<RagProfilesListResponses, RagProfilesListErrors, ThrowOnError> => (options?.client ?? client).get<RagProfilesListResponses, RagProfilesListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/profiles',
+    ...options
+});
+
+/**
+ * Crear perfil de embeddings
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragProfilesCreate = <ThrowOnError extends boolean = false>(options: Options<RagProfilesCreateData, ThrowOnError>): RequestResult<RagProfilesCreateResponses, RagProfilesCreateErrors, ThrowOnError> => (options.client ?? client).post<RagProfilesCreateResponses, RagProfilesCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/profiles',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Eliminar perfil sin uso
+ *
+ * **Permiso requerido:** `rag.collections.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragProfilesDelete = <ThrowOnError extends boolean = false>(options: Options<RagProfilesDeleteData, ThrowOnError>): RequestResult<RagProfilesDeleteResponses, RagProfilesDeleteErrors, ThrowOnError> => (options.client ?? client).delete<RagProfilesDeleteResponses, RagProfilesDeleteErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/profiles/{id}',
+    ...options
+});
+
+/**
+ * Laboratorio de búsqueda
+ *
+ * Búsqueda vectorial, de texto completo o híbrida (RRF) sobre las colecciones autorizadas; registra la ejecución para analítica.
+ *
+ * **Permiso requerido:** `rag.playground.use`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragSearch = <ThrowOnError extends boolean = false>(options: Options<RagSearchData, ThrowOnError>): RequestResult<RagSearchResponses, RagSearchErrors, ThrowOnError> => (options.client ?? client).post<RagSearchResponses, RagSearchErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/search',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Eliminar fuente y sus documentos
+ *
+ * **Permiso requerido:** `rag.sources.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragSourcesDelete = <ThrowOnError extends boolean = false>(options: Options<RagSourcesDeleteData, ThrowOnError>): RequestResult<RagSourcesDeleteResponses, RagSourcesDeleteErrors, ThrowOnError> => (options.client ?? client).delete<RagSourcesDeleteResponses, RagSourcesDeleteErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/sources/{id}',
+    ...options
+});
+
+/**
+ * Editar fuente (nombre, programación, pausa)
+ *
+ * **Permiso requerido:** `rag.sources.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragSourcesUpdate = <ThrowOnError extends boolean = false>(options: Options<RagSourcesUpdateData, ThrowOnError>): RequestResult<RagSourcesUpdateResponses, RagSourcesUpdateErrors, ThrowOnError> => (options.client ?? client).patch<RagSourcesUpdateResponses, RagSourcesUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/sources/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Sincronizar fuente ahora
+ *
+ * **Permiso requerido:** `rag.sources.manage`.
+ *
+ * **Módulo:** `rag` debe estar habilitado.
+ */
+export const ragSourcesSync = <ThrowOnError extends boolean = false>(options: Options<RagSourcesSyncData, ThrowOnError>): RequestResult<RagSourcesSyncResponses, RagSourcesSyncErrors, ThrowOnError> => (options.client ?? client).post<RagSourcesSyncResponses, RagSourcesSyncErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/rag/sources/{id}/sync',
+    ...options
+});

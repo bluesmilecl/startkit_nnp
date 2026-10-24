@@ -2,6 +2,7 @@ import { getEnv } from '@starter/config';
 import { createDb, runMigrations, sql, waitForDatabase } from '@starter/db';
 import { JobQueue } from '@starter/jobs';
 import { createLogger } from '@starter/observability';
+import { createPgPool, migratePgStore } from '@starter/rag';
 import { seedBaseData } from '../seed.js';
 
 const log = createLogger('migrate');
@@ -19,13 +20,36 @@ async function main(): Promise<void> {
   log.info('installing job queue schema');
   const jobs = await JobQueue.create({ connectionString: url, role: 'migrate' });
   await jobs.stop(false);
-  await grantRuntimeAccess(url, env.DATABASE_URL, env.DATABASE_SSL);
   const handle = createDb(url, { max: 2, ssl: env.DATABASE_SSL, applicationName: 'starter-migrate' });
   try {
+    if (env.FEATURE_RAG) await upgradeInternalStores(handle, url, env.DATABASE_URL, env.DATABASE_SSL);
+    await grantRuntimeAccess(url, env.DATABASE_URL, env.DATABASE_SSL);
     const result = await seedBaseData(handle.db, env);
     log.info(result, 'base data ready');
   } finally {
     await handle.close();
+  }
+}
+
+/**
+ * Keeps already activated internal knowledge stores on the current store schema version during
+ * upgrades. Activation itself (CREATE EXTENSION vector) is an explicit step from the panel or CLI.
+ */
+async function upgradeInternalStores(handle: ReturnType<typeof createDb>, migrationUrl: string, runtimeUrl: string, ssl: 'disable' | 'require' | 'verify-full') {
+  const ext = await handle.db.execute<{ v: string | null }>(sql`select extversion as v from pg_extension where extname = 'vector'`);
+  if (!ext.rows[0]?.v) return;
+  const schemas = await handle.db.execute<{ schema: string }>(sql`select distinct coalesce(config->>'schema', 'rag') as schema from rag_connections where kind = 'internal' and enabled_at is not null`);
+  if (!schemas.rows.length) return;
+  const pool = createPgPool(migrationUrl, { ssl, max: 1, applicationName: 'starter-migrate-rag' });
+  try {
+    const runtime = decodeURIComponent(new URL(runtimeUrl).username);
+    const owner = decodeURIComponent(new URL(migrationUrl).username);
+    for (const { schema } of schemas.rows) {
+      const r = await migratePgStore(pool, schema, { createExtension: false, grantTo: runtime && runtime !== owner ? runtime : null });
+      log.info({ schema, applied: r.applied }, 'internal knowledge store up to date');
+    }
+  } finally {
+    await pool.end();
   }
 }
 

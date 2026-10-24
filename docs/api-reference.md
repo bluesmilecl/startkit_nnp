@@ -20,7 +20,7 @@ Swagger UI: `/api/docs` (según `OPENAPI_DOCS`). Documento JSON: `/api/docs-json
 - [admin-system](#admin-system) (2)
 - [admin-users](#admin-users) (10)
 - [ai-agents](#ai-agents) (10)
-- [ai-chat](#ai-chat) (10)
+- [ai-chat](#ai-chat) (11)
 - [ai-connections](#ai-connections) (7)
 - [ai-lab](#ai-lab) (4)
 - [ai-models](#ai-models) (7)
@@ -30,6 +30,9 @@ Swagger UI: `/api/docs` (según `OPENAPI_DOCS`). Documento JSON: `/api/docs-json
 - [health](#health) (3)
 - [me](#me) (6)
 - [public](#public) (1)
+- [rag-collections](#rag-collections) (16)
+- [rag-connections](#rag-connections) (10)
+- [rag-operations](#rag-operations) (13)
 
 ## admin-action-proposals
 
@@ -773,6 +776,20 @@ Devuelve 409 NOT_CONFIGURED mientras no exista un agente publicado; el chat no s
 
 **Módulo:** `ai` debe estar habilitado.
 
+### `POST /api/ai/messages/{id}/feedback`
+
+- **operationId:** `ai_messages_feedback`
+- **Resumen:** Valorar una respuesta del asistente
+- **Parámetros:**
+  - `id` (path, requerido): `string`
+- **Cuerpo** (`application/json`): `FeedbackInput`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `ai.chat`.
+
+**Módulo:** `ai` debe estar habilitado.
+
 ### `POST /api/ai/transcriptions`
 
 - **operationId:** `ai_transcriptions_create`
@@ -1408,7 +1425,544 @@ Comprueba base de datos y migraciones. pgvector solo se verifica si RAG está ha
 
 **Acceso:** público.
 
+## rag-collections
+
+### `GET /api/rag/collections`
+
+- **operationId:** `rag_collections_list`
+- **Resumen:** Colecciones de conocimiento
+- **Parámetros:**
+  - `page` (query): `integer`
+  - `pageSize` (query): `integer`
+  - `search` (query): `string`
+- **200**: OK — `application/json` `CollectionsPage`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/collections`
+
+- **operationId:** `rag_collections_create`
+- **Resumen:** Crear colección
+- **Cuerpo** (`application/json`): `CreateCollectionInput`
+- **201**: OK — `application/json` `Collection`
+- **Errores:** 400, 401, 403, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `DELETE /api/rag/collections/{id}`
+
+- **operationId:** `rag_collections_delete`
+- **Resumen:** Eliminar colección (purga durable de documentos, vectores y archivos)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **202**: OK — `application/json` `JobAccepted`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `GET /api/rag/collections/{id}`
+
+- **operationId:** `rag_collections_get`
+- **Resumen:** Colección con estadísticas
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `Collection`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `PATCH /api/rag/collections/{id}`
+
+- **operationId:** `rag_collections_update`
+- **Resumen:** Editar colección (incluye permisos de acceso)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `UpdateCollectionInput`
+- **200**: OK — `application/json` `Collection`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/collections/{id}/documents`
+
+- **operationId:** `rag_documents_upload`
+- **Resumen:** Subir documento (PDF, Markdown, HTML o texto)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`multipart/form-data`): `object`
+- **202**: OK — `application/json` `JobAccepted`
+- **Errores:** 400, 401, 403, 404, 413, 422, 500 (`ErrorResponse`)
+
+Validado por contenido, almacenado y luego indexado por un trabajo durable. aclRoles/aclUsers (separados por coma) restringen el documento.
+
+**Permiso requerido:** `rag.sources.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `DELETE /api/rag/collections/{id}/documents/{documentId}`
+
+- **operationId:** `rag_documents_delete`
+- **Resumen:** Eliminar documento (vectores y archivo, trabajo durable)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+  - `documentId` (path, requerido): `string`
+- **202**: OK — `application/json` `JobAccepted`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.documents.delete`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `GET /api/rag/collections/{id}/documents/{documentId}`
+
+- **operationId:** `rag_documents_get`
+- **Resumen:** Documento con sus fragmentos
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+  - `documentId` (path, requerido): `string`
+- **200**: OK — `application/json` `DocumentDetail`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.documents.read`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/collections/{id}/documents/{documentId}/reprocess`
+
+- **operationId:** `rag_documents_reprocess`
+- **Resumen:** Volver a procesar un documento
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+  - `documentId` (path, requerido): `string`
+- **202**: OK — `application/json` `JobAccepted`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.sources.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/collections/{id}/reindex`
+
+- **operationId:** `rag_collections_reindex`
+- **Resumen:** Reindexar (mismo perfil o cambio de modelo)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `ReindexInput`
+- **202**: OK — `application/json` `JobAccepted`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+Construye una versión nueva del índice en segundo plano y cambia atómicamente al terminar; las búsquedas siguen usando la versión activa.
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `GET /api/rag/collections/{id}/sources`
+
+- **operationId:** `rag_sources_list`
+- **Resumen:** Fuentes de una colección
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `SourceList`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/collections/{id}/sources`
+
+- **operationId:** `rag_sources_create`
+- **Resumen:** Agregar fuente (URL, sitemap o texto)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `CreateSourceInput`
+- **201**: OK — `application/json` `Source`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+Las URL se descargan con protección SSRF, límites de tamaño y tiempo. La sincronización se ejecuta como trabajo durable.
+
+**Permiso requerido:** `rag.sources.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `GET /api/rag/documents`
+
+- **operationId:** `rag_documents_list`
+- **Resumen:** Documentos de las colecciones autorizadas
+- **Parámetros:**
+  - `page` (query): `integer`
+  - `pageSize` (query): `integer`
+  - `collectionId` (query): `uuid`
+  - `status` (query): `pending` \| `processing` \| `indexed` \| `failed`
+  - `search` (query): `string`
+- **200**: OK — `application/json` `DocumentsPage`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.documents.read`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `DELETE /api/rag/sources/{id}`
+
+- **operationId:** `rag_sources_delete`
+- **Resumen:** Eliminar fuente y sus documentos
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.sources.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `PATCH /api/rag/sources/{id}`
+
+- **operationId:** `rag_sources_update`
+- **Resumen:** Editar fuente (nombre, programación, pausa)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `UpdateSourceInput`
+- **200**: OK — `application/json` `Source`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.sources.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/sources/{id}/sync`
+
+- **operationId:** `rag_sources_sync`
+- **Resumen:** Sincronizar fuente ahora
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **202**: OK — `application/json` `JobAccepted`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.sources.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+## rag-connections
+
+### `GET /api/rag/connections`
+
+- **operationId:** `rag_connections_list`
+- **Resumen:** Conexiones de conocimiento (interna, PostgreSQL externo, API)
+- **200**: OK — `application/json` `RagConnectionList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/connections`
+
+- **operationId:** `rag_connections_create`
+- **Resumen:** Crear conexión de conocimiento
+- **Cuerpo** (`application/json`): `CreateRagConnectionInput`
+- **201**: OK — `application/json` `RagConnection`
+- **Errores:** 400, 401, 403, 409, 422, 500 (`ErrorResponse`)
+
+Las credenciales (cadena de conexión o token) se guardan cifradas o se referencian a secretos del despliegue y nunca se devuelven.
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `DELETE /api/rag/connections/{id}`
+
+- **operationId:** `rag_connections_delete`
+- **Resumen:** Eliminar conexión sin colecciones
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `GET /api/rag/connections/{id}`
+
+- **operationId:** `rag_connections_get`
+- **Resumen:** Conexión de conocimiento
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `RagConnection`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `PATCH /api/rag/connections/{id}`
+
+- **operationId:** `rag_connections_update`
+- **Resumen:** Editar o rotar credencial
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `UpdateRagConnectionInput`
+- **200**: OK — `application/json` `RagConnection`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/connections/{id}/activate`
+
+- **operationId:** `rag_connections_activate`
+- **Resumen:** Preparar el almacén (extensión, esquema, migraciones, permisos)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `RagConnection`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+Solo en conexiones administradas por el starter. Si falta un privilegio, el diagnóstico devuelve los pasos manuales exactos.
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/connections/{id}/diagnose`
+
+- **operationId:** `rag_connections_diagnose`
+- **Resumen:** Diagnóstico de solo lectura (pgvector, esquema, privilegios, capacidades)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `RagConnection`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `GET /api/rag/profiles`
+
+- **operationId:** `rag_profiles_list`
+- **Resumen:** Perfiles de embeddings
+- **200**: OK — `application/json` `EmbeddingProfileList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Acceso:** cualquier sesión válida.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/profiles`
+
+- **operationId:** `rag_profiles_create`
+- **Resumen:** Crear perfil de embeddings
+- **Cuerpo** (`application/json`): `CreateEmbeddingProfileInput`
+- **201**: OK — `application/json` `EmbeddingProfile`
+- **Errores:** 400, 401, 403, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `DELETE /api/rag/profiles/{id}`
+
+- **operationId:** `rag_profiles_delete`
+- **Resumen:** Eliminar perfil sin uso
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.collections.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+## rag-operations
+
+### `GET /api/rag/analytics`
+
+- **operationId:** `rag_analytics`
+- **Resumen:** Analítica de conocimiento (consultas, abstención, latencia, ingesta, costos, retroalimentación)
+- **Parámetros:**
+  - `days` (query): `integer`
+  - `collectionId` (query): `uuid`
+- **200**: OK — `application/json` `RagAnalytics`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.analytics.read`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `GET /api/rag/evaluations`
+
+- **operationId:** `rag_evaluations_list`
+- **Resumen:** Conjuntos de evaluación
+- **200**: OK — `application/json` `EvaluationSetList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.playground.use`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/evaluations`
+
+- **operationId:** `rag_evaluations_create`
+- **Resumen:** Crear conjunto de evaluación
+- **Cuerpo** (`application/json`): `EvaluationSetInput`
+- **201**: OK — `application/json` `EvaluationSet`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.playground.use`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `DELETE /api/rag/evaluations/{id}`
+
+- **operationId:** `rag_evaluations_delete`
+- **Resumen:** Eliminar conjunto de evaluación
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.playground.use`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `PUT /api/rag/evaluations/{id}`
+
+- **operationId:** `rag_evaluations_update`
+- **Resumen:** Editar conjunto de evaluación
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `EvaluationSetInput`
+- **200**: OK — `application/json` `EvaluationSet`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.playground.use`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/evaluations/{id}/ratings`
+
+- **operationId:** `rag_evaluations_rate`
+- **Resumen:** Calificación humana de un caso
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `RateEvaluationInput`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.playground.use`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `GET /api/rag/evaluations/{id}/runs`
+
+- **operationId:** `rag_evaluations_runs`
+- **Resumen:** Resultados por configuración (recall@k, latencia, costo)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `EvaluationRunList`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.playground.use`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/evaluations/{id}/runs`
+
+- **operationId:** `rag_evaluations_run`
+- **Resumen:** Ejecutar evaluación con una configuración
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `EvaluationRunInput`
+- **201**: OK — `application/json` `EvaluationRun`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.playground.use`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `GET /api/rag/jobs`
+
+- **operationId:** `rag_jobs_list`
+- **Resumen:** Trabajos de indexación con etapa, progreso y costo
+- **Parámetros:**
+  - `page` (query): `integer`
+  - `pageSize` (query): `integer`
+  - `status` (query): `queued` \| `running` \| `retrying` \| `paused` \| `succeeded` \| `failed` \| `cancelled`
+  - `collectionId` (query): `uuid`
+  - `active` (query): `string`
+- **200**: OK — `application/json` `RagJobsPage`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.jobs.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `GET /api/rag/jobs/{id}`
+
+- **operationId:** `rag_jobs_get`
+- **Resumen:** Trabajo
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `RagJob`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.jobs.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/jobs/{id}/cancel`
+
+- **operationId:** `rag_jobs_cancel`
+- **Resumen:** Cancelar (en cola: inmediato; en curso: en el siguiente punto seguro)
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `RagJob`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.jobs.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/jobs/{id}/retry`
+
+- **operationId:** `rag_jobs_retry`
+- **Resumen:** Reintentar trabajo fallido o cancelado
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `RagJob`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `rag.jobs.manage`.
+
+**Módulo:** `rag` debe estar habilitado.
+
+### `POST /api/rag/search`
+
+- **operationId:** `rag_search`
+- **Resumen:** Laboratorio de búsqueda
+- **Cuerpo** (`application/json`): `SearchRequest`
+- **200**: OK — `application/json` `SearchResult`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Búsqueda vectorial, de texto completo o híbrida (RRF) sobre las colecciones autorizadas; registra la ejecución para analítica.
+
+**Permiso requerido:** `rag.playground.use`.
+
+**Módulo:** `rag` debe estar habilitado.
+
 ## Esquemas
 
-121 esquemas en `components.schemas` (ver `openapi.json`).
+160 esquemas en `components.schemas` (ver `openapi.json`).
 

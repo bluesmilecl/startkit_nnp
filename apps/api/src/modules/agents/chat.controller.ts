@@ -9,6 +9,7 @@ import {
   ChatRequest,
   ConversationList,
   ConversationMessages,
+  FeedbackInput,
   IdParams,
   OkResponse,
   RenameConversationInput,
@@ -88,6 +89,14 @@ export class ChatController {
   @Endpoint({ operationId: 'ai_conversations_delete', summary: 'Eliminar conversación y sus adjuntos', feature: 'ai', permission: 'ai.chat', params: IdParams, response: { schema: OkResponse }, errors: [404] })
   async remove(@CurrentActor() actor: Actor, @ZParams() p: z.infer<typeof IdParams>) {
     await this.chat.deleteConversation(actor, p.id);
+    return { ok: true as const };
+  }
+
+  @Post('messages/:id/feedback')
+  @HttpCode(200)
+  @Endpoint({ operationId: 'ai_messages_feedback', summary: 'Valorar una respuesta del asistente', feature: 'ai', permission: 'ai.chat', params: z.object({ id: z.string().min(1).max(100) }), body: FeedbackInput, response: { schema: OkResponse }, errors: [404] })
+  async feedback(@CurrentActor() actor: Actor, @ZParams() p: { id: string }, @ZBody() body: z.infer<typeof FeedbackInput>) {
+    await this.chat.feedback(actor, p.id, body);
     return { ok: true as const };
   }
 

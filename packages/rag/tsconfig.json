@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "lib": ["ES2023", "DOM"]
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts"],
+  "references": [
+    { "path": "../config" },
+    { "path": "../observability" },
+    { "path": "../db" },
+    { "path": "../contracts" },
+    { "path": "../auth" },
+    { "path": "../storage" },
+    { "path": "../jobs" },
+    { "path": "../ai" }
+  ]
+}

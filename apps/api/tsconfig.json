@@ -41,6 +41,9 @@
     },
     {
       "path": "../../packages/ai"
+    },
+    {
+      "path": "../../packages/rag"
     }
   ]
 }

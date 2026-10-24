@@ -5,3 +5,4 @@ export * from './system.js';
 export * from './errors.js';
 export * from './ai.js';
 export * from './agents.js';
+export * from './rag.js';

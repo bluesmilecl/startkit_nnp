@@ -1,7 +1,7 @@
 import type { ServerResponse } from 'node:http';
 import { assertCan, type Actor, type ProposalsService } from '@starter/auth';
 import { AppError, type AttachmentInfo, type ChatRequest } from '@starter/contracts';
-import { and, asc, attachments, conversations, desc, eq, inArray, isNull, messages, outerRef, sql } from '@starter/db';
+import { and, answerFeedback, asc, attachments, conversations, desc, eq, inArray, isNull, messages, or, outerRef, sql } from '@starter/db';
 import { createLogger, sanitizeError } from '@starter/observability';
 import { newKey, type Storage } from '@starter/storage';
 import { convertToModelMessages, createUIMessageStream, generateText, pipeUIMessageStreamToResponse, stepCountIs, streamText, type ToolSet, type UIMessage } from 'ai';
@@ -24,7 +24,9 @@ export interface ChatDeps extends AiDeps {
 }
 
 export interface KnowledgeHit {
+  /** Label the model cites ([f1]) or the chunk id. */
   id: string;
+  chunkId?: string;
   text: string;
   title: string | null;
   sourceUrl: string | null;
@@ -36,7 +38,14 @@ export interface KnowledgeHit {
 /** Implemented by the RAG module; the chat only depends on this contract. */
 export interface KnowledgeProvider {
   retrieve(actor: Actor, opts: { collectionIds: string[]; query: string; topK: number; minScore: number; agentId: string; conversationId: string | null; aiRequestId: string | null }): Promise<{ hits: KnowledgeHit[]; retrievalRunId: string | null }>;
-  tool(actor: Actor, opts: { collectionIds: string[]; topK: number; minScore: number; agentId: string; conversationId: string | null; aiRequestId: string | null; onHits: (hits: KnowledgeHit[]) => void }): ToolSet;
+  tool(actor: Actor, opts: { collectionIds: string[]; topK: number; minScore: number; agentId: string; conversationId: string | null; aiRequestId: string | null; onHits: (hits: KnowledgeHit[], runId: string | null) => void }): ToolSet;
+  /** Records which retrieved fragments the answer cited and whether it abstained. */
+  afterAnswer?(info: { runIds: string[]; citedChunkIds: string[]; abstained: boolean }): Promise<void>;
+}
+
+/** Citation labels present in an answer ([f1], [f2]…). */
+export function citedLabels(text: string): Set<string> {
+  return new Set([...text.matchAll(/\[(f\d+)\]/g)].map((m) => m[1]!));
 }
 
 export interface ChatMessageMetadata {
@@ -209,6 +218,23 @@ export class ChatService {
     if (files.length) await this.deps.purgeFiles?.(files.map((f) => f.key), `conversation ${id} deleted`);
   }
 
+  /** Thumbs up/down on an assistant answer of an own conversation (one per person and answer). */
+  async feedback(actor: Actor, messageId: string, input: { rating: 1 | -1; comment?: string }) {
+    assertCan(actor, 'ai.chat');
+    const isUuid = /^[0-9a-f-]{36}$/i.test(messageId);
+    const [m] = await this.deps.db
+      .select({ id: messages.id, role: messages.role, agentId: conversations.agentId })
+      .from(messages)
+      .innerJoin(conversations, eq(conversations.id, messages.conversationId))
+      .where(and(eq(conversations.userId, actor.userId), isUuid ? or(eq(messages.id, messageId), eq(messages.clientId, messageId)) : eq(messages.clientId, messageId)))
+      .limit(1);
+    if (!m || m.role !== 'assistant') throw AppError.notFound('Respuesta');
+    await this.deps.db
+      .insert(answerFeedback)
+      .values({ organizationId: actor.organizationId, messageId: m.id, agentId: m.agentId, userId: actor.userId, rating: input.rating, comment: input.comment ?? null })
+      .onConflictDoUpdate({ target: [answerFeedback.messageId, answerFeedback.userId], set: { rating: input.rating, comment: input.comment ?? null } });
+  }
+
   // ── model input ─────────────────────────────────────────────────────────
 
   /** Replaces attachment references by inline data (images/PDF) or delimited text (text files). */
@@ -362,16 +388,28 @@ export class ChatService {
 
     // Knowledge: retrieval before answering ("always") or a search tool ("tool").
     let citations: KnowledgeHit[] = [];
+    const runIds: string[] = [];
     let context: string | null = null;
     const tools: ToolSet = buildAdminTools({ actor, db, access: this.deps, proposals: this.deps.proposals, agentId: p.agent.id, conversationId, aiRequestId }, cfg.tools.admin);
     if (cfg.knowledge.mode !== 'off' && this.knowledge) {
       const kopts = { collectionIds: cfg.knowledge.collectionIds, topK: cfg.knowledge.topK, minScore: cfg.knowledge.minScore, agentId: p.agent.id, conversationId, aiRequestId };
       if (cfg.knowledge.mode === 'always' && text) {
         const r = await this.knowledge.retrieve(actor, { ...kopts, query: text });
-        citations = r.hits;
+        if (r.retrievalRunId) runIds.push(r.retrievalRunId);
+        // The model cites positional labels; keep the chunk id for analytics.
+        citations = r.hits.map((h, i) => ({ ...h, chunkId: h.chunkId ?? h.id, id: `f${i + 1}` }));
         context = ChatService.formatContext(r.hits);
       } else if (cfg.knowledge.mode === 'tool') {
-        Object.assign(tools, this.knowledge.tool(actor, { ...kopts, onHits: (h) => (citations = [...citations, ...h]) }));
+        Object.assign(
+          tools,
+          this.knowledge.tool(actor, {
+            ...kopts,
+            onHits: (h, runId) => {
+              citations = [...citations, ...h];
+              if (runId) runIds.push(runId);
+            },
+          }),
+        );
       }
     }
 
@@ -397,7 +435,13 @@ export class ChatService {
       return finalized;
     };
     const showDetails = cfg.ui.showDetailsToAdmins && actor.permissions.has('ai.usage.read');
-    const citationMeta = () => citations.map((h, i) => ({ id: context !== null ? `f${i + 1}` : h.id, title: h.title, sourceUrl: h.sourceUrl, documentId: h.documentId, collectionId: h.collectionId }));
+    // Only fragments the answer actually cites are shown as sources.
+    let answerText = '';
+    const citationMeta = () => {
+      const labels = citedLabels(answerText);
+      const cited = citations.filter((h) => labels.has(h.id));
+      return cited.length ? cited.map((h) => ({ id: h.id, title: h.title, sourceUrl: h.sourceUrl, documentId: h.documentId, collectionId: h.collectionId })) : undefined;
+    };
 
     const result = streamText({
       model,
@@ -427,7 +471,8 @@ export class ChatService {
         }
         if (signal.aborted) status = 'cancelled';
         const details = await finalize(status, error);
-        writer.write({ type: 'finish', messageMetadata: { conversationId, agentVersionId: p.version.id, cancelled: status === 'cancelled' || undefined, citations: citations.length ? citationMeta() : undefined, details: showDetails ? details : undefined } });
+        answerText = await Promise.resolve(result.text).catch(() => '');
+        writer.write({ type: 'finish', messageMetadata: { conversationId, agentVersionId: p.version.id, cancelled: status === 'cancelled' || undefined, citations: citationMeta(), details: showDetails ? details : undefined } });
       },
       onError: (err) => {
         const c = classifyAiError(err);
@@ -437,16 +482,23 @@ export class ChatService {
       onEnd: async ({ responseMessage, isAborted, isCancelled }) => {
         try {
           const details = await finalize(isAborted || isCancelled || signal.aborted ? 'cancelled' : 'succeeded');
+          answerText = responseMessage.parts.filter((x) => x.type === 'text').map((x) => (x as { text: string }).text).join('\n');
           const metadata: ChatMessageMetadata = {
             ...(responseMessage.metadata ?? {}),
             conversationId,
             agentVersionId: p.version.id,
             cancelled: finalStatus === 'cancelled' || undefined,
             details,
-            citations: citations.length ? citationMeta() : undefined,
+            citations: citationMeta(),
           };
           if (responseMessage.parts.length) {
             await db.insert(messages).values({ conversationId, clientId: responseMessage.id, role: 'assistant', parts: responseMessage.parts, metadata, agentVersionId: p.version.id, aiRequestId });
+          }
+          if (runIds.length && this.knowledge?.afterAnswer) {
+            const labels = citedLabels(answerText);
+            const cited = citations.filter((h) => labels.has(h.id)).map((h) => h.chunkId ?? h.id);
+            const abstained = !citations.length || (!cited.length && /no (encontr|tengo|hay)|sin contexto suficiente|evidencia suficiente/i.test(answerText));
+            await this.knowledge.afterAnswer({ runIds, citedChunkIds: cited, abstained });
           }
           await db.update(conversations).set({ updatedAt: new Date(), lastAgentVersionId: p.version.id }).where(eq(conversations.id, conversationId));
         } catch (err) {

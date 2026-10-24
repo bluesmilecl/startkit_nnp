@@ -1308,6 +1308,598 @@ export type TranscriptionResult = {
     costStatus: string | null;
 };
 
+export type RagConnectionKind = 'internal' | 'postgres' | 'api';
+
+export type StoreCapabilities = {
+    search: boolean;
+    vector: boolean;
+    fullText: boolean;
+    hybrid: boolean;
+    ingest: boolean;
+    delete: boolean;
+    reindex: boolean;
+    acl: boolean;
+    browse: boolean;
+};
+
+export type StoreDiagnostic = {
+    ok: boolean;
+    checks: Array<{
+        key: string;
+        label: string;
+        status: 'ok' | 'warn' | 'error';
+        detail: string | null;
+    }>;
+    manualSteps: Array<string>;
+    capabilities: StoreCapabilities;
+    latencyMs: number;
+};
+
+export type RagConnection = {
+    id: string;
+    name: string;
+    kind: RagConnectionKind;
+    status: 'pending' | 'ready' | 'error' | 'disabled';
+    schema: string | null;
+    baseUrl: string | null;
+    access: 'read-write' | 'read-only';
+    managed: boolean;
+    tls: 'disable' | 'require' | 'verify-full';
+    timeoutMs: number;
+    credentialSource: 'stored' | 'reference' | 'none' | 'application';
+    credentialHint: string | null;
+    capabilities: StoreCapabilities | null;
+    diagnostic: StoreDiagnostic | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    diagnosedAt: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    enabledAt: string | null;
+    collections: number;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+};
+
+export type RagConnectionList = Array<RagConnection>;
+
+export type CreateRagConnectionInput = {
+    name: string;
+    kind: RagConnectionKind;
+    schema?: string;
+    /**
+     * api: base URL of the retrieval service
+     */
+    baseUrl?: string;
+    credentialRef?: string;
+    tls?: 'disable' | 'require' | 'verify-full';
+    timeoutMs?: number;
+    access?: 'read-write' | 'read-only';
+    /**
+     * Allow the starter to create the extension, schema and indexes on the target
+     */
+    managed?: boolean;
+};
+
+export type UpdateRagConnectionInput = {
+    name?: string;
+    credentialRef?: string | null;
+    baseUrl?: string;
+    tls?: 'disable' | 'require' | 'verify-full';
+    timeoutMs?: number;
+    access?: 'read-write' | 'read-only';
+    managed?: boolean;
+    disabled?: boolean;
+};
+
+export type EmbeddingProfile = {
+    id: string;
+    key: string;
+    name: string;
+    connectionId: string;
+    provider: string;
+    modelId: string;
+    modelCatalogId: string | null;
+    dimensions: number;
+    metric: 'cosine' | 'l2' | 'inner_product';
+    indexType: string;
+    collections: number;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+};
+
+export type EmbeddingProfileList = Array<EmbeddingProfile>;
+
+export type CreateEmbeddingProfileInput = {
+    key: string;
+    name: string;
+    modelCatalogId: string;
+    metric?: 'cosine' | 'l2' | 'inner_product';
+    /**
+     * Only when the catalog does not declare it
+     */
+    dimensions?: number;
+};
+
+export type ChunkingConfig = {
+    size: number;
+    overlap: number;
+};
+
+export type RetrievalConfig = {
+    method: 'vector' | 'fulltext' | 'hybrid';
+    topK: number;
+    minScore: number;
+};
+
+export type Collection = {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    language: string;
+    connection: {
+        id: string;
+        name: string;
+        kind: RagConnectionKind;
+        status: string;
+    };
+    profile: {
+        id: string;
+        name: string;
+        modelId: string;
+        dimensions: number;
+    } | null;
+    chunking: ChunkingConfig;
+    retrieval: RetrievalConfig;
+    visibility: 'organization' | 'restricted';
+    aclRoles: Array<string>;
+    aclUsers: Array<string>;
+    retentionDays: number | null;
+    externalRef: string | null;
+    status: 'active' | 'paused' | 'deleting';
+    activeIndexVersionId: string | null;
+    buildingIndexVersionId: string | null;
+    stats: {
+        documents: number;
+        indexed: number;
+        failed: number;
+        chunks: number;
+        bytes: number;
+    };
+    sources: number;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+};
+
+export type CollectionsPage = {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+    items: Array<Collection>;
+};
+
+export type CreateCollectionInput = {
+    name: string;
+    slug: string;
+    description?: string | null;
+    ragConnectionId: string;
+    embeddingProfileId?: string | null;
+    language?: 'spanish' | 'english' | 'portuguese' | 'simple';
+    chunking?: ChunkingConfig;
+    retrieval?: RetrievalConfig;
+    visibility?: 'organization' | 'restricted';
+    aclRoles?: Array<string>;
+    aclUsers?: Array<string>;
+    retentionDays?: number | null;
+    /**
+     * api connections: remote collection id
+     */
+    externalRef?: string | null;
+};
+
+export type UpdateCollectionInput = {
+    name?: string;
+    description?: string | null;
+    embeddingProfileId?: string | null;
+    language?: 'spanish' | 'english' | 'portuguese' | 'simple';
+    chunking?: ChunkingConfig;
+    retrieval?: RetrievalConfig;
+    visibility?: 'organization' | 'restricted';
+    aclRoles?: Array<string>;
+    aclUsers?: Array<string>;
+    retentionDays?: number | null;
+    /**
+     * api connections: remote collection id
+     */
+    externalRef?: string | null;
+    status?: 'active' | 'paused';
+};
+
+export type SourceKind = 'upload' | 'url' | 'sitemap' | 'text';
+
+export type Source = {
+    id: string;
+    collectionId: string;
+    kind: SourceKind;
+    name: string;
+    config: {
+        [key: string]: unknown;
+    };
+    schedule: string | null;
+    status: 'active' | 'paused' | 'error' | 'deleting';
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    lastSyncAt: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    nextSyncAt: string | null;
+    lastError: string | null;
+    stats: {
+        [key: string]: number;
+    };
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+};
+
+export type SourceList = Array<Source>;
+
+export type CreateSourceInput = {
+    kind: 'url';
+    name: string;
+    url: string;
+    schedule?: string | null;
+    acl?: {
+        roles?: Array<string>;
+        users?: Array<string>;
+    };
+} | {
+    kind: 'sitemap';
+    name: string;
+    url: string;
+    maxUrls?: number;
+    /**
+     * Regular expression URLs must match
+     */
+    include?: string | null;
+    exclude?: string | null;
+    schedule?: string | null;
+    acl?: {
+        roles?: Array<string>;
+        users?: Array<string>;
+    };
+} | {
+    kind: 'text';
+    name: string;
+    title: string;
+    text: string;
+    acl?: {
+        roles?: Array<string>;
+        users?: Array<string>;
+    };
+} | {
+    kind: 'upload';
+    name: string;
+    acl?: {
+        roles?: Array<string>;
+        users?: Array<string>;
+    };
+};
+
+export type UpdateSourceInput = {
+    name?: string;
+    schedule?: string | null;
+    status?: 'active' | 'paused';
+};
+
+export type RagDocument = {
+    id: string;
+    collectionId: string;
+    collectionName: string;
+    sourceId: string | null;
+    externalId: string;
+    title: string | null;
+    sourceUrl: string | null;
+    mediaType: string | null;
+    bytes: number | null;
+    version: number;
+    status: 'pending' | 'processing' | 'indexed' | 'failed' | 'deleted';
+    chunkCount: number;
+    aclRoles: Array<string>;
+    aclUsers: Array<string>;
+    error: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    indexedAt: string | null;
+};
+
+export type DocumentsPage = {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+    items: Array<RagDocument>;
+};
+
+export type DocumentDetail = {
+    id: string;
+    collectionId: string;
+    collectionName: string;
+    sourceId: string | null;
+    externalId: string;
+    title: string | null;
+    sourceUrl: string | null;
+    mediaType: string | null;
+    bytes: number | null;
+    version: number;
+    status: 'pending' | 'processing' | 'indexed' | 'failed' | 'deleted';
+    chunkCount: number;
+    aclRoles: Array<string>;
+    aclUsers: Array<string>;
+    error: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    indexedAt: string | null;
+    chunks: Array<{
+        id: string;
+        ordinal: number;
+        text: string;
+        heading: string | null;
+        page: number | null;
+        tokenCount: number | null;
+    }>;
+};
+
+export type RagJob = {
+    id: string;
+    kind: string;
+    status: 'queued' | 'running' | 'retrying' | 'paused' | 'succeeded' | 'failed' | 'cancelled';
+    stage: string | null;
+    progressCurrent: number;
+    progressTotal: number | null;
+    attempts: number;
+    maxAttempts: number;
+    collectionId: string | null;
+    collectionName: string | null;
+    sourceId: string | null;
+    documentId: string | null;
+    units: {
+        [key: string]: number;
+    };
+    costUsd: UsdAmount;
+    budgetUsd: UsdAmount | null;
+    error: string | null;
+    stageTimings: {
+        [key: string]: number;
+    };
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    startedAt: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    finishedAt: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    heartbeatAt: string | null;
+};
+
+export type RagJobsPage = {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+    items: Array<RagJob>;
+};
+
+export type ReindexInput = {
+    /**
+     * New profile (model change); omitted = rebuild with the current one
+     */
+    embeddingProfileId?: string;
+    budgetUsd?: UsdAmount;
+};
+
+export type SearchRequest = {
+    query: string;
+    collectionIds: Array<string>;
+    method: 'vector' | 'fulltext' | 'hybrid';
+    topK: number;
+    minScore: number;
+};
+
+export type SearchHit = {
+    chunkId: string;
+    documentId: string;
+    collectionId: string;
+    text: string;
+    heading: string | null;
+    page: number | null;
+    title: string | null;
+    sourceUrl: string | null;
+    score: number;
+    scoreType: string;
+    vectorRank: number | null;
+    textRank: number | null;
+};
+
+export type SearchResult = {
+    runId: string | null;
+    method: string;
+    hits: Array<SearchHit>;
+    latencyMs: number;
+    embeddingCostUsd: UsdAmount | null;
+    warnings: Array<string>;
+};
+
+export type EvaluationSet = {
+    id: string;
+    name: string;
+    description: string | null;
+    collectionIds: Array<string>;
+    cases: Array<{
+        id: string;
+        question: string;
+        relevantDocumentIds: Array<string>;
+        expectedAnswer?: string;
+    }>;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+};
+
+export type EvaluationSetList = Array<EvaluationSet>;
+
+export type EvaluationSetInput = {
+    name: string;
+    description?: string | null;
+    collectionIds: Array<string>;
+    cases: Array<{
+        id: string;
+        question: string;
+        relevantDocumentIds?: Array<string>;
+        expectedAnswer?: string;
+    }>;
+};
+
+export type EvaluationRunInput = {
+    label: string;
+    method?: 'vector' | 'fulltext' | 'hybrid';
+    topK?: number;
+};
+
+export type EvaluationRun = {
+    label: string;
+    method: string;
+    topK: number;
+    meanRecall: number | null;
+    meanLatencyMs: number | null;
+    costUsd: UsdAmount | null;
+    cases: Array<{
+        caseId: string;
+        question: string;
+        recallAtK: number | null;
+        retrievedDocumentIds: Array<string>;
+        latencyMs: number | null;
+        humanRating: number | null;
+    }>;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+};
+
+export type EvaluationRunList = Array<EvaluationRun>;
+
+export type RateEvaluationInput = {
+    runLabel: string;
+    caseId: string;
+    rating: number;
+    notes?: string;
+};
+
+export type RagAnalytics = {
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    from: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    to: string;
+    totals: {
+        queries: number;
+        abstained: number;
+        withoutHits: number;
+        avgLatencyMs: number | null;
+        p95LatencyMs: number | null;
+        embeddingCostUsd: UsdAmount;
+        ingestionJobs: number;
+        failedJobs: number;
+        positiveFeedback: number;
+        negativeFeedback: number;
+    };
+    daily: Array<{
+        date: string;
+        queries: number;
+        abstained: number;
+        withoutHits: number;
+        avgLatencyMs: number | null;
+        ingested: number;
+        failed: number;
+        embeddingCostUsd: number;
+    }>;
+    byCollection: Array<{
+        collectionId: string;
+        name: string;
+        queries: number;
+        documents: number;
+        chunks: number;
+    }>;
+    topQueries: Array<{
+        query: string;
+        count: number;
+        withoutHits: number;
+    }> | null;
+    topDocuments: Array<{
+        documentId: string;
+        title: string | null;
+        hits: number;
+        cited: number;
+    }>;
+};
+
+export type FeedbackInput = {
+    rating: 1 | -1;
+    comment?: string;
+};
+
 export type OrganizationList = Array<OrganizationSummary>;
 
 export type OrganizationMemberList = Array<{
@@ -1454,6 +2046,45 @@ export type UpdateConnectionInputWritable = {
     options?: {
         [key: string]: unknown;
     };
+    disabled?: boolean;
+};
+
+export type CreateRagConnectionInputWritable = {
+    name: string;
+    kind: RagConnectionKind;
+    schema?: string;
+    /**
+     * postgres: connection string (write-only, stored encrypted)
+     */
+    connectionUrl?: string;
+    /**
+     * api: base URL of the retrieval service
+     */
+    baseUrl?: string;
+    /**
+     * api: bearer token (write-only, stored encrypted)
+     */
+    token?: string;
+    credentialRef?: string;
+    tls?: 'disable' | 'require' | 'verify-full';
+    timeoutMs?: number;
+    access?: 'read-write' | 'read-only';
+    /**
+     * Allow the starter to create the extension, schema and indexes on the target
+     */
+    managed?: boolean;
+};
+
+export type UpdateRagConnectionInputWritable = {
+    name?: string;
+    connectionUrl?: string;
+    token?: string;
+    credentialRef?: string | null;
+    baseUrl?: string;
+    tls?: 'disable' | 'require' | 'verify-full';
+    timeoutMs?: number;
+    access?: 'read-write' | 'read-only';
+    managed?: boolean;
     disabled?: boolean;
 };
 
@@ -4853,6 +5484,53 @@ export type AiLabGetResponses = {
 
 export type AiLabGetResponse = AiLabGetResponses[keyof AiLabGetResponses];
 
+export type AiMessagesFeedbackData = {
+    body: FeedbackInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/ai/messages/{id}/feedback';
+};
+
+export type AiMessagesFeedbackErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type AiMessagesFeedbackError = AiMessagesFeedbackErrors[keyof AiMessagesFeedbackErrors];
+
+export type AiMessagesFeedbackResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type AiMessagesFeedbackResponse = AiMessagesFeedbackResponses[keyof AiMessagesFeedbackResponses];
+
 export type AiModelsListData = {
     body?: never;
     path?: never;
@@ -6772,3 +7450,1826 @@ export type PublicSettingsResponses = {
 };
 
 export type PublicSettingsResponse = PublicSettingsResponses[keyof PublicSettingsResponses];
+
+export type RagAnalyticsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        days?: number;
+        collectionId?: string;
+    };
+    url: '/api/rag/analytics';
+};
+
+export type RagAnalyticsErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagAnalyticsError = RagAnalyticsErrors[keyof RagAnalyticsErrors];
+
+export type RagAnalyticsResponses = {
+    /**
+     * OK
+     */
+    200: RagAnalytics;
+};
+
+export type RagAnalyticsResponse = RagAnalyticsResponses[keyof RagAnalyticsResponses];
+
+export type RagCollectionsListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        pageSize?: number;
+        search?: string;
+    };
+    url: '/api/rag/collections';
+};
+
+export type RagCollectionsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagCollectionsListError = RagCollectionsListErrors[keyof RagCollectionsListErrors];
+
+export type RagCollectionsListResponses = {
+    /**
+     * OK
+     */
+    200: CollectionsPage;
+};
+
+export type RagCollectionsListResponse = RagCollectionsListResponses[keyof RagCollectionsListResponses];
+
+export type RagCollectionsCreateData = {
+    body: CreateCollectionInput;
+    path?: never;
+    query?: never;
+    url: '/api/rag/collections';
+};
+
+export type RagCollectionsCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagCollectionsCreateError = RagCollectionsCreateErrors[keyof RagCollectionsCreateErrors];
+
+export type RagCollectionsCreateResponses = {
+    /**
+     * OK
+     */
+    201: Collection;
+};
+
+export type RagCollectionsCreateResponse = RagCollectionsCreateResponses[keyof RagCollectionsCreateResponses];
+
+export type RagCollectionsDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/collections/{id}';
+};
+
+export type RagCollectionsDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagCollectionsDeleteError = RagCollectionsDeleteErrors[keyof RagCollectionsDeleteErrors];
+
+export type RagCollectionsDeleteResponses = {
+    /**
+     * OK
+     */
+    202: JobAccepted;
+};
+
+export type RagCollectionsDeleteResponse = RagCollectionsDeleteResponses[keyof RagCollectionsDeleteResponses];
+
+export type RagCollectionsGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/collections/{id}';
+};
+
+export type RagCollectionsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagCollectionsGetError = RagCollectionsGetErrors[keyof RagCollectionsGetErrors];
+
+export type RagCollectionsGetResponses = {
+    /**
+     * OK
+     */
+    200: Collection;
+};
+
+export type RagCollectionsGetResponse = RagCollectionsGetResponses[keyof RagCollectionsGetResponses];
+
+export type RagCollectionsUpdateData = {
+    body: UpdateCollectionInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/collections/{id}';
+};
+
+export type RagCollectionsUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagCollectionsUpdateError = RagCollectionsUpdateErrors[keyof RagCollectionsUpdateErrors];
+
+export type RagCollectionsUpdateResponses = {
+    /**
+     * OK
+     */
+    200: Collection;
+};
+
+export type RagCollectionsUpdateResponse = RagCollectionsUpdateResponses[keyof RagCollectionsUpdateResponses];
+
+export type RagDocumentsUploadData = {
+    body: {
+        file: Blob | File;
+        aclRoles?: string;
+        aclUsers?: string;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/collections/{id}/documents';
+};
+
+export type RagDocumentsUploadErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Contenido demasiado grande
+     */
+    413: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagDocumentsUploadError = RagDocumentsUploadErrors[keyof RagDocumentsUploadErrors];
+
+export type RagDocumentsUploadResponses = {
+    /**
+     * OK
+     */
+    202: JobAccepted;
+};
+
+export type RagDocumentsUploadResponse = RagDocumentsUploadResponses[keyof RagDocumentsUploadResponses];
+
+export type RagDocumentsDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+        documentId: string;
+    };
+    query?: never;
+    url: '/api/rag/collections/{id}/documents/{documentId}';
+};
+
+export type RagDocumentsDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagDocumentsDeleteError = RagDocumentsDeleteErrors[keyof RagDocumentsDeleteErrors];
+
+export type RagDocumentsDeleteResponses = {
+    /**
+     * OK
+     */
+    202: JobAccepted;
+};
+
+export type RagDocumentsDeleteResponse = RagDocumentsDeleteResponses[keyof RagDocumentsDeleteResponses];
+
+export type RagDocumentsGetData = {
+    body?: never;
+    path: {
+        id: string;
+        documentId: string;
+    };
+    query?: never;
+    url: '/api/rag/collections/{id}/documents/{documentId}';
+};
+
+export type RagDocumentsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagDocumentsGetError = RagDocumentsGetErrors[keyof RagDocumentsGetErrors];
+
+export type RagDocumentsGetResponses = {
+    /**
+     * OK
+     */
+    200: DocumentDetail;
+};
+
+export type RagDocumentsGetResponse = RagDocumentsGetResponses[keyof RagDocumentsGetResponses];
+
+export type RagDocumentsReprocessData = {
+    body?: never;
+    path: {
+        id: string;
+        documentId: string;
+    };
+    query?: never;
+    url: '/api/rag/collections/{id}/documents/{documentId}/reprocess';
+};
+
+export type RagDocumentsReprocessErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagDocumentsReprocessError = RagDocumentsReprocessErrors[keyof RagDocumentsReprocessErrors];
+
+export type RagDocumentsReprocessResponses = {
+    /**
+     * OK
+     */
+    202: JobAccepted;
+};
+
+export type RagDocumentsReprocessResponse = RagDocumentsReprocessResponses[keyof RagDocumentsReprocessResponses];
+
+export type RagCollectionsReindexData = {
+    body: ReindexInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/collections/{id}/reindex';
+};
+
+export type RagCollectionsReindexErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagCollectionsReindexError = RagCollectionsReindexErrors[keyof RagCollectionsReindexErrors];
+
+export type RagCollectionsReindexResponses = {
+    /**
+     * OK
+     */
+    202: JobAccepted;
+};
+
+export type RagCollectionsReindexResponse = RagCollectionsReindexResponses[keyof RagCollectionsReindexResponses];
+
+export type RagSourcesListData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/collections/{id}/sources';
+};
+
+export type RagSourcesListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagSourcesListError = RagSourcesListErrors[keyof RagSourcesListErrors];
+
+export type RagSourcesListResponses = {
+    /**
+     * OK
+     */
+    200: SourceList;
+};
+
+export type RagSourcesListResponse = RagSourcesListResponses[keyof RagSourcesListResponses];
+
+export type RagSourcesCreateData = {
+    body: CreateSourceInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/collections/{id}/sources';
+};
+
+export type RagSourcesCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagSourcesCreateError = RagSourcesCreateErrors[keyof RagSourcesCreateErrors];
+
+export type RagSourcesCreateResponses = {
+    /**
+     * OK
+     */
+    201: Source;
+};
+
+export type RagSourcesCreateResponse = RagSourcesCreateResponses[keyof RagSourcesCreateResponses];
+
+export type RagConnectionsListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/rag/connections';
+};
+
+export type RagConnectionsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagConnectionsListError = RagConnectionsListErrors[keyof RagConnectionsListErrors];
+
+export type RagConnectionsListResponses = {
+    /**
+     * OK
+     */
+    200: RagConnectionList;
+};
+
+export type RagConnectionsListResponse = RagConnectionsListResponses[keyof RagConnectionsListResponses];
+
+export type RagConnectionsCreateData = {
+    body: CreateRagConnectionInputWritable;
+    path?: never;
+    query?: never;
+    url: '/api/rag/connections';
+};
+
+export type RagConnectionsCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagConnectionsCreateError = RagConnectionsCreateErrors[keyof RagConnectionsCreateErrors];
+
+export type RagConnectionsCreateResponses = {
+    /**
+     * OK
+     */
+    201: RagConnection;
+};
+
+export type RagConnectionsCreateResponse = RagConnectionsCreateResponses[keyof RagConnectionsCreateResponses];
+
+export type RagConnectionsDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/connections/{id}';
+};
+
+export type RagConnectionsDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagConnectionsDeleteError = RagConnectionsDeleteErrors[keyof RagConnectionsDeleteErrors];
+
+export type RagConnectionsDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type RagConnectionsDeleteResponse = RagConnectionsDeleteResponses[keyof RagConnectionsDeleteResponses];
+
+export type RagConnectionsGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/connections/{id}';
+};
+
+export type RagConnectionsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagConnectionsGetError = RagConnectionsGetErrors[keyof RagConnectionsGetErrors];
+
+export type RagConnectionsGetResponses = {
+    /**
+     * OK
+     */
+    200: RagConnection;
+};
+
+export type RagConnectionsGetResponse = RagConnectionsGetResponses[keyof RagConnectionsGetResponses];
+
+export type RagConnectionsUpdateData = {
+    body: UpdateRagConnectionInputWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/connections/{id}';
+};
+
+export type RagConnectionsUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagConnectionsUpdateError = RagConnectionsUpdateErrors[keyof RagConnectionsUpdateErrors];
+
+export type RagConnectionsUpdateResponses = {
+    /**
+     * OK
+     */
+    200: RagConnection;
+};
+
+export type RagConnectionsUpdateResponse = RagConnectionsUpdateResponses[keyof RagConnectionsUpdateResponses];
+
+export type RagConnectionsActivateData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/connections/{id}/activate';
+};
+
+export type RagConnectionsActivateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagConnectionsActivateError = RagConnectionsActivateErrors[keyof RagConnectionsActivateErrors];
+
+export type RagConnectionsActivateResponses = {
+    /**
+     * OK
+     */
+    200: RagConnection;
+};
+
+export type RagConnectionsActivateResponse = RagConnectionsActivateResponses[keyof RagConnectionsActivateResponses];
+
+export type RagConnectionsDiagnoseData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/connections/{id}/diagnose';
+};
+
+export type RagConnectionsDiagnoseErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagConnectionsDiagnoseError = RagConnectionsDiagnoseErrors[keyof RagConnectionsDiagnoseErrors];
+
+export type RagConnectionsDiagnoseResponses = {
+    /**
+     * OK
+     */
+    200: RagConnection;
+};
+
+export type RagConnectionsDiagnoseResponse = RagConnectionsDiagnoseResponses[keyof RagConnectionsDiagnoseResponses];
+
+export type RagDocumentsListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        pageSize?: number;
+        collectionId?: string;
+        status?: 'pending' | 'processing' | 'indexed' | 'failed';
+        search?: string;
+    };
+    url: '/api/rag/documents';
+};
+
+export type RagDocumentsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagDocumentsListError = RagDocumentsListErrors[keyof RagDocumentsListErrors];
+
+export type RagDocumentsListResponses = {
+    /**
+     * OK
+     */
+    200: DocumentsPage;
+};
+
+export type RagDocumentsListResponse = RagDocumentsListResponses[keyof RagDocumentsListResponses];
+
+export type RagEvaluationsListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/rag/evaluations';
+};
+
+export type RagEvaluationsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagEvaluationsListError = RagEvaluationsListErrors[keyof RagEvaluationsListErrors];
+
+export type RagEvaluationsListResponses = {
+    /**
+     * OK
+     */
+    200: EvaluationSetList;
+};
+
+export type RagEvaluationsListResponse = RagEvaluationsListResponses[keyof RagEvaluationsListResponses];
+
+export type RagEvaluationsCreateData = {
+    body: EvaluationSetInput;
+    path?: never;
+    query?: never;
+    url: '/api/rag/evaluations';
+};
+
+export type RagEvaluationsCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagEvaluationsCreateError = RagEvaluationsCreateErrors[keyof RagEvaluationsCreateErrors];
+
+export type RagEvaluationsCreateResponses = {
+    /**
+     * OK
+     */
+    201: EvaluationSet;
+};
+
+export type RagEvaluationsCreateResponse = RagEvaluationsCreateResponses[keyof RagEvaluationsCreateResponses];
+
+export type RagEvaluationsDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/evaluations/{id}';
+};
+
+export type RagEvaluationsDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagEvaluationsDeleteError = RagEvaluationsDeleteErrors[keyof RagEvaluationsDeleteErrors];
+
+export type RagEvaluationsDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type RagEvaluationsDeleteResponse = RagEvaluationsDeleteResponses[keyof RagEvaluationsDeleteResponses];
+
+export type RagEvaluationsUpdateData = {
+    body: EvaluationSetInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/evaluations/{id}';
+};
+
+export type RagEvaluationsUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagEvaluationsUpdateError = RagEvaluationsUpdateErrors[keyof RagEvaluationsUpdateErrors];
+
+export type RagEvaluationsUpdateResponses = {
+    /**
+     * OK
+     */
+    200: EvaluationSet;
+};
+
+export type RagEvaluationsUpdateResponse = RagEvaluationsUpdateResponses[keyof RagEvaluationsUpdateResponses];
+
+export type RagEvaluationsRateData = {
+    body: RateEvaluationInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/evaluations/{id}/ratings';
+};
+
+export type RagEvaluationsRateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagEvaluationsRateError = RagEvaluationsRateErrors[keyof RagEvaluationsRateErrors];
+
+export type RagEvaluationsRateResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type RagEvaluationsRateResponse = RagEvaluationsRateResponses[keyof RagEvaluationsRateResponses];
+
+export type RagEvaluationsRunsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/evaluations/{id}/runs';
+};
+
+export type RagEvaluationsRunsErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagEvaluationsRunsError = RagEvaluationsRunsErrors[keyof RagEvaluationsRunsErrors];
+
+export type RagEvaluationsRunsResponses = {
+    /**
+     * OK
+     */
+    200: EvaluationRunList;
+};
+
+export type RagEvaluationsRunsResponse = RagEvaluationsRunsResponses[keyof RagEvaluationsRunsResponses];
+
+export type RagEvaluationsRunData = {
+    body: EvaluationRunInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/evaluations/{id}/runs';
+};
+
+export type RagEvaluationsRunErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagEvaluationsRunError = RagEvaluationsRunErrors[keyof RagEvaluationsRunErrors];
+
+export type RagEvaluationsRunResponses = {
+    /**
+     * OK
+     */
+    201: EvaluationRun;
+};
+
+export type RagEvaluationsRunResponse = RagEvaluationsRunResponses[keyof RagEvaluationsRunResponses];
+
+export type RagJobsListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        pageSize?: number;
+        status?: 'queued' | 'running' | 'retrying' | 'paused' | 'succeeded' | 'failed' | 'cancelled';
+        collectionId?: string;
+        active?: boolean | '0' | '1' | 'true' | 'false';
+    };
+    url: '/api/rag/jobs';
+};
+
+export type RagJobsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagJobsListError = RagJobsListErrors[keyof RagJobsListErrors];
+
+export type RagJobsListResponses = {
+    /**
+     * OK
+     */
+    200: RagJobsPage;
+};
+
+export type RagJobsListResponse = RagJobsListResponses[keyof RagJobsListResponses];
+
+export type RagJobsGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/jobs/{id}';
+};
+
+export type RagJobsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagJobsGetError = RagJobsGetErrors[keyof RagJobsGetErrors];
+
+export type RagJobsGetResponses = {
+    /**
+     * OK
+     */
+    200: RagJob;
+};
+
+export type RagJobsGetResponse = RagJobsGetResponses[keyof RagJobsGetResponses];
+
+export type RagJobsCancelData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/jobs/{id}/cancel';
+};
+
+export type RagJobsCancelErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagJobsCancelError = RagJobsCancelErrors[keyof RagJobsCancelErrors];
+
+export type RagJobsCancelResponses = {
+    /**
+     * OK
+     */
+    200: RagJob;
+};
+
+export type RagJobsCancelResponse = RagJobsCancelResponses[keyof RagJobsCancelResponses];
+
+export type RagJobsRetryData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/jobs/{id}/retry';
+};
+
+export type RagJobsRetryErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagJobsRetryError = RagJobsRetryErrors[keyof RagJobsRetryErrors];
+
+export type RagJobsRetryResponses = {
+    /**
+     * OK
+     */
+    200: RagJob;
+};
+
+export type RagJobsRetryResponse = RagJobsRetryResponses[keyof RagJobsRetryResponses];
+
+export type RagProfilesListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/rag/profiles';
+};
+
+export type RagProfilesListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagProfilesListError = RagProfilesListErrors[keyof RagProfilesListErrors];
+
+export type RagProfilesListResponses = {
+    /**
+     * OK
+     */
+    200: EmbeddingProfileList;
+};
+
+export type RagProfilesListResponse = RagProfilesListResponses[keyof RagProfilesListResponses];
+
+export type RagProfilesCreateData = {
+    body: CreateEmbeddingProfileInput;
+    path?: never;
+    query?: never;
+    url: '/api/rag/profiles';
+};
+
+export type RagProfilesCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagProfilesCreateError = RagProfilesCreateErrors[keyof RagProfilesCreateErrors];
+
+export type RagProfilesCreateResponses = {
+    /**
+     * OK
+     */
+    201: EmbeddingProfile;
+};
+
+export type RagProfilesCreateResponse = RagProfilesCreateResponses[keyof RagProfilesCreateResponses];
+
+export type RagProfilesDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/profiles/{id}';
+};
+
+export type RagProfilesDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagProfilesDeleteError = RagProfilesDeleteErrors[keyof RagProfilesDeleteErrors];
+
+export type RagProfilesDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type RagProfilesDeleteResponse = RagProfilesDeleteResponses[keyof RagProfilesDeleteResponses];
+
+export type RagSearchData = {
+    body: SearchRequest;
+    path?: never;
+    query?: never;
+    url: '/api/rag/search';
+};
+
+export type RagSearchErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagSearchError = RagSearchErrors[keyof RagSearchErrors];
+
+export type RagSearchResponses = {
+    /**
+     * OK
+     */
+    200: SearchResult;
+};
+
+export type RagSearchResponse = RagSearchResponses[keyof RagSearchResponses];
+
+export type RagSourcesDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/sources/{id}';
+};
+
+export type RagSourcesDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagSourcesDeleteError = RagSourcesDeleteErrors[keyof RagSourcesDeleteErrors];
+
+export type RagSourcesDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type RagSourcesDeleteResponse = RagSourcesDeleteResponses[keyof RagSourcesDeleteResponses];
+
+export type RagSourcesUpdateData = {
+    body: UpdateSourceInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/sources/{id}';
+};
+
+export type RagSourcesUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagSourcesUpdateError = RagSourcesUpdateErrors[keyof RagSourcesUpdateErrors];
+
+export type RagSourcesUpdateResponses = {
+    /**
+     * OK
+     */
+    200: Source;
+};
+
+export type RagSourcesUpdateResponse = RagSourcesUpdateResponses[keyof RagSourcesUpdateResponses];
+
+export type RagSourcesSyncData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/rag/sources/{id}/sync';
+};
+
+export type RagSourcesSyncErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type RagSourcesSyncError = RagSourcesSyncErrors[keyof RagSourcesSyncErrors];
+
+export type RagSourcesSyncResponses = {
+    /**
+     * OK
+     */
+    202: JobAccepted;
+};
+
+export type RagSourcesSyncResponse = RagSourcesSyncResponses[keyof RagSourcesSyncResponses];
