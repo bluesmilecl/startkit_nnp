@@ -174,13 +174,11 @@ export async function create(opts: CreateOptions): Promise<void> {
   }
 
   title('Siguientes pasos');
-  const rel = relative(process.cwd(), dir) || '.';
+  const rel = relative(process.cwd(), dir);
   const steps = [
-    `cd ${rel}`,
+    `cd ${!rel ? '.' : rel.startsWith('..') ? dir : rel}`,
     ...(opts.install === false ? ['pnpm install'] : []),
-    db === 'docker'
-      ? `docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail${modules.has('rag') ? '' : ''} up -d postgres mailpit`
-      : '# Asegura pgvector en tu PostgreSQL externo (CREATE EXTENSION vector)',
+    db === 'docker' ? 'pnpm infra:up             # PostgreSQL 18 + pgvector y Mailpit en Docker' : '# Asegura pgvector en tu PostgreSQL externo (CREATE EXTENSION vector) o deja que la migración lo cree',
     'pnpm build:ts && pnpm db:migrate',
     'pnpm starter doctor',
     'pnpm dev',

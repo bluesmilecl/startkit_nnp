@@ -13,6 +13,8 @@
     "build:ts": "tsc -b tsconfig.json",
     "clean": "pnpm -r exec rm -rf dist .output .nuxt *.tsbuildinfo",
     "dev": "node scripts/dev.mjs",
+    "infra:up": "docker compose --env-file .env -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail up -d --wait postgres mailpit",
+    "infra:down": "docker compose --env-file .env -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail down",
     "typecheck": "tsc -b tsconfig.json && pnpm --filter @starter/web typecheck",
     "lint": "eslint .",
     "test": "vitest run --project unit",

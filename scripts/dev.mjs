@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Local development without containers for the apps (infrastructure can run in Docker):
- *   docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail up -d postgres mailpit
- *   pnpm db:migrate && pnpm dev
+ *   pnpm infra:up            (PostgreSQL + pgvector and Mailpit in Docker, reading the root .env)
+ *   pnpm build:ts && pnpm db:migrate && pnpm dev
  * Runs: TypeScript build in watch mode, API and worker with node --watch, Nuxt dev server.
  */
 import { spawn } from 'node:child_process';
