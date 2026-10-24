@@ -142,6 +142,7 @@ pone HTTPS.
    RESEND_API_KEY=re_…
    MAIL_FROM="Mesa de Ayuda <no-reply@tudominio.cl>"
    MAILPIT_UI_AUTH=usuario:clave    # si publicas Mailpit
+   MAILPIT_WEBROOT=/mailpit/        # Mailpit en https://app.tudominio.cl/mailpit/ (un solo DNS)
    ```
 
    Con un PostgreSQL externo define `DATABASE_URL` y `DATABASE_MIGRATION_URL`: tienen prioridad
@@ -152,7 +153,7 @@ pone HTTPS.
    | --- | --- | --- | --- |
    | `app.tudominio.cl` | `/` | `web` | 3000 |
    | `app.tudominio.cl` | `/api` | `api` | 3001 |
-   | `correo-app.tudominio.cl` (opcional) | `/` | `mailpit` | 8025 |
+   | `app.tudominio.cl` (opcional) | `/mailpit` | `mailpit` | 8025 |
 
 5. **Deploy.** `migrate` aplica las migraciones antes de que arranquen `api` y `worker`; revisa
    `/admin/diagnostics` al terminar. Con *Autodeploy* cada push a la rama vuelve a desplegar.

@@ -4,7 +4,8 @@
 # its Environment tab next to this file (docker/.env) and adds the Traefik labels of its domains:
 #   <host>  path /     -> web:3000
 #   <host>  path /api  -> api:3001      (same host: the browser calls /api on its own origin)
-#   <mail-host>        -> mailpit:8025  (optional; protect it with MAILPIT_UI_AUTH)
+#   <host>  path /mailpit -> mailpit:8025 with MAILPIT_WEBROOT=/mailpit/ (optional; protect it
+#                            with MAILPIT_UI_AUTH), or its own host with the default webroot
 # Compose Path in Dokploy: ./docker/compose.dokploy.yaml. Guide: docs/docker.md#dokploy
 # ---------------------------------------------------------------------------------------------
 
@@ -57,6 +58,8 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 'true'
       MP_SMTP_AUTH_ALLOW_INSECURE: 'true'
       MP_UI_AUTH: ${MAILPIT_UI_AUTH:-}
+      # Serve it under a path of the app host (e.g. /mailpit/) instead of its own subdomain.
+      MP_WEBROOT: ${MAILPIT_WEBROOT:-/}
       MP_MAX_MESSAGES: '500'
     restart: unless-stopped
 
