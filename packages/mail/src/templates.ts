@@ -55,7 +55,7 @@ export function budgetAlertEmail(b: Branding, budgetName: string, threshold: num
     subject,
     `<p style="margin:0 0 12px">El presupuesto <strong>${escape(budgetName)}</strong> alcanzó el ${threshold}% de su límite.</p>
 <p style="margin:0">Consumo: <strong>${escape(spent)}</strong> de ${escape(limit)}.</p>
-<p style="margin:16px 0 0"><a href="${escape(b.appUrl)}/admin/ai/costs">Ver presupuestos</a></p>`,
+<p style="margin:16px 0 0"><a href="${escape(b.appUrl)}/admin/ai/budgets">Ver presupuestos</a></p>`,
   );
   const text = `El presupuesto ${budgetName} alcanzó el ${threshold}% (${spent} de ${limit}).`;
   return { subject, html, text };

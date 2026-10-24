@@ -7,22 +7,7 @@ import {
   type RoleSummary,
   type UpdateRoleInput,
 } from '@starter/contracts';
-import {
-  and,
-  asc,
-  count,
-  eq,
-  inArray,
-  isNull,
-  or,
-  permissions,
-  rolePermissions,
-  roles,
-  sql,
-  userRoles,
-  users,
-  type DbOrTx,
-} from '@starter/db';
+import { and, asc, count, type DbOrTx, eq, inArray, isNull, or, outerRef, permissions, rolePermissions, roles, sql, userRoles, users } from '@starter/db';
 import { assertCan, type AccessDeps, type Actor } from './actor.js';
 import { recordAudit } from './audit.js';
 import { assertCanManageRole, assertCanManageUser, assertDelegable, assertNotLastOwner, targetUserInfo } from './policies.js';
@@ -60,8 +45,8 @@ export class RolesService {
     const rows = await db
       .select({
         role: roles,
-        userCount: sql<number>`(select count(*)::int from ${userRoles} ur where ur.role_id = ${roles.id})`,
-        permissionCount: sql<number>`(select count(*)::int from ${rolePermissions} rp where rp.role_id = ${roles.id})`,
+        userCount: sql<number>`(select count(*)::int from ${userRoles} ur where ur.role_id = ${outerRef(roles.id)})`,
+        permissionCount: sql<number>`(select count(*)::int from ${rolePermissions} rp where rp.role_id = ${outerRef(roles.id)})`,
       })
       .from(roles)
       .where(this.visibleRolesFilter(actor))

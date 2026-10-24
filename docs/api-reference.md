@@ -765,7 +765,7 @@ Aparecer en un catálogo no implica acceso: esta llamada explícita (con costo r
   - `pageSize` (query): `integer`
   - `provider` (query): `string`
   - `modelId` (query): `string`
-  - `includeHistory` (query): `boolean`
+  - `includeHistory` (query): `string`
 - **200**: OK — `application/json` `PricesPage`
 - **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
 

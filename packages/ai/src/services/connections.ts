@@ -1,7 +1,7 @@
 import { assertCan, recordAudit, type AccessDeps, type Actor } from '@starter/auth';
 import { maskSecret, resolveSecretRef, type SecretBox } from '@starter/config';
 import { AppError, type Connection, type CreateConnectionInput, type UpdateConnectionInput } from '@starter/contracts';
-import { and, asc, count, eq, modelCatalog, providerConnections, sql, type DbOrTx } from '@starter/db';
+import { and, asc, count, type DbOrTx, eq, modelCatalog, outerRef, providerConnections, sql } from '@starter/db';
 import { assertAllowedEndpoint } from '../endpoint-policy.js';
 import { classifyAiError } from '../errors.js';
 import { createProviderClient, PROVIDERS, type ProviderClient, type ProviderKey, type ResolvedConnection } from '../providers/registry.js';
@@ -51,7 +51,7 @@ export class ConnectionsService {
   async list(actor: Actor): Promise<Connection[]> {
     this.assertRead(actor);
     const rows = await this.deps.db
-      .select({ c: providerConnections, n: sql<number>`(select count(*)::int from ${modelCatalog} m where m.connection_id = ${providerConnections.id})` })
+      .select({ c: providerConnections, n: sql<number>`(select count(*)::int from ${modelCatalog} m where m.connection_id = ${outerRef(providerConnections.id)})` })
       .from(providerConnections)
       .where(eq(providerConnections.organizationId, actor.organizationId))
       .orderBy(asc(providerConnections.alias));

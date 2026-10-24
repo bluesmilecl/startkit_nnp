@@ -3902,7 +3902,7 @@ export type AiPricesListData = {
         pageSize?: number;
         provider?: string;
         modelId?: string;
-        includeHistory?: boolean;
+        includeHistory?: boolean | '0' | '1' | 'true' | 'false';
     };
     url: '/api/ai/prices';
 };

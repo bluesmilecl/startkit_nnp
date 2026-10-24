@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { IsoDate, PageQuery, pageOf, UsdAmount, Uuid } from './common.js';
+import { IsoDate, PageQuery, pageOf, QueryBool, UsdAmount, Uuid } from './common.js';
 
 export const ProviderKey = z.enum(['openai', 'anthropic', 'google', 'openai-compatible', 'test']).meta({ id: 'ProviderKey' });
 export const CapabilityStatus = z.enum(['yes', 'no', 'unknown']).meta({ id: 'CapabilityStatus' });
@@ -183,7 +183,7 @@ export const SyncRun = z
 export const PricesQuery = PageQuery.extend({
   provider: z.string().max(40).optional(),
   modelId: z.string().max(200).optional(),
-  includeHistory: z.coerce.boolean().default(false),
+  includeHistory: QueryBool.default(false),
 });
 export const PricesPage = pageOf(PriceRow, 'PricesPage');
 

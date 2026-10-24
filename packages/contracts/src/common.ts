@@ -24,6 +24,11 @@ export const OkResponse = z.object({ ok: z.literal(true) }).meta({ id: 'OkRespon
 
 export const IdParams = z.object({ id: Uuid });
 
+/** Boolean query parameter: accepts true/false/1/0 strings (z.coerce.boolean would read "false" as true). */
+export const QueryBool = z
+  .union([z.boolean(), z.enum(['true', 'false', '1', '0'])])
+  .transform((v) => v === true || v === 'true' || v === '1');
+
 export const PageQuery = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),

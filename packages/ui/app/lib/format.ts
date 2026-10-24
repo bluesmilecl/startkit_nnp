@@ -30,7 +30,24 @@ export function formatUsd(value: string | null | undefined, digits = 4): string 
   if (value === null || value === undefined) return 'desconocido';
   const n = Number(value);
   if (!Number.isFinite(n)) return 'desconocido';
+  // Sub-cent amounts (single AI calls) keep three significant digits instead of rounding to 0.00.
+  if (n !== 0 && Math.abs(n) < 0.01) return `US$ ${n.toLocaleString(locale(), { maximumSignificantDigits: 3 })}`;
   return `US$ ${n.toLocaleString(locale(), { minimumFractionDigits: 2, maximumFractionDigits: digits })}`;
+}
+
+/** Visual CLP conversion of a USD amount with a dated rate (never used for accounting). */
+export function formatClp(usd: string | null | undefined, rate: string | number): string {
+  if (usd === null || usd === undefined) return 'desconocido';
+  const n = Number(usd) * Number(rate);
+  if (!Number.isFinite(n)) return 'desconocido';
+  const digits = Math.abs(n) < 10 ? 2 : 0;
+  return `CLP$ ${n.toLocaleString(locale(), { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
+}
+
+/** Price per million units, e.g. "US$ 0.15 / 1M". */
+export function formatPerMillion(price: string, unitQuantity: number): string {
+  const n = (Number(price) * 1_000_000) / unitQuantity;
+  return `US$ ${n.toLocaleString(locale(), { maximumFractionDigits: 4 })} / 1M`;
 }
 
 export function formatNumber(value: number | null | undefined): string {

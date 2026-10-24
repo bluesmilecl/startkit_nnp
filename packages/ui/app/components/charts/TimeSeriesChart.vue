@@ -35,6 +35,8 @@ const palette = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--ch
 const config = computed<ChartConfig>(() =>
   Object.fromEntries(props.series.map((s, i) => [s.key, { label: s.label, color: s.color ?? palette[i % palette.length] }])),
 );
+// Lines and areas need two points; a single day is drawn as bars.
+const effectiveKind = computed(() => (props.data.length < 2 && (props.kind === 'line' || props.kind === 'area') ? 'bar' : props.kind));
 const indexed = computed(() => props.data.map((d, i) => ({ ...d, __i: i })));
 const x = (d: { __i: number }) => d.__i;
 const ys = computed(() => props.series.map((s) => (d: Record<string, unknown>) => Number(d[s.key] ?? 0)));
@@ -81,22 +83,26 @@ function exportCsv() {
         </TableBody>
       </Table>
     </div>
-    <ChartContainer v-else :config="config" :class="height" cursor>
+    <!-- Unovis renders in the browser only; SSR shows a sized placeholder (no hydration mismatch). -->
+    <ClientOnly v-else>
+      <template #fallback><div :class="height" class="bg-muted/40 animate-pulse rounded-md" aria-hidden="true" /></template>
+    <ChartContainer :config="config" :class="height" cursor>
       <VisXYContainer :data="indexed" :margin="{ left: 8, right: 8 }">
-        <template v-if="kind === 'area'">
+        <template v-if="effectiveKind === 'area'">
           <VisArea v-for="(y, i) in ys" :key="i" :x="x" :y="y" :color="colors[i]" :opacity="0.25" />
           <VisLine v-for="(y, i) in ys" :key="`l${i}`" :x="x" :y="y" :color="colors[i]" />
         </template>
-        <template v-else-if="kind === 'line'">
+        <template v-else-if="effectiveKind === 'line'">
           <VisLine v-for="(y, i) in ys" :key="i" :x="x" :y="y" :color="colors[i]" />
         </template>
-        <VisGroupedBar v-else-if="kind === 'bar'" :x="x" :y="ys" :color="colors" :rounded-corners="4" />
-        <VisStackedBar v-else :x="x" :y="ys" :color="colors" :rounded-corners="2" />
+        <VisGroupedBar v-else-if="effectiveKind === 'bar'" :x="x" :y="ys" :color="colors" :rounded-corners="4" :bar-max-width="48" />
+        <VisStackedBar v-else :x="x" :y="ys" :color="colors" :rounded-corners="2" :bar-max-width="48" />
         <VisAxis type="x" :x="x" :tick-line="false" :domain-line="false" :grid-line="false" :tick-format="tickFormat" :num-ticks="6" />
         <VisAxis type="y" :tick-line="false" :domain-line="false" :tick-format="fmt" :num-ticks="4" />
         <ChartTooltip />
-        <ChartCrosshair :template="componentToString(config, ChartTooltipContent, { labelFormatter: (i: number | Date) => String(data[Number(i)]?.x ?? '') })" :color="colors" />
+        <ChartCrosshair :x="x" :y="ys" :template="componentToString(config, ChartTooltipContent, { labelFormatter: (i: number | Date) => String(data[Number(i)]?.x ?? '') })" :color="colors" />
       </VisXYContainer>
     </ChartContainer>
+    </ClientOnly>
   </figure>
 </template>

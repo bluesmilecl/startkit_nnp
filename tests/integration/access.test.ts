@@ -56,6 +56,15 @@ describe('authorization in services (same rules for REST, CLI and chat tools)', 
     await rolesSvc.unassign(owner, u.id, await roleId(ctx.handle, 'editor'));
     expect((await actorFor(ctx.handle, u.id)).permissions.has('users.read')).toBe(false);
   });
+
+  it('role summaries report real user and permission counts', async () => {
+    const owner = await actorFor(ctx.handle, (await makeUser(ctx.handle, { roles: ['owner'] })).id);
+    const before = (await rolesSvc.list(owner)).find((r) => r.key === 'viewer')!;
+    await makeUser(ctx.handle, { roles: ['viewer'] });
+    const after = (await rolesSvc.list(owner)).find((r) => r.key === 'viewer')!;
+    expect(after.userCount).toBe(before.userCount + 1);
+    expect(after.permissionCount).toBeGreaterThan(0);
+  });
 });
 
 describe('last owner protection', () => {

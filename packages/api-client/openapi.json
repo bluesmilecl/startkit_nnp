@@ -6035,8 +6035,20 @@
             "required": false,
             "in": "query",
             "schema": {
-              "default": false,
-              "type": "boolean"
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "0",
+                    "1",
+                    "true",
+                    "false"
+                  ]
+                }
+              ]
             }
           }
         ],

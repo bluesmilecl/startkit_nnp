@@ -32,6 +32,15 @@ describe('provider connections', () => {
     await ai.connections.remove(owner, created.id);
   });
 
+  it('lists connections with their real model count', async () => {
+    const list = await ai.connections.list(owner);
+    const test = list.find((c) => c.provider === 'test')!;
+    expect(test.modelCount).toBe(4);
+    const filtered = await ai.models.list(owner, { page: 1, pageSize: 50, capability: 'tools' } as never);
+    expect(filtered.total).toBe(filtered.items.length);
+    expect(filtered.items.every((m) => m.capabilities.tools === 'yes')).toBe(true);
+  });
+
   it('a viewer cannot manage providers', async () => {
     const viewer = await actorFor(ctx.handle, (await makeUser(ctx.handle, { roles: ['viewer'] })).id);
     await expect(ai.connections.create(viewer, { provider: 'test', alias: 'x', options: {} } as never)).rejects.toMatchObject({ code: 'FORBIDDEN' });

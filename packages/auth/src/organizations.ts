@@ -1,5 +1,5 @@
 import { AppError } from '@starter/contracts';
-import { and, asc, count, eq, isNull, memberships, organizations, sessions, sql, userRoles, users } from '@starter/db';
+import { and, asc, count, eq, isNull, memberships, organizations, outerRef, sessions, sql, userRoles, users } from '@starter/db';
 import { assertCan, type AccessDeps, type Actor } from './actor.js';
 import { recordAudit } from './audit.js';
 
@@ -31,7 +31,7 @@ export class OrganizationsService {
     const rows = await this.deps.db
       .select({
         org: organizations,
-        memberCount: sql<number>`(select count(*)::int from ${memberships} m where m.organization_id = ${organizations.id})`,
+        memberCount: sql<number>`(select count(*)::int from ${memberships} m where m.organization_id = ${outerRef(organizations.id)})`,
       })
       .from(organizations)
       .where(platform ? undefined : sql`${organizations.id} in ${actor.organizationIds.length ? actor.organizationIds : ['00000000-0000-0000-0000-000000000000']}`)

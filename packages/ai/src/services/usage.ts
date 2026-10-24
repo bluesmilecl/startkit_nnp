@@ -1,5 +1,5 @@
 import { assertCan, type Actor } from '@starter/auth';
-import { agents, aiAttempts, aiRequests, and, count, desc, eq, fxRates, gte, lte, normalizePage, offsetOf, organizations, sql, toPage, users, type SQL } from '@starter/db';
+import { agents, aiAttempts, aiRequests, and, count, desc, eq, fxRates, gte, lte, normalizePage, offsetOf, organizations, outerRef, sql, type SQL, toPage, users } from '@starter/db';
 import { add, ZERO } from '../money.js';
 import type { AiDeps } from './connections.js';
 
@@ -147,7 +147,7 @@ export class UsageService {
         .select({
           r: aiRequests,
           email: users.email,
-          attempts: sql<number>`(select count(*)::int from ${aiAttempts} a where a.ai_request_id = ${aiRequests.id})`,
+          attempts: sql<number>`(select count(*)::int from ${aiAttempts} a where a.ai_request_id = ${outerRef(aiRequests.id)})`,
         })
         .from(aiRequests)
         .leftJoin(users, eq(users.id, aiRequests.userId))

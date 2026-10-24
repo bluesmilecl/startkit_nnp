@@ -1,24 +1,6 @@
 import { assertCan, recordAudit, type Actor } from '@starter/auth';
 import { AppError, type CatalogModel } from '@starter/contracts';
-import {
-  and,
-  asc,
-  count,
-  eq,
-  ilike,
-  inArray,
-  likeTerm,
-  modelCapabilities,
-  modelCatalog,
-  normalizePage,
-  offsetOf,
-  or,
-  priceSyncRuns,
-  providerConnections,
-  sql,
-  toPage,
-  type SQL,
-} from '@starter/db';
+import { and, asc, count, eq, ilike, inArray, likeTerm, modelCapabilities, modelCatalog, normalizePage, offsetOf, or, outerRef, priceSyncRuns, providerConnections, sql, type SQL, toPage } from '@starter/db';
 import { sanitizeError } from '@starter/observability';
 import { embed, experimental_transcribe as transcribe, generateText } from 'ai';
 import { guessFunctions, loadCatalog, type CatalogEntry } from '../catalog-source.js';
@@ -122,14 +104,14 @@ export class ModelsService {
     if (q.connectionId) filters.push(eq(modelCatalog.connectionId, q.connectionId));
     if (q.availability) filters.push(eq(modelCatalog.availability, q.availability));
     if (q.capability) {
-      filters.push(sql`exists (select 1 from ${modelCapabilities} c where c.model_catalog_id = ${modelCatalog.id} and c.capability = ${q.capability} and c.status = 'yes')`);
+      filters.push(sql`exists (select 1 from ${modelCapabilities} c where c.model_catalog_id = ${outerRef(modelCatalog.id)} and c.capability = ${q.capability} and c.status = 'yes')`);
     }
     const where = and(...filters);
     const order =
       q.sort === 'context'
         ? [sql`${modelCatalog.contextWindow} desc nulls last`, asc(modelCatalog.modelId)]
         : q.sort === 'inputPrice'
-          ? [sql`(select min(p.price) from model_prices p where p.provider = ${modelCatalog.provider} and p.model_id = ${modelCatalog.modelId} and p.unit = 'input_tokens' and p.effective_to is null) asc nulls last`, asc(modelCatalog.modelId)]
+          ? [sql`(select min(p.price) from model_prices p where p.provider = ${outerRef(modelCatalog.provider)} and p.model_id = ${outerRef(modelCatalog.modelId)} and p.unit = 'input_tokens' and p.effective_to is null) asc nulls last`, asc(modelCatalog.modelId)]
           : [asc(modelCatalog.provider), asc(modelCatalog.modelId)];
     const [rows, total] = await Promise.all([
       this.deps.db
