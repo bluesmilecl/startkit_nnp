@@ -196,7 +196,12 @@ export function planModule(root: string, spec: ModuleSpec): ModulePlan {
       apply: (s) => {
         if (s.includes(`'/admin/${n.kebab}'`)) return s;
         let out: string | null = s;
-        if (!new RegExp(`\\b${n.icon}\\b`).test(s)) out = s.replace(/import \{([^}]*)\} from '@lucide\/vue';/, (_m, names: string) => `import {${names.trimEnd()}, ${n.icon} } from '@lucide/vue';`);
+        if (!new RegExp(`\\b${n.icon}\\b`).test(s)) {
+          out = s.replace(/import \{([^}]*)\} from '@lucide\/vue';/, (_m, names: string) => {
+            const list = [...new Set([...names.split(',').map((x) => x.trim()).filter(Boolean), n.icon])].sort();
+            return names.includes('\n') ? `import {\n${list.map((x) => `  ${x},`).join('\n')}\n} from '@lucide/vue';` : `import { ${list.join(', ')} } from '@lucide/vue';`;
+          });
+        }
         return insertAfter(/ {6}\{ title: 'Proyectos', to: '\/admin\/projects'[^\n]*\n/, `      { title: '${n.label}', to: '/admin/${n.kebab}', icon: ${n.icon}, permission: '${n.snake}.read' },\n`)(out);
       },
     },
