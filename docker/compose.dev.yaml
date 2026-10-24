@@ -1,0 +1,34 @@
+# Development / local evaluation overrides:
+#   docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail up -d
+# - edge proxy always on at http://localhost:8080 (single origin for web + /api)
+# - Mailpit UI at http://localhost:8025, PostgreSQL at localhost:5432
+# - local database URLs point to the compose services
+x-dev-env: &dev-env
+  DATABASE_URL: postgres://${POSTGRES_APP_USER:-starter_app}:${POSTGRES_APP_PASSWORD:-starter_app}@postgres:5432/${POSTGRES_DB:-starter}
+  DATABASE_MIGRATION_URL: postgres://${POSTGRES_USER:-starter}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-starter}
+  SMTP_URL: smtp://mailpit:1025
+  APP_URL: ${APP_URL:-http://localhost:8080}
+  STORAGE_LOCAL_DIR: /data/storage
+  NUXT_API_INTERNAL_URL: http://api:3001
+
+services:
+  postgres:
+    environment:
+      POSTGRES_APP_PASSWORD: ${POSTGRES_APP_PASSWORD:-starter_app}
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+  mailpit:
+    ports:
+      - '127.0.0.1:${MAILPIT_PORT:-8025}:8025'
+  migrate:
+    environment: *dev-env
+  api:
+    environment: *dev-env
+  worker:
+    environment: *dev-env
+  web:
+    environment: *dev-env
+  proxy:
+    profiles: !reset []
+    ports:
+      - '127.0.0.1:${PROXY_PORT:-8080}:8080'

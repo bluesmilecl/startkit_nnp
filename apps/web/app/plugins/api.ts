@@ -32,10 +32,13 @@ export default defineNuxtPlugin((nuxtApp) => {
     );
   } else {
     client = createClient(createConfig({ baseUrl: '', credentials: 'include', throwOnError: true }));
+    // Captured during plugin setup: interceptors run outside the Nuxt context.
+    const me = useState('me');
+    const router = useRouter();
     client.interceptors.response.use((response) => {
-      if (response.status === 401 && useState('me').value && !response.url.includes('/api/auth/')) {
-        useState('me').value = null;
-        void nuxtApp.runWithContext(() => navigateTo('/session-expired'));
+      if (response.status === 401 && me.value && !response.url.includes('/api/auth/')) {
+        me.value = null;
+        void nuxtApp.runWithContext(() => router.push({ path: '/session-expired', query: { redirect: router.currentRoute.value.fullPath } }));
       }
       return response;
     });

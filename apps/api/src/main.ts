@@ -13,7 +13,7 @@ async function main(): Promise<void> {
 
 main().catch((err: unknown) => {
   log.fatal({ err: err instanceof Error ? err.message : String(err) }, 'api failed to start');
-  // eslint-disable-next-line no-console
+   
   console.error(err);
   process.exit(1);
 });

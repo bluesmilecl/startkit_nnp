@@ -32,6 +32,12 @@
     },
     {
       "path": "../../packages/auth"
+    },
+    {
+      "path": "../../packages/jobs"
+    },
+    {
+      "path": "../../packages/storage"
     }
   ]
 }

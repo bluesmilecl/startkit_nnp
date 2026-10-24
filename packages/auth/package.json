@@ -4,9 +4,14 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
-  "scripts": { "build": "tsc -b" },
+  "scripts": {
+    "build": "tsc -b"
+  },
   "dependencies": {
     "@starter/config": "workspace:*",
     "@starter/contracts": "workspace:*",
@@ -15,5 +20,8 @@
     "@starter/observability": "workspace:*",
     "better-auth": "1.7.12",
     "zod": "4.6.7"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }

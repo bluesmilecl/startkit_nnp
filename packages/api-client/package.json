@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "./openapi.json": "./openapi.json"
   },
   "scripts": {
@@ -13,5 +16,9 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.99.0"
-  }
+  },
+  "files": [
+    "dist",
+    "openapi.json"
+  ]
 }

@@ -20,7 +20,9 @@ watch(pending, () => (typed.value = ''));
 const open = computed({
   get: () => !!pending.value,
   set: (v) => {
-    if (!v) settle(false);
+    // Closing (Escape, overlay, Cancel or Action) settles as "cancel" only if the action button
+    // has not already settled the promise in the same interaction.
+    if (!v) queueMicrotask(() => settle(false));
   },
 });
 const canConfirm = computed(() => !pending.value?.typeToConfirm || typed.value.trim() === pending.value.typeToConfirm);

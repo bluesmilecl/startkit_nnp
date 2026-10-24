@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CI: 'true'
+  BETTER_AUTH_SECRET: ci-only-secret-ci-only-secret-ci-only-secret
+  APP_ENCRYPTION_KEY: Y2ktb25seS1lbmNyeXB0aW9uLWtleS0zMi1ieXRlcyE=
+  DATABASE_URL: postgres://starter:starter@localhost:5432/starter
+
+jobs:
+  quality:
+    name: Lint, types, unit tests, contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:ts
+      - run: pnpm lint
+      - run: pnpm --filter @starter/web typecheck
+      - run: pnpm test
+      - name: OpenAPI and Markdown reference match the real API
+        run: pnpm api:docs:generate -- --check
+      - name: Generated client is up to date and compiles
+        run: |
+          pnpm api:client:generate
+          git diff --exit-code -- packages/api-client/src/generated
+          pnpm exec tsc -b packages/api-client
+      - name: Breaking API changes are flagged
+        run: pnpm api:contract:check
+      - name: Manifest, docs and config examples
+        run: |
+          node scripts/manifest.mjs --check
+          pnpm docs:check
+
+  integration:
+    name: Integration (PostgreSQL + pgvector)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.7-pg18-trixie
+        env:
+          POSTGRES_USER: starter
+          POSTGRES_PASSWORD: starter
+          POSTGRES_DB: starter
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U starter" --health-interval 5s --health-timeout 5s --health-retries 20
+      mailpit:
+        image: ghcr.io/axllent/mailpit:v1.32.0
+        ports: ['1025:1025', '8025:8025']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:ts
+      - run: pnpm db:migrate
+      - run: pnpm test:integration
+
+  node-current:
+    name: Node Current (informative)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '26'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:ts
+      - run: pnpm test
+
+  docker:
+    name: Docker images and Compose variants
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - name: Compose variants are valid
+        run: |
+          cp .env.example .env && ln -sf ../.env docker/.env
+          docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail config -q
+          docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail --profile rag-db config -q
+          docker compose -f docker/compose.yaml -f docker/compose.production.yaml config -q
+          docker compose -f docker/compose.yaml -f docker/compose.production.yaml --profile edge config -q
+      - name: Build images
+        run: |
+          for s in api worker web; do
+            docker buildx build --load -f docker/$s.Dockerfile -t starter/$s:local --cache-from type=gha,scope=$s --cache-to type=gha,mode=max,scope=$s .
+          done
+
+  e2e:
+    name: E2E (Chromium, full Docker stack)
+    needs: [quality]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Start stack
+        run: node scripts/e2e-stack.mjs up
+      - run: pnpm test:e2e --project=chromium
+      - name: Stack logs on failure
+        if: failure()
+        run: node scripts/e2e-stack.mjs logs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+      - name: Tear down
+        if: always()
+        run: node scripts/e2e-stack.mjs down

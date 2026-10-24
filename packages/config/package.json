@@ -4,13 +4,22 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-    "./starter-config": { "types": "./dist/starter-config.d.ts", "default": "./dist/starter-config.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./starter-config": {
+      "types": "./dist/starter-config.d.ts",
+      "default": "./dist/starter-config.js"
+    }
   },
   "scripts": {
     "build": "tsc -b"
   },
   "dependencies": {
     "zod": "4.6.7"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }

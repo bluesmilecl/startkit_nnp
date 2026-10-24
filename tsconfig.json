@@ -23,7 +23,16 @@
       "path": "packages/auth"
     },
     {
+      "path": "packages/jobs"
+    },
+    {
+      "path": "packages/storage"
+    },
+    {
       "path": "apps/api"
+    },
+    {
+      "path": "apps/worker"
     }
   ]
 }

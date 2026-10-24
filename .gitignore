@@ -18,3 +18,5 @@ blob-report/
 .turbo/
 .vscode/*
 !.vscode/extensions.json
+verify-report.md
+.env.e2e

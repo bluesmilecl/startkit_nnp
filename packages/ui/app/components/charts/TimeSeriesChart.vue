@@ -87,7 +87,9 @@ function exportCsv() {
           <VisArea v-for="(y, i) in ys" :key="i" :x="x" :y="y" :color="colors[i]" :opacity="0.25" />
           <VisLine v-for="(y, i) in ys" :key="`l${i}`" :x="x" :y="y" :color="colors[i]" />
         </template>
-        <VisLine v-else-if="kind === 'line'" v-for="(y, i) in ys" :key="i" :x="x" :y="y" :color="colors[i]" />
+        <template v-else-if="kind === 'line'">
+          <VisLine v-for="(y, i) in ys" :key="i" :x="x" :y="y" :color="colors[i]" />
+        </template>
         <VisGroupedBar v-else-if="kind === 'bar'" :x="x" :y="ys" :color="colors" :rounded-corners="4" />
         <VisStackedBar v-else :x="x" :y="ys" :color="colors" :rounded-corners="2" />
         <VisAxis type="x" :x="x" :tick-line="false" :domain-line="false" :grid-line="false" :tick-format="tickFormat" :num-ticks="6" />

@@ -1,0 +1,65 @@
+# Production overrides (infrastructure configured externally through .env):
+#   docker compose -f docker/compose.yaml -f docker/compose.production.yaml up -d web api worker
+# Add `--profile edge` (or route /api -> api:3001 and / -> web:3000 in your own ingress) and set
+# SITE_ADDRESS to the public domain for automatic HTTPS.
+# PostgreSQL and Mailpit never publish ports here.
+x-prod: &prod
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options:
+      max-size: '20m'
+      max-file: '5'
+  security_opt:
+    - no-new-privileges:true
+  read_only: true
+  tmpfs:
+    - /tmp
+
+services:
+  migrate:
+    <<: *prod
+    restart: 'no'
+    environment:
+      NODE_ENV: production
+  api:
+    <<: *prod
+    environment:
+      NODE_ENV: production
+      OPENAPI_DOCS: ${OPENAPI_DOCS:-protected}
+      AI_TEST_PROVIDER_ENABLED: 'false'
+    deploy:
+      resources:
+        limits: { cpus: '2', memory: 1g }
+  worker:
+    <<: *prod
+    environment:
+      NODE_ENV: production
+      AI_TEST_PROVIDER_ENABLED: 'false'
+    deploy:
+      resources:
+        limits: { cpus: '2', memory: 1536m }
+  web:
+    <<: *prod
+    environment:
+      NODE_ENV: production
+    deploy:
+      resources:
+        limits: { cpus: '1', memory: 512m }
+  proxy:
+    logging:
+      driver: json-file
+      options: { max-size: '20m', max-file: '5' }
+    ports:
+      - '80:8080'
+      - '443:443'
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:8080}
+  postgres:
+    logging:
+      driver: json-file
+      options: { max-size: '20m', max-file: '5' }
+  rag-postgres:
+    logging:
+      driver: json-file
+      options: { max-size: '20m', max-file: '5' }

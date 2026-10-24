@@ -1,0 +1,25 @@
+{
+  "name": "@starter/tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Integration (Vitest + PostgreSQL) and end-to-end (Playwright) suites.",
+  "dependencies": {
+    "@starter/api": "workspace:*",
+    "@starter/api-client": "workspace:*",
+    "@starter/auth": "workspace:*",
+    "@starter/config": "workspace:*",
+    "@starter/contracts": "workspace:*",
+    "@starter/db": "workspace:*",
+    "@starter/jobs": "workspace:*",
+    "@starter/mail": "workspace:*",
+    "@starter/storage": "workspace:*",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/pg": "8.23.1",
+    "@types/supertest": "7.2.1",
+    "supertest": "7.3.1"
+  }
+}

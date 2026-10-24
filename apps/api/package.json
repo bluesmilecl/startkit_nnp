@@ -18,8 +18,10 @@
     "@starter/config": "workspace:*",
     "@starter/contracts": "workspace:*",
     "@starter/db": "workspace:*",
+    "@starter/jobs": "workspace:*",
     "@starter/mail": "workspace:*",
     "@starter/observability": "workspace:*",
+    "@starter/storage": "workspace:*",
     "better-auth": "1.7.12",
     "express": "5.3.0",
     "helmet": "8.3.0",
@@ -32,5 +34,8 @@
     "@types/express": "5.0.6",
     "@types/supertest": "7.2.1",
     "supertest": "7.3.1"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }

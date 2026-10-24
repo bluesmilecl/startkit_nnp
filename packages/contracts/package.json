@@ -5,10 +5,18 @@
   "type": "module",
   "sideEffects": true,
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
-  "scripts": { "build": "tsc -b" },
+  "scripts": {
+    "build": "tsc -b"
+  },
   "dependencies": {
     "zod": "4.6.7"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }

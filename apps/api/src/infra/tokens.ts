@@ -5,3 +5,5 @@ export const MAILER = Symbol('MAILER');
 export const FEATURES = Symbol('FEATURES');
 export const AUTH = Symbol('AUTH');
 export const ACCESS_DEPS = Symbol('ACCESS_DEPS');
+export const JOBS = Symbol('JOBS');
+export const STORAGE = Symbol('STORAGE');

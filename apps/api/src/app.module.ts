@@ -5,10 +5,11 @@ import { AdminModule } from './modules/admin/admin.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CsrfMiddleware } from './modules/auth/csrf.middleware.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { JobsModule } from './modules/jobs/jobs.module.js';
 import { SystemModule } from './modules/system/system.module.js';
 
 @Module({
-  imports: [InfraModule, HealthModule, AuthModule, AdminModule, SystemModule],
+  imports: [InfraModule, HealthModule, AuthModule, SystemModule, JobsModule, AdminModule],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

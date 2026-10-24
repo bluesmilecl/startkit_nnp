@@ -1,0 +1,104 @@
+import { expect, login, otpFor, sql, test, uniqueEmail, waitHydrated, OWNER, apiLogin } from './fixtures.js';
+
+test.describe('OTP login @critical', () => {
+  test('correct code signs in and lands on the requested page', async ({ page }) => {
+    await page.goto('/admin/users');
+    await expect(page).toHaveURL(/\/login\?redirect=/);
+    await login(page, OWNER, { navigate: false });
+    await expect(page).toHaveURL(/\/admin\/users|\/onboarding/);
+  });
+
+  test('wrong code is rejected with a clear message', async ({ page }) => {
+    const email = OWNER;
+    await page.goto(`/login`);
+    await waitHydrated(page);
+    await page.getByTestId('login-email').fill(email);
+    const since = Date.now();
+    await page.getByTestId('login-submit').click();
+    await page.waitForURL(/\/verify/);
+    await waitHydrated(page);
+    const real = await otpFor(email, since);
+    const wrong = real === '000000' ? '111111' : '000000';
+    await page.getByTestId('otp-input').fill(wrong);
+    await expect(page.getByTestId('verify-error')).toContainText('no es válido');
+    await expect(page).toHaveURL(/\/verify/);
+  });
+
+  test('expired code is rejected', async ({ page }) => {
+    const since = Date.now();
+    await page.goto('/login');
+    await waitHydrated(page);
+    await page.getByTestId('login-email').fill(OWNER);
+    await page.getByTestId('login-submit').click();
+    await page.waitForURL(/\/verify/);
+    const code = await otpFor(OWNER, since);
+    await sql(`update verifications set expires_at = now() - interval '1 second' where identifier = $1`, [`sign-in-otp-${OWNER}`]);
+    await waitHydrated(page);
+    await page.getByTestId('otp-input').fill(code);
+    await expect(page.getByTestId('verify-error')).toBeVisible();
+    await expect(page).toHaveURL(/\/verify/);
+  });
+
+  test('resend is limited by the cooldown', async ({ page, request }) => {
+    await page.goto('/login');
+    await waitHydrated(page);
+    await page.getByTestId('login-email').fill(OWNER);
+    await page.getByTestId('login-submit').click();
+    await page.waitForURL(/\/verify/);
+    await waitHydrated(page);
+    await expect(page.getByTestId('resend')).toBeDisabled();
+    const r = await request.post('/api/auth/email-otp/send-verification-otp', {
+      data: { email: OWNER, type: 'sign-in' },
+      headers: { origin: new URL(page.url()).origin },
+    });
+    expect(r.status()).toBe(429);
+    expect((await r.json()).code).toBe('OTP_RESEND_COOLDOWN');
+  });
+
+  test('unknown e-mails get the same response but no code is sent (invite-only)', async ({ page }) => {
+    const stranger = uniqueEmail('stranger');
+    await page.goto('/login');
+    await waitHydrated(page);
+    await page.getByTestId('login-email').fill(stranger);
+    await page.getByTestId('login-submit').click();
+    await page.waitForURL(/\/verify/);
+    await page.waitForTimeout(1500);
+    const rows = await sql(`select count(*)::int as n from users where email = $1`, [stranger]);
+    expect(rows[0]!.n).toBe(0);
+    await expect(otpFor(stranger, Date.now() - 5000)).rejects.toThrow();
+  });
+});
+
+test.describe('session @critical', () => {
+  test('SSR keeps the session on reload, logout ends it', async ({ page }) => {
+    await login(page, OWNER);
+    if (page.url().includes('/onboarding')) await page.request.post('/api/admin/settings/onboarding/complete', { headers: { origin: new URL(page.url()).origin } });
+    await page.goto('/admin');
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Inicio' })).toBeVisible();
+    await waitHydrated(page);
+    await page.getByTestId('user-menu').click();
+    await page.getByTestId('logout').click();
+    await expect(page).toHaveURL(/\/login/);
+    await page.goto('/admin');
+    await expect(page).toHaveURL(/\/login/);
+  });
+
+  test('a revoked session is detected and the user is sent to session-expired', async ({ page, browser }) => {
+    await login(page, OWNER);
+    await page.goto('/admin/profile');
+    await waitHydrated(page);
+    // Revoke from a second session
+    const other = await browser.newContext({ baseURL: test.info().project.use.baseURL });
+    await apiLogin(other.request, OWNER);
+    const sessions = await (await other.request.get('/api/me/sessions')).json();
+    const origin = new URL(page.url()).origin;
+    for (const s of sessions as { id: string; current: boolean }[]) {
+      if (!s.current) await other.request.delete(`/api/me/sessions/${s.id}`, { headers: { origin } });
+    }
+    await other.close();
+    await page.getByTestId('profile-name').fill('Propietaria E2E');
+    await page.getByTestId('profile-save').click();
+    await expect(page).toHaveURL(/\/session-expired|\/login/);
+  });
+});

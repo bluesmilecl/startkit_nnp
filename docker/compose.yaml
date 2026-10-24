@@ -1,0 +1,160 @@
+# ---------------------------------------------------------------------------------------------
+# Base composition. Infrastructure is selected with profiles:
+#   local-db  PostgreSQL 18 + pgvector for data, sessions and the job queue
+#   rag-db    separate PostgreSQL + pgvector to test an external RAG store
+#   dev-mail  Mailpit (captures e-mails, UI on :8025)
+#   edge      Caddy edge proxy (single origin, HTTPS when SITE_ADDRESS is a domain)
+# With an external database simply omit local-db and set DATABASE_URL in .env.
+# Activating a profile never enables a feature by itself: RAG mode, providers and permissions
+# are configured in the application.
+# ---------------------------------------------------------------------------------------------
+name: starter
+
+x-app: &app
+  env_file:
+    - path: ${STARTER_ENV_FILE:-../.env}
+      required: false
+  restart: unless-stopped
+  networks: [internal]
+
+x-app-environment: &app-environment
+  STORAGE_LOCAL_DIR: /data/storage
+  NUXT_API_INTERNAL_URL: http://api:3001
+
+services:
+  postgres:
+    profiles: [local-db]
+    image: pgvector/pgvector:0.8.7-pg18-trixie
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-starter}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+      POSTGRES_DB: ${POSTGRES_DB:-starter}
+      POSTGRES_APP_USER: ${POSTGRES_APP_USER:-starter_app}
+      POSTGRES_APP_PASSWORD: ${POSTGRES_APP_PASSWORD:-}
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    networks: [internal]
+
+  rag-postgres:
+    profiles: [rag-db]
+    image: pgvector/pgvector:0.8.7-pg18-trixie
+    environment:
+      POSTGRES_USER: ${RAG_POSTGRES_USER:-rag}
+      POSTGRES_PASSWORD: ${RAG_POSTGRES_PASSWORD:-}
+      POSTGRES_DB: ${RAG_POSTGRES_DB:-rag}
+    volumes:
+      - ragpgdata:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    networks: [internal]
+
+  mailpit:
+    profiles: [dev-mail]
+    image: ghcr.io/axllent/mailpit:v1.32.0
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 'true'
+      MP_SMTP_AUTH_ALLOW_INSECURE: 'true'
+    restart: unless-stopped
+    networks: [internal]
+
+  migrate:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    image: ${STARTER_IMAGE_PREFIX:-starter}/api:${STARTER_VERSION:-local}
+    command: ['node', 'dist/scripts/migrate.js']
+    restart: 'no'
+    environment:
+      <<: *app-environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: false
+
+  api:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    image: ${STARTER_IMAGE_PREFIX:-starter}/api:${STARTER_VERSION:-local}
+    environment:
+      <<: *app-environment
+    volumes:
+      - storage:/data/storage
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+        required: false
+    stop_grace_period: 30s
+
+  worker:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: docker/worker.Dockerfile
+    image: ${STARTER_IMAGE_PREFIX:-starter}/worker:${STARTER_VERSION:-local}
+    environment:
+      <<: *app-environment
+    volumes:
+      - storage:/data/storage
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+        required: false
+    stop_grace_period: 60s
+
+  web:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: docker/web.Dockerfile
+    image: ${STARTER_IMAGE_PREFIX:-starter}/web:${STARTER_VERSION:-local}
+    environment:
+      <<: *app-environment
+    depends_on:
+      api:
+        condition: service_healthy
+
+  proxy:
+    profiles: [edge]
+    image: caddy:2.11.7-alpine
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:8080}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [internal, public]
+
+networks:
+  internal: {}
+  public: {}
+
+volumes:
+  pgdata: {}
+  ragpgdata: {}
+  storage: {}
+  caddy-data: {}
+  caddy-config: {}

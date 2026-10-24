@@ -1,0 +1,72 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits", ":dependencyDashboard", "helpers:pinGitHubActionDigests"],
+  "timezone": "America/Santiago",
+  "schedule": ["before 6am"],
+  "rangeStrategy": "pin",
+  "prConcurrentLimit": 8,
+  "prHourlyLimit": 4,
+  "labels": ["dependencies"],
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "lockFileMaintenance": { "enabled": true, "schedule": ["before 6am on monday"] },
+  "vulnerabilityAlerts": { "enabled": true, "labels": ["security"], "minimumReleaseAge": null, "schedule": ["at any time"], "prPriority": 10 },
+  "osvVulnerabilityAlerts": true,
+  "postUpdateOptions": ["pnpmDedupe"],
+  "ignorePaths": ["**/node_modules/**", "packages/ui/app/components/ui/**"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Node.js LTS used locally and by CI (.node-version)",
+      "managerFilePatterns": ["/^\\.node-version$/"],
+      "matchStrings": ["(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version",
+      "versioningTemplate": "node"
+    },
+    {
+      "customType": "regex",
+      "description": "pnpm installed inside Dockerfiles",
+      "managerFilePatterns": ["/^docker/.+\\.Dockerfile$/"],
+      "matchStrings": ["pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "pnpm",
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Node.js stays on the active LTS line; Current is tested in CI but never auto-proposed",
+      "matchDepNames": ["node"],
+      "matchManagers": ["custom.regex", "dockerfile", "docker-compose", "github-actions"],
+      "allowedVersions": "/^24\\./",
+      "groupName": "node lts"
+    },
+    { "matchPackageNames": ["@nestjs/**", "reflect-metadata", "rxjs"], "groupName": "nestjs" },
+    { "matchPackageNames": ["ai", "@ai-sdk/**"], "groupName": "ai sdk", "description": "AI SDK core and the Vue client must move together" },
+    { "matchPackageNames": ["nuxt", "vue", "@nuxt/**", "vue-tsc", "nitropack"], "groupName": "nuxt" },
+    { "matchPackageNames": ["better-auth", "@better-auth/**"], "groupName": "better auth", "automerge": false, "labels": ["dependencies", "auth"] },
+    { "matchPackageNames": ["drizzle-orm", "drizzle-kit", "pg", "@types/pg", "pg-boss"], "groupName": "database", "automerge": false, "labels": ["dependencies", "database"] },
+    { "matchPackageNames": ["tailwindcss", "@tailwindcss/**", "tw-animate-css"], "groupName": "tailwind" },
+    { "matchPackageNames": ["shadcn-nuxt", "reka-ui", "@unovis/**", "vue-sonner", "vue-input-otp", "cn", "@lucide/vue"], "groupName": "ui kit" },
+    { "matchPackageNames": ["eslint", "@eslint/**", "typescript-eslint", "eslint-plugin-vue", "vue-eslint-parser", "globals"], "groupName": "lint" },
+    { "matchPackageNames": ["vitest", "@vitest/**", "@playwright/test", "supertest", "@types/supertest"], "groupName": "test tooling" },
+    { "matchPackageNames": ["@hey-api/**"], "groupName": "openapi client generator" },
+    { "matchDatasources": ["docker"], "matchPackageNames": ["pgvector/pgvector", "postgres"], "groupName": "postgres images", "automerge": false, "labels": ["dependencies", "database"] },
+    {
+      "description": "Eligible patch/minor updates merge automatically only after every required CI check passes",
+      "matchUpdateTypes": ["patch", "minor", "pin", "digest"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "description": "Majors, auth, database, migrations and security-sensitive packages always need explicit review and a migration plan",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["dependencies", "major", "needs-migration-plan"],
+      "dependencyDashboardApproval": false
+    },
+    { "matchPackageNames": ["better-auth", "@better-auth/**", "drizzle-orm", "drizzle-kit", "pg-boss", "helmet", "zod"], "automerge": false }
+  ]
+}

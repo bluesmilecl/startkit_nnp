@@ -1,5 +1,5 @@
 import type { AppSettings, UpdateSettingsInput } from '@starter/contracts';
-import { BrandingSettings, LocaleSettings, AuthSettings, RetentionSettings } from '@starter/contracts';
+import { type BrandingSettings, type LocaleSettings, type AuthSettings, type RetentionSettings } from '@starter/contracts';
 import { eq, and, isNull, settings, type Database, type DbOrTx } from '@starter/db';
 import type { z } from 'zod';
 import { assertCan, type AccessDeps, type Actor } from './actor.js';

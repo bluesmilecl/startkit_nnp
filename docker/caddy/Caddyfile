@@ -1,0 +1,38 @@
+# Edge proxy: single public origin. /api (including /api/auth) -> NestJS, everything else -> Nuxt.
+# SITE_ADDRESS=":8080" serves plain HTTP for local use; a domain name enables automatic HTTPS.
+{
+	admin off
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+{$SITE_ADDRESS::8080} {
+	encode zstd gzip
+
+	request_body {
+		max_size {$MAX_BODY_SIZE:50MB}
+	}
+
+	header {
+		-Server
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), geolocation=(), microphone=(self)"
+	}
+
+	@api path /api /api/*
+	handle @api {
+		reverse_proxy {$API_UPSTREAM:api:3001} {
+			# Stream AI responses without buffering; client aborts propagate upstream.
+			flush_interval -1
+			transport http {
+				read_timeout 10m
+			}
+		}
+	}
+
+	handle {
+		reverse_proxy {$WEB_UPSTREAM:web:3000}
+	}
+}

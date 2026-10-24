@@ -24,8 +24,10 @@ export function useConfirm() {
     });
   }
   function settle(ok: boolean) {
-    pending.value?.resolve(ok);
+    const current = pending.value;
+    if (!current) return;
     pending.value = null;
+    current.resolve(ok);
   }
   return { confirm, pending, settle };
 }
