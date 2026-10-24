@@ -1,0 +1,1 @@
+ALTER TABLE "retrieval_hits" ADD COLUMN "title" text;

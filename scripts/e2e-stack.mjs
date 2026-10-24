@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Full Docker stack for Playwright: web + api + worker + PostgreSQL/pgvector + Mailpit (+ RAG db).
+ * Full Docker stack for Playwright: web + api + worker + PostgreSQL/pgvector + Mailpit, plus the
+ * RAG test infrastructure (external PostgreSQL/pgvector and the retrieval API test double).
  *   node scripts/e2e-stack.mjs up|down|logs
  * Uses its own compose project and .env.e2e so it never touches the development stack.
  * Extra docker build flags (proxy, CA secret, base image mirror) can be passed with E2E_BUILD_ARGS.
@@ -36,6 +37,7 @@ function writeEnv() {
     POSTGRES_APP_USER: 'starter_app',
     POSTGRES_APP_PASSWORD: randomBytes(12).toString('hex'),
     RAG_POSTGRES_PASSWORD: randomBytes(12).toString('hex'),
+    RETRIEVAL_TEST_TOKEN: randomBytes(12).toString('hex'),
     OWNER_EMAIL: 'owner@e2e.test',
     REGISTRATION_MODE: 'invite-only',
     MAIL_TRANSPORT: 'smtp',

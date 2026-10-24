@@ -32,3 +32,16 @@ services:
     profiles: !reset []
     ports:
       - '127.0.0.1:${PROXY_PORT:-8080}:8080'
+
+  # Test double of the external retrieval API contract (docs/rag-external.md) plus a tiny static
+  # site for URL/sitemap ingestion. Development and E2E only; it refuses NODE_ENV=production.
+  retrieval-test:
+    profiles: [rag-db]
+    image: ${STARTER_IMAGE_PREFIX:-starter}/api:${STARTER_VERSION:-local}
+    command: ['node', 'dist/scripts/retrieval-test-server.js']
+    environment:
+      NODE_ENV: test
+      RETRIEVAL_TEST_PORT: '3005'
+      RETRIEVAL_TEST_TOKEN: ${RETRIEVAL_TEST_TOKEN:-}
+    restart: unless-stopped
+    networks: [internal]

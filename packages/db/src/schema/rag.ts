@@ -243,6 +243,8 @@ export const retrievalHits = pgTable(
     rank: integer('rank').notNull(),
     chunkId: text('chunk_id').notNull(),
     documentId: text('document_id'),
+    /** Document title at retrieval time (for analytics; external stores have no document listing). */
+    title: text('title'),
     collectionId: uuid('collection_id'),
     score: real('score'),
     /** cosine_similarity | ts_rank | rrf | external */

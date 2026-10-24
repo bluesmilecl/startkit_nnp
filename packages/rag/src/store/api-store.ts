@@ -30,6 +30,7 @@ const SearchResponse = z.object({
         url: z.string().max(2000).nullable().optional(),
         heading: z.string().max(500).nullable().optional(),
         page: z.number().int().nullable().optional(),
+        collection: z.string().max(200).optional(),
       }),
     )
     .max(200),
@@ -121,7 +122,7 @@ export class ApiStore implements RagStore {
       .map((h, i) => ({
         chunkId: h.id,
         documentId: h.documentId,
-        collectionId: byRef.get((h as { collection?: string }).collection ?? '') ?? first,
+        collectionId: byRef.get(h.collection ?? '') ?? first,
         text: h.text,
         heading: h.heading ?? null,
         page: h.page ?? null,

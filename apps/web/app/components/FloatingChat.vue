@@ -8,13 +8,14 @@ import {
   aiConversationsDelete,
   aiConversationsGet,
   aiConversationsList,
+  aiMessagesFeedback,
   aiTranscriptionsCreate,
   type ActionProposal,
   type AttachmentInfo,
   type ChatAgentInfo,
   type ConversationSummary,
 } from '@starter/api-client';
-import { Bot, FileText, History, Loader2, MessageCircle, Mic, Paperclip, Plus, Send, Square, Trash2, X } from '@lucide/vue';
+import { Bot, FileText, History, Loader2, MessageCircle, Mic, Paperclip, Plus, Send, Square, ThumbsDown, ThumbsUp, Trash2, X } from '@lucide/vue';
 import { useLocalStorage } from '@vueuse/core';
 import { toast } from 'vue-sonner';
 import { Button } from '#ui/components/ui/button';
@@ -93,6 +94,25 @@ watch(
   },
   { deep: false },
 );
+
+// Feedback on assistant answers (feeds knowledge analytics); kept per message for this session.
+const ratings = reactive<Record<string, 1 | -1>>({});
+function canRate(m: ChatMessage, index: number) {
+  if (m.role !== 'assistant' || m.metadata?.cancelled) return false;
+  const streaming = index === messages.value.length - 1 && (status.value === 'streaming' || status.value === 'submitted');
+  return !streaming && m.parts.some((p) => p.type === 'text' && textOf(p));
+}
+async function rate(m: ChatMessage, rating: 1 | -1) {
+  const previous = ratings[m.id];
+  ratings[m.id] = rating;
+  try {
+    await aiMessagesFeedback({ client: api, path: { id: m.id }, body: { rating } });
+  } catch (err) {
+    if (previous) ratings[m.id] = previous;
+    else delete ratings[m.id];
+    toast.error(apiError(err).message);
+  }
+}
 
 const errorText = computed(() => {
   const raw = error.value?.message;
@@ -316,7 +336,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onEscape));
             </div>
           </div>
 
-          <div v-for="m in messages" :key="m.id" class="flex flex-col gap-1.5" :class="m.role === 'user' ? 'items-end' : 'items-start'" :data-role="m.role" data-testid="chat-message">
+          <div v-for="(m, mi) in messages" :key="m.id" class="flex flex-col gap-1.5" :class="m.role === 'user' ? 'items-end' : 'items-start'" :data-role="m.role" data-testid="chat-message">
             <template v-for="(p, i) in m.parts" :key="i">
               <div v-if="p.type === 'text' && textOf(p)" class="max-w-[90%] rounded-lg px-3 py-2 text-sm" :class="m.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted/60'">
                 <MessageText v-if="m.role === 'assistant'" :text="textOf(p)" :citations="m.metadata?.citations" />
@@ -344,6 +364,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onEscape));
               </li>
             </ul>
             <p v-if="m.metadata?.cancelled" class="text-muted-foreground text-xs">Respuesta detenida</p>
+            <div v-if="canRate(m, mi)" class="flex items-center gap-0.5" role="group" aria-label="Valorar respuesta">
+              <Button variant="ghost" size="icon" class="size-6" :aria-pressed="ratings[m.id] === 1" aria-label="Respuesta útil" data-testid="chat-thumbs-up" @click="rate(m, 1)"><ThumbsUp class="size-3.5" :class="ratings[m.id] === 1 ? 'fill-current' : ''" /></Button>
+              <Button variant="ghost" size="icon" class="size-6" :aria-pressed="ratings[m.id] === -1" aria-label="Respuesta no útil" data-testid="chat-thumbs-down" @click="rate(m, -1)"><ThumbsDown class="size-3.5" :class="ratings[m.id] === -1 ? 'fill-current' : ''" /></Button>
+            </div>
             <p v-if="info.showDetails && m.metadata?.details" class="text-muted-foreground text-[11px] tabular-nums" data-testid="chat-details">
               {{ m.metadata.details.model }} · {{ formatNumber(m.metadata.details.inputTokens) }}↑ {{ formatNumber(m.metadata.details.outputTokens) }}↓ · {{ formatNumber(m.metadata.details.latencyMs) }} ms ·
               {{ m.metadata.details.costStatus === 'unknown' ? 'costo desconocido' : `${formatUsd(m.metadata.details.costUsd)} (${COST[m.metadata.details.costStatus]})` }}

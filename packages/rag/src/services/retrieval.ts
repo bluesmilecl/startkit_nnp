@@ -133,7 +133,7 @@ export class RetrievalService {
       .returning({ id: retrievalRuns.id });
     if (hits.length) {
       await this.deps.db.insert(retrievalHits).values(
-        hits.map((h, i) => ({ runId: run!.id, rank: i + 1, chunkId: h.chunkId, documentId: h.documentId, collectionId: h.collectionId, score: h.score, scoreType: h.scoreType })),
+        hits.map((h, i) => ({ runId: run!.id, rank: i + 1, chunkId: h.chunkId, documentId: h.documentId, title: h.title, collectionId: h.collectionId, score: h.score, scoreType: h.scoreType })),
       );
     }
     return { runId: run!.id, method, hits, latencyMs, embeddingCostUsd: embeddingCost, warnings };
@@ -296,7 +296,7 @@ export class RetrievalService {
     const dates = [...new Set([...daily.map((d) => d.date), ...ingest.map((d) => d.date), ...embedDaily.map((d) => d.date)])].sort();
     const collections = await db.select({ id: ragCollections.id, name: ragCollections.name }).from(ragCollections).where(eq(ragCollections.organizationId, org));
     const perCollection = (
-      await db.execute<{ id: string; queries: number }>(sql`select unnest(collection_ids) as id, count(*)::int as queries from ${retrievalRuns} where organization_id = ${org} and created_at >= ${from} group by 1`)
+      await db.execute<{ id: string; queries: number }>(sql`select unnest(collection_ids) as id, count(*)::int as queries from ${retrievalRuns} where organization_id = ${org} and created_at >= ${from} and origin = 'chat' group by 1`)
     ).rows;
     const statsByCollection: Record<string, { documents: number; chunks: number }> = {};
     for (const r of await this.collections.readable(actor, collections.map((c) => c.id), true)) {
@@ -308,9 +308,9 @@ export class RetrievalService {
       }
     }
     const topDocuments = (
-      await db.execute<{ document_id: string; hits: number; cited: number }>(sql`
-        select h.document_id, count(*)::int as hits, (count(*) filter (where h.cited))::int as cited from ${retrievalHits} h join ${retrievalRuns} r on r.id = h.run_id
-        where r.organization_id = ${org} and r.created_at >= ${from} group by 1 order by hits desc limit 10`)
+      await db.execute<{ document_id: string; title: string | null; hits: number; cited: number }>(sql`
+        select h.document_id, max(h.title) as title, count(*)::int as hits, (count(*) filter (where h.cited))::int as cited from ${retrievalHits} h join ${retrievalRuns} r on r.id = h.run_id
+        where r.organization_id = ${org} and r.created_at >= ${from} and r.origin = 'chat' ${col} group by 1 order by hits desc limit 10`)
     ).rows;
     const topQueries = (
       await db.execute<{ query: string; count: number; without: number }>(sql`
@@ -339,7 +339,7 @@ export class RetrievalService {
       }),
       byCollection: collections.map((c) => ({ collectionId: c.id, name: c.name, queries: perCollection.find((p) => p.id === c.id)?.queries ?? 0, documents: statsByCollection[c.id]?.documents ?? 0, chunks: statsByCollection[c.id]?.chunks ?? 0 })),
       topQueries: topQueries.map((t) => ({ query: t.query, count: t.count, withoutHits: t.without })),
-      topDocuments: topDocuments.map((t) => ({ documentId: t.document_id, title: null, hits: t.hits, cited: t.cited })),
+      topDocuments: topDocuments.map((t) => ({ documentId: t.document_id, title: t.title, hits: t.hits, cited: t.cited })),
     };
   }
 }
