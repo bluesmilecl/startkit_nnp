@@ -1,7 +1,9 @@
-import { createLogger, sanitizeError } from '@starter/observability';
+import { isAppError, isRetryableError } from '@starter/contracts';
+import { createLogger, metrics, sanitizeError } from '@starter/observability';
 import { PgBoss } from 'pg-boss';
 
 const log = createLogger('jobs');
+const jobFailures = metrics.counter('job_failures_total');
 
 /**
  * Queue catalog. Long operations never depend on an open HTTP request: the API enqueues and
@@ -139,7 +141,18 @@ export class JobQueue {
           await handler(job.data, { jobId: job.id, retryCount: job.retryCount, signal: job.signal });
           log.debug({ queue: name, jobId: job.id, ms: Date.now() - started }, 'job done');
         } catch (err) {
-          log.warn({ queue: name, jobId: job.id, retry: job.retryCount, err: sanitizeError(err) }, 'job failed');
+          const retryable = isRetryableError(err);
+          const errorCode = isAppError(err) ? err.code : 'UNHANDLED';
+          jobFailures.inc({ queue: name, errorCode, retryable: String(retryable) });
+          const fields = { queue: name, jobId: job.id, retry: job.retryCount, errorCode, err: sanitizeError(err) };
+          if (!retryable) {
+            // A domain error that cannot succeed unchanged (forbidden, not found, invalid, unsupported…)
+            // ends the delivery now instead of burning retries; the domain status row keeps the reason.
+            log.warn(fields, 'job failed permanently; not retried');
+            continue;
+          }
+          // Unknown and transient failures: pg-boss retries with backoff until retryLimit.
+          log[isAppError(err) ? 'warn' : 'error']({ ...fields, ...(isAppError(err) ? {} : { stack: (err as Error)?.stack }) }, 'job failed; will retry if attempts remain');
           throw err;
         }
       }

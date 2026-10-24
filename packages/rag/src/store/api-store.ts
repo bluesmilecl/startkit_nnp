@@ -1,3 +1,4 @@
+import { AppError } from '@starter/contracts';
 import { z } from 'zod';
 import type { ChunkInput, DocumentInput, IndexSpace, RagStore, SearchHit, SearchInput, StoreCapabilities, StoreDiagnostic, StoredDocument } from './types.js';
 
@@ -59,17 +60,28 @@ export class ApiStore implements RagStore {
   private async call(method: string, path: string, body?: unknown): Promise<unknown> {
     const url = `${this.opts.baseUrl.replace(/\/$/, '')}${path}`;
     await this.opts.assertUrl(url);
-    const res = await fetch(url, {
-      method,
-      headers: { accept: 'application/json', ...(body ? { 'content-type': 'application/json' } : {}), ...(this.opts.token ? { authorization: `Bearer ${this.opts.token}` } : {}) },
-      body: body ? JSON.stringify(body) : undefined,
-      redirect: 'error',
-      signal: AbortSignal.timeout(this.opts.timeoutMs),
-    });
-    if (!res.ok) throw new Error(`API de recuperación respondió ${res.status}`);
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        method,
+        headers: { accept: 'application/json', ...(body ? { 'content-type': 'application/json' } : {}), ...(this.opts.token ? { authorization: `Bearer ${this.opts.token}` } : {}) },
+        body: body ? JSON.stringify(body) : undefined,
+        redirect: 'error',
+        signal: AbortSignal.timeout(this.opts.timeoutMs),
+      });
+    } catch (err) {
+      if ((err as Error)?.name === 'TimeoutError') throw AppError.timeout('La API de recuperación no respondió a tiempo', err);
+      throw AppError.upstream('No se pudo conectar con la API de recuperación', { cause: err });
+    }
+    // 4xx (bad token, unknown collection) will fail again; 5xx, 408 and 429 may recover.
+    if (!res.ok) throw AppError.upstream(`La API de recuperación respondió ${res.status}`, { retryable: res.status >= 500 || res.status === 408 || res.status === 429, details: { upstreamStatus: res.status } });
     const text = await res.text();
-    if (text.length > 5_000_000) throw new Error('Respuesta demasiado grande');
-    return text ? JSON.parse(text) : null;
+    if (text.length > 5_000_000) throw AppError.upstream('La API de recuperación devolvió una respuesta demasiado grande', { retryable: false });
+    try {
+      return text ? JSON.parse(text) : null;
+    } catch (err) {
+      throw AppError.upstream('La API de recuperación devolvió JSON inválido', { retryable: false, cause: err });
+    }
   }
 
   async loadCapabilities(): Promise<StoreCapabilities> {
@@ -136,7 +148,7 @@ export class ApiStore implements RagStore {
   }
 
   async upsertDocument(doc: DocumentInput): Promise<{ document: StoredDocument; changed: boolean }> {
-    if (!this.capabilities().ingest) throw new Error('La API externa no admite ingesta');
+    if (!this.capabilities().ingest) throw AppError.unsupported('La API externa no admite ingesta');
     const now = new Date();
     return {
       document: {
@@ -173,18 +185,18 @@ export class ApiStore implements RagStore {
 
   async setDocumentStatus(): Promise<void> {}
   async createIndexVersion(): Promise<string> {
-    throw new Error('La API externa administra sus propios índices');
+    throw AppError.unsupported('La API externa administra sus propios índices');
   }
   async ensureProfileIndex(): Promise<void> {}
   async replaceChunks(_d: string, _c: string, _s: IndexSpace, _chunks: ChunkInput[]): Promise<void> {
-    throw new Error('La API externa administra sus propios fragmentos');
+    throw AppError.unsupported('La API externa administra sus propios fragmentos');
   }
   async activateIndexVersion(): Promise<{ retired: string[] }> {
     return { retired: [] };
   }
   async deleteIndexVersion(): Promise<void> {}
   async deleteDocument(id: string, collectionId?: string | null): Promise<{ storageKey: string | null }> {
-    if (!this.capabilities().delete) throw new Error('La API externa no admite eliminar documentos');
+    if (!this.capabilities().delete) throw AppError.unsupported('La API externa no admite eliminar documentos');
     const ref = collectionId ? (this.opts.externalRefs.get(collectionId) ?? collectionId) : null;
     await this.call('DELETE', `/documents/${encodeURIComponent(id)}${ref ? `?collection=${encodeURIComponent(ref)}` : ''}`);
     return { storageKey: null };

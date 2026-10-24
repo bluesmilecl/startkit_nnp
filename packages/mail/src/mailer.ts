@@ -1,4 +1,5 @@
 import type { Env } from '@starter/config';
+import { AppError } from '@starter/contracts';
 import { createLogger, sanitizeError } from '@starter/observability';
 import nodemailer, { type Transporter } from 'nodemailer';
 import { Resend } from 'resend';
@@ -55,7 +56,11 @@ class ResendMailer implements Mailer {
   }
   async send(m: MailMessage) {
     const { data, error } = await this.client.emails.send({ from: this.from, to: m.to, subject: m.subject, html: m.html, text: m.text });
-    if (error) throw new Error(`Resend error: ${error.message}`);
+    if (error) {
+      // Validation errors (bad address, unverified domain) will fail again; quota and outages may not.
+      const retryable = !/validation|invalid|missing|restricted|not_found/i.test(error.name ?? '');
+      throw AppError.upstream('El proveedor de correo rechazó el envío', { retryable, cause: new Error(`Resend ${error.name}: ${error.message}`) });
+    }
     log.info({ category: m.category, messageId: data?.id }, 'mail sent');
     return { id: data?.id ?? null };
   }

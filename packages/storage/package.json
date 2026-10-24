@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1156.0",
-    "@starter/config": "workspace:*"
+    "@starter/config": "workspace:*",
+    "@starter/contracts": "workspace:*"
   },
   "files": [
     "dist"

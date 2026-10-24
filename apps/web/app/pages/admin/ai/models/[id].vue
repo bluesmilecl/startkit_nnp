@@ -15,9 +15,10 @@ import StatusBadge from '~/components/shared/StatusBadge.vue';
 
 definePageMeta({ permission: 'ai.models.manage', feature: 'ai', breadcrumb: 'Detalle' });
 const api = useApi();
+const notify = useNotify();
 const route = useRoute();
 const id = computed(() => String(route.params.id));
-const { data: model, refresh } = await useAsyncData(`ai-model-${id.value}`, () => unwrap(aiModelsGet({ client: api, path: { id: id.value } })));
+const { data: model, refresh, problem } = await useApiData(`ai-model-${id.value}`, () => unwrap(aiModelsGet({ client: api, path: { id: id.value } })), { fatal: [404] });
 const { data: history } = await useAsyncData(
   `ai-model-prices-${id.value}`,
   () => (model.value ? unwrap(aiPricesList({ client: api, query: { provider: model.value.provider, modelId: model.value.modelId, includeHistory: true, page: 1, pageSize: 100 } })) : Promise.resolve(null)),
@@ -35,7 +36,7 @@ async function verify() {
     else toast.error(r.message);
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   } finally {
     verifying.value = false;
   }
@@ -46,12 +47,13 @@ async function update(body: { enabled?: boolean; capabilities?: Record<string, '
     toast.success('Modelo actualizado');
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 </script>
 
 <template>
+  <LoadError v-if="problem" :error="problem" @retry="refresh()" />
   <div v-if="model" class="space-y-6">
     <Button variant="ghost" size="sm" as-child class="-ml-2"><NuxtLink to="/admin/ai/models"><ArrowLeft class="size-4" /> Modelos</NuxtLink></Button>
     <PageHeader :title="model.displayName ?? model.modelId" :description="`${model.connectionAlias} · ${model.modelId}`">

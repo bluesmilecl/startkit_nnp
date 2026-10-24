@@ -1,10 +1,13 @@
 import { createClient, createConfig, type Client } from '@starter/api-client';
+import { toApiError } from '#ui/lib/errors';
 
 /**
  * Typed REST client generated from the backend OpenAPI document.
  * - Browser: same-origin requests with the session cookie.
  * - SSR: calls NUXT_API_INTERNAL_URL forwarding cookies/forwarded headers and relays Set-Cookie
  *   (session refresh) back to the browser.
+ * - Both: failures are thrown as `ApiError` (status + ErrorResponse body, network failures as
+ *   NETWORK), which `normalizeError`, `notify.error`, LoadError and error.vue understand.
  */
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig();
@@ -43,5 +46,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       return response;
     });
   }
+  client.interceptors.error.use((error, response) => toApiError(error, response));
   return { provide: { api: client } };
 });

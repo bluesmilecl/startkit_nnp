@@ -1,7 +1,7 @@
 import { toast } from 'vue-sonner';
-import { describeError } from '#ui/lib/errors';
+import { describeError, normalizeError, type Problem } from '#ui/lib/errors';
 
-export { describeError };
+export { describeError, normalizeError };
 
 export interface NotifyOptions {
   description?: string;
@@ -17,7 +17,9 @@ export interface NotifyOptions {
  *
  *   const notify = useNotify();
  *   notify.success('Proyecto creado');
- *   notify.error(err);                                  // API error → message + "Código: …"
+ *   notify.error(err);                                  // API error → message + "Código de solicitud: …"
+ *   notify.error(err, { retry: () => save() });         // "Reintentar" when the error is transient
+ *   notify.error(err, { context: `«${file.name}»` });   // "«informe.pdf»: El archivo supera…"
  *   notify.undo('Proyecto archivado', () => restore()); // action button
  *   await notify.promise(save(), { loading: 'Guardando…', success: 'Guardado' });
  */
@@ -31,9 +33,19 @@ export function useNotify() {
   function warning(message: string, options: NotifyOptions = {}) {
     return toast.warning(message, options);
   }
-  function error(err: unknown, options: NotifyOptions & { fallback?: string } = {}) {
-    const d = describeError(err, options.fallback);
-    return toast.error(d.message, { duration: 8000, ...options, description: options.description ?? (d.requestId ? `Código de solicitud: ${d.requestId}` : undefined) });
+  /**
+   * Error toast from anything thrown (see `normalizeError`): the server's Spanish message, the
+   * request id to quote to support and, with `retry`, a "Reintentar" button for transient errors.
+   */
+  function error(err: unknown, options: NotifyOptions & { fallback?: string; context?: string; retry?: () => unknown } = {}) {
+    const { retry, fallback, context, ...rest } = options;
+    const p = normalizeError(err, fallback);
+    return toast.error(context ? `${context}: ${p.message}` : p.message, {
+      duration: 8000,
+      action: retry && p.retryable ? { label: 'Reintentar', onClick: () => void retry() } : undefined,
+      ...rest,
+      description: rest.description ?? problemDescription(p),
+    });
   }
   function undo(message: string, onUndo: () => unknown, options: NotifyOptions & { label?: string } = {}) {
     return toast.success(message, { duration: 6000, ...options, action: { label: options.label ?? 'Deshacer', onClick: () => void onUndo() } });
@@ -45,10 +57,16 @@ export function useNotify() {
       toast.success(typeof messages.success === 'function' ? messages.success(value) : messages.success, { id });
       return value;
     } catch (err) {
-      const d = describeError(err, messages.error);
-      toast.error(messages.error ?? d.message, { id, duration: 8000, description: d.requestId ? `Código de solicitud: ${d.requestId}` : undefined });
+      const p = normalizeError(err, messages.error);
+      toast.error(messages.error ?? p.message, { id, duration: 8000, description: problemDescription(p) });
       throw err;
     }
   }
   return { success, info, warning, error, undo, promise, dismiss: toast.dismiss };
+}
+
+function problemDescription(p: Problem): string | undefined {
+  const wait = p.retryAfterSeconds ? `Intenta de nuevo en ${p.retryAfterSeconds} s.` : undefined;
+  const id = p.requestId ? `Código de solicitud: ${p.requestId}` : undefined;
+  return [wait, id].filter(Boolean).join(' · ') || undefined;
 }

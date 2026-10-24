@@ -34,6 +34,7 @@ Antes de modificar código, lee AGENTS.md: reglas de seguridad (sin secretos en 
 ## Desarrollo y operación
 
 - [Extender el starter](docs/extending.md): generador de módulos y módulo Proyectos
+- [Manejo de errores](docs/errors.md): catálogo de códigos, `AppError`, traducción de PostgreSQL, filtro HTTP, logs, reintentos del worker, `normalizeError`, `LoadError`, `useApiData` y página de error
 - [Kit de interfaz](docs/frontend-components.md): formularios desde Zod, asistente por pasos, listas en tabla o tarjetas, gráficos, carrusel, menús, avisos, modales, íconos y reglas
 - [Referencia de la API](docs/api-reference.md): generada desde OpenAPI
 - [Docker](docs/docker.md): perfiles, imágenes y producción

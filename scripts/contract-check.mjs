@@ -28,11 +28,14 @@ const resolve = (doc, s) => {
   return node ?? {};
 };
 
+/** `type` may be a string or an array (["object", "null"]); compare by value, ignoring order. */
+const typeKey = (t) => [t].flat().sort().join(',');
+
 function compareSchemas(where, oldS, newS, direction, depth = 0) {
   if (depth > 6) return;
   const o = resolve(base, oldS);
   const n = resolve(current, newS);
-  if (o.type && n.type && o.type !== n.type) breaking.push(`${where}: type ${o.type} → ${n.type}`);
+  if (o.type && n.type && typeKey(o.type) !== typeKey(n.type)) breaking.push(`${where}: type ${o.type} → ${n.type}`);
   if (direction === 'response') {
     for (const p of Object.keys(o.properties ?? {})) {
       if (!(p in (n.properties ?? {}))) breaking.push(`${where}: response property "${p}" removed`);

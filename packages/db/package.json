@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@starter/config": "workspace:*",
+    "@starter/contracts": "workspace:*",
     "@starter/observability": "workspace:*",
     "drizzle-orm": "0.45.4",
     "pg": "8.23.1"

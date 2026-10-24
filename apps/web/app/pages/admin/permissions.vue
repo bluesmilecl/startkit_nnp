@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '#ui/co
 definePageMeta({ permission: ['permissions.read', 'roles.read'] });
 useHead({ title: 'Matriz de permisos' });
 const api = useApi();
+const notify = useNotify();
 const can = useCan();
 const { confirm } = useConfirm();
 const { data, refresh } = await useAsyncData('perm-matrix', () => unwrap(adminPermissionsMatrix({ client: api })));
@@ -38,7 +39,7 @@ async function save() {
     try {
       await adminRolesSetPermissions({ client: api, path: { id: r.id }, body: { permissions: [...(draft.value[r.id] ?? [])], expectedVersion: r.version } });
     } catch (err) {
-      toast.error(`${r.name}: ${apiError(err).message}`);
+      notify.error(err, { context: r.name });
     }
   }
   toast.success('Matriz actualizada');

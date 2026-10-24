@@ -14,6 +14,7 @@ import { Badge } from '#ui/components/ui/badge';
 definePageMeta({ permission: 'settings.read' });
 useHead({ title: 'Configuración' });
 const api = useApi();
+const notify = useNotify();
 const can = useCan();
 const readonly = computed(() => !can('settings.update'));
 const { data } = await useAsyncData('settings', () => unwrap(adminSettingsGet({ client: api })));
@@ -35,7 +36,7 @@ async function save(section: 'branding' | 'locale' | 'auth' | 'retention') {
     toast.success('Configuración guardada');
     if (section === 'branding' || section === 'auth') await loadBranding();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   } finally {
     saving.value = false;
   }

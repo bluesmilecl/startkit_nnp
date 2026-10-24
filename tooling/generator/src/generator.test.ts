@@ -24,6 +24,7 @@ describe('module generator', () => {
         "export const projects = pgTable(\n  'projects',\n  {});",
         'return this.projects.create(actor, body); can("projects.manage")',
         '<DataToolbar testid="project" /> <FormFields id-prefix="pj" /> useViewMode(\'projects\')',
+        "uniqueIndex('projects_org_name_uq'); isUniqueViolation(err, 'projects_org_name_uq'); throw AppError.notFound('Proyecto'); <LoadError testid=\"project-load-error\" />",
       ].join('\n'),
       n,
     );
@@ -38,6 +39,8 @@ describe('module generator', () => {
     expect(out).toContain("pgTable(\n  'ordenes_compra',");
     expect(out).toContain('return this.ordenesCompra.create(actor, body); can("ordenes_compra.manage")');
     expect(out).toContain('<DataToolbar testid="purchase-order" /> <FormFields id-prefix="oc" /> useViewMode(\'ordenes-compra\')');
+    // The error standard travels with the module: named unique index, gendered 404, LoadError.
+    expect(out).toContain("uniqueIndex('ordenes_compra_org_name_uq'); isUniqueViolation(err, 'ordenes_compra_org_name_uq'); throw AppError.notFound('Orden de compra', 'f'); <LoadError testid=\"purchase-order-load-error\" />");
     expect(out).not.toMatch(/project|Project|proyecto/i);
   });
 

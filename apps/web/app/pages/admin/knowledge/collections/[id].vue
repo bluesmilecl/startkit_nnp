@@ -44,11 +44,12 @@ import DocumentChunksSheet from '~/components/knowledge/DocumentChunksSheet.vue'
 
 definePageMeta({ permission: ['rag.collections.read', 'rag.collections.manage'], feature: 'rag', breadcrumb: 'Detalle' });
 const api = useApi();
+const notify = useNotify();
 const route = useRoute();
 const can = useCan();
 const { confirm } = useConfirm();
 const id = computed(() => String(route.params.id));
-const { data: collection, refresh } = await useAsyncData(`rag-collection-${id.value}`, () => unwrap(ragCollectionsGet({ client: api, path: { id: id.value } })));
+const { data: collection, refresh, problem } = await useApiData(`rag-collection-${id.value}`, () => unwrap(ragCollectionsGet({ client: api, path: { id: id.value } })), { fatal: [404] });
 useHead({ title: () => collection.value?.name ?? 'Colección' });
 const canIngest = computed(() => can('rag.sources.manage') && collection.value?.status === 'active');
 
@@ -83,16 +84,16 @@ async function syncSource(s: Source) {
     toast.success('Sincronización en cola');
     await refreshJobs();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function togglePause(s: Source) {
-  await ragSourcesUpdate({ client: api, path: { id: s.id }, body: { status: s.status === 'paused' ? 'active' : 'paused' } }).catch((err) => toast.error(apiError(err).message));
+  await ragSourcesUpdate({ client: api, path: { id: s.id }, body: { status: s.status === 'paused' ? 'active' : 'paused' } }).catch((err) => notify.error(err));
   await refreshSources();
 }
 async function removeSource(s: Source) {
   if (!(await confirm({ title: `¿Eliminar la fuente «${s.name}»?`, description: 'Sus documentos se eliminan del índice y del almacenamiento mediante trabajos durables.', confirmLabel: 'Eliminar', destructive: true }))) return;
-  await ragSourcesDelete({ client: api, path: { id: s.id } }).catch((err) => toast.error(apiError(err).message));
+  await ragSourcesDelete({ client: api, path: { id: s.id } }).catch((err) => notify.error(err));
   await Promise.all([refreshSources(), refreshJobs()]);
 }
 const SOURCE_ICON = { url: Globe, sitemap: MapIcon, text: Type, upload: FileUp } as const;
@@ -114,7 +115,7 @@ async function onFiles(files: File[]) {
         await ragDocumentsUpload({ client: api, path: { id: id.value }, body: { file: f, aclRoles: uploadRoles.value.join(',') } });
         toast.success(`«${f.name}» en cola para indexar`);
       } catch (err) {
-        toast.error(`«${f.name}»: ${apiError(err).message}`);
+        notify.error(err, { context: `«${f.name}»` });
       }
     }
     await refreshJobs();
@@ -127,7 +128,7 @@ async function openDoc(d: RagDocument) {
   try {
     viewing.value = await unwrap(ragDocumentsGet({ client: api, path: { id: id.value, documentId: d.id } }));
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function deleteDoc(d: RagDocument) {
@@ -137,7 +138,7 @@ async function deleteDoc(d: RagDocument) {
     toast.success('Eliminación en cola');
     await refreshJobs();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function reprocess(d: RagDocument) {
@@ -146,7 +147,7 @@ async function reprocess(d: RagDocument) {
     toast.success('Reprocesamiento en cola');
     await refreshJobs();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 
@@ -193,7 +194,7 @@ async function saveSettings() {
     toast.success('Colección actualizada', { description: 'Los cambios de fragmentación aplican a documentos nuevos o al reindexar.' });
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 const { data: profiles } = await useAsyncData('rag-profiles-min', () => (can('rag.collections.manage') ? unwrap(ragProfilesList({ client: api })) : Promise.resolve([])));
@@ -207,7 +208,7 @@ async function reindex() {
     reindexOpen.value = false;
     await Promise.all([refresh(), refreshJobs()]);
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function removeCollection() {
@@ -218,12 +219,13 @@ async function removeCollection() {
     toast.success('Eliminación en curso');
     await navigateTo('/admin/knowledge/collections');
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 </script>
 
 <template>
+  <LoadError v-if="problem" :error="problem" @retry="refresh()" />
   <div v-if="collection" class="space-y-6">
     <Button variant="ghost" size="sm" as-child class="-ml-2"><NuxtLink to="/admin/knowledge/collections"><ArrowLeft class="size-4" /> Colecciones</NuxtLink></Button>
     <PageHeader :title="collection.name" :description="`${collection.connection.name}${collection.profile ? ` · ${collection.profile.modelId} (${collection.profile.dimensions} dim.)` : ''} · ${collection.visibility === 'organization' ? 'toda la organización' : 'restringida'}`">

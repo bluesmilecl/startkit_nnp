@@ -192,7 +192,7 @@ export class ChatService {
       .from(conversations)
       .where(and(eq(conversations.id, id), eq(conversations.userId, actor.userId), eq(conversations.organizationId, actor.organizationId)))
       .limit(1);
-    if (!c) throw AppError.notFound('Conversación');
+    if (!c) throw AppError.notFound('Conversación', 'f');
     return c;
   }
 
@@ -228,7 +228,7 @@ export class ChatService {
       .innerJoin(conversations, eq(conversations.id, messages.conversationId))
       .where(and(eq(conversations.userId, actor.userId), isUuid ? or(eq(messages.id, messageId), eq(messages.clientId, messageId)) : eq(messages.clientId, messageId)))
       .limit(1);
-    if (!m || m.role !== 'assistant') throw AppError.notFound('Respuesta');
+    if (!m || m.role !== 'assistant') throw AppError.notFound('Respuesta', 'f');
     await this.deps.db
       .insert(answerFeedback)
       .values({ organizationId: actor.organizationId, messageId: m.id, agentId: m.agentId, userId: actor.userId, rating: input.rating, comment: input.comment ?? null })
@@ -552,7 +552,7 @@ export class ChatService {
       const c = classifyAiError(err);
       const cost = await ledger.finish(aiRequestId, { status: 'failed', errorKind: c.kind, error: c.message });
       await this.runtime.budgetsService.settle(reservation, cost.costUsd);
-      throw new AppError('UPSTREAM_ERROR', `El proveedor IA falló (${c.kind}): ${c.message}`, { errorKind: c.kind, aiRequestId });
+      throw new AppError('UPSTREAM_ERROR', `El proveedor IA falló (${c.kind}): ${c.message}`, { errorKind: c.kind, aiRequestId }, { retryable: c.retryable });
     }
   }
 

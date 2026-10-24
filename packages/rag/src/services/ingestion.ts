@@ -1,5 +1,5 @@
 import { recordAudit, systemActor } from '@starter/auth';
-import { AppError, isAppError } from '@starter/contracts';
+import { AppError, isAppError, isRetryableError } from '@starter/contracts';
 import { and, embeddingProfiles, eq, ragCollections, ragConnections, ragSources, sql, syncRuns } from '@starter/db';
 import { createLogger, sanitizeError } from '@starter/observability';
 import { newKey } from '@starter/storage';
@@ -37,7 +37,7 @@ interface IngestParams {
 
 /** Errors that will not succeed on retry. */
 function permanent(err: unknown): boolean {
-  return err instanceof JobCancelledError || (isAppError(err) && ['VALIDATION_FAILED', 'NOT_FOUND', 'CAPABILITY_UNSUPPORTED', 'BUDGET_EXCEEDED', 'NOT_CONFIGURED', 'FEATURE_DISABLED'].includes(err.code));
+  return err instanceof JobCancelledError || !isRetryableError(err);
 }
 
 export class IngestionService {
@@ -104,7 +104,7 @@ export class IngestionService {
       .innerJoin(ragConnections, eq(ragConnections.id, ragCollections.ragConnectionId))
       .leftJoin(embeddingProfiles, eq(embeddingProfiles.id, ragCollections.embeddingProfileId))
       .where(eq(ragCollections.id, job.collectionId));
-    if (!row) throw AppError.notFound('Colección');
+    if (!row) throw AppError.notFound('Colección', 'f');
     return { ...row, store: this.stores.get(row.conn) };
   }
 
@@ -216,7 +216,7 @@ export class IngestionService {
 
   private async ingestSource(job: JobRow) {
     const [s] = await this.deps.db.select().from(ragSources).where(eq(ragSources.id, job.sourceId!));
-    if (!s) throw AppError.notFound('Fuente');
+    if (!s) throw AppError.notFound('Fuente', 'f');
     const { c, store } = await this.context(job);
     const [run] = await this.deps.db.insert(syncRuns).values({ organizationId: job.organizationId, sourceId: s.id, jobId: job.id }).returning();
     const stats = { discovered: 0, added: 0, updated: 0, removed: 0, unchanged: 0, failed: 0 };

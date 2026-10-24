@@ -16,6 +16,7 @@
   "dependencies": {
     "@internationalized/date": "3.12.4",
     "@lucide/vue": "1.61.0",
+    "@starter/contracts": "workspace:*",
     "@tailwindcss/vite": "4.3.3",
     "@tanstack/vue-table": "8.21.3",
     "@unovis/ts": "1.7.1",

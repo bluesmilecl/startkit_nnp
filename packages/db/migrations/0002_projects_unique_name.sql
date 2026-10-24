@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "projects_org_name_uq" ON "projects" USING btree ("organization_id",lower("name"));

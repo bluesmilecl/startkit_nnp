@@ -169,7 +169,7 @@ Envía un correo de invitación. Al ingresar con el código OTP se aplica el rol
 - **Parámetros:**
   - `id` (path, requerido): `uuid`
 - **200**: OK — `application/json` `OkResponse`
-- **Errores:** 400, 401, 403, 409, 422, 500, 502 (`ErrorResponse`)
+- **Errores:** 400, 401, 403, 404, 409, 422, 500, 502 (`ErrorResponse`)
 
 **Permiso requerido:** `users.invite`.
 
@@ -631,7 +631,7 @@ Publica una copia de la versión elegida como nueva versión.
   - `id` (path, requerido): `uuid`
 - **Cuerpo** (`application/json`): `AgentTestInput`
 - **200**: OK — `application/json` `AgentTestResult`
-- **Errores:** 400, 401, 402, 403, 409, 422, 500, 502 (`ErrorResponse`)
+- **Errores:** 400, 401, 402, 403, 404, 409, 422, 500, 502 (`ErrorResponse`)
 
 Ejecuta un mensaje con tus permisos reales; las herramientas sensibles solo crean propuestas. El consumo se registra en el libro.
 
@@ -647,7 +647,7 @@ Ejecuta un mensaje con tus permisos reales; las herramientas sensibles solo crea
   - `id` (path, requerido): `uuid`
 - **Cuerpo** (`application/json`): `AgentConfig`
 - **200**: OK — `application/json` `AgentValidation`
-- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
 
 **Permiso requerido:** `ai.agents.manage`.
 
@@ -1900,7 +1900,7 @@ Solo en conexiones administradas por el starter. Si falta un privilegio, el diag
 - **Parámetros:**
   - `id` (path, requerido): `uuid`
 - **200**: OK — `application/json` `OkResponse`
-- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
 
 **Permiso requerido:** `rag.playground.use`.
 

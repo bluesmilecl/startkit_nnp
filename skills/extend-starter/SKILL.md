@@ -33,8 +33,9 @@ Luego ajusta columnas en `packages/db/src/schema/<clave>.ts`, el contrato en `pa
 1. Define entrada/salida en `packages/contracts/src/…` con `.meta({ id })` para nombrarlos en OpenAPI.
 2. En el controlador: `@Endpoint({ operationId, summary, permission, feature?, body/query/params, response: { status?, schema }, errors: [...] })` y `@ZBody()/@ZQuery()/@ZParams()`.
 3. En el servicio: `assertCan(actor, 'permiso')`, filtra siempre por `actor.organizationId`, registra `recordAudit` en mutaciones.
-4. Regenera OpenAPI/cliente y usa la función generada en la web (`unwrap(miOperacion({ client: useApi(), ... }))`).
-5. Prueba: integración (servicio) y E2E (permiso denegado devuelve 403).
+4. Errores ([docs/errors.md](../../docs/errors.md)): lanza `AppError` del catálogo (`notFound('Cliente')`, `field('rut', 'Ya existe…', 'CONFLICT')`, `notConfigured`, `upstream({ retryable })`), nunca `new Error`. Unicidad con un índice único con nombre y `isUniqueViolation(err, '<indice>')`, no con un `SELECT` previo.
+5. Regenera OpenAPI/cliente y usa la función generada en la web (`unwrap(miOperacion({ client: useApi(), ... }))`), con `useApiData` + `LoadError` para cargas y `notify.error(err)` para acciones.
+6. Prueba: integración (servicio) y E2E (permiso denegado devuelve 403 con `code: 'FORBIDDEN'`; duplicado devuelve 409 en el campo).
 
 ## Permisos
 

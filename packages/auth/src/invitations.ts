@@ -119,7 +119,7 @@ export class InvitationsService {
         .from(invitations)
         .where(and(eq(invitations.id, id), eq(invitations.organizationId, actor.organizationId)))
         .limit(1);
-      if (!inv) throw AppError.notFound('Invitación');
+      if (!inv) throw AppError.notFound('Invitación', 'f');
       if (inv.kind === 'bootstrap' && !actor.isOwner) throw AppError.forbidden('Solo un propietario puede revocar la preasignación');
       if (inv.status !== 'pending') throw AppError.conflict('La invitación ya no está pendiente');
       await tx.update(invitations).set({ status: 'revoked' }).where(eq(invitations.id, id));

@@ -1,10 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { assertCan, recordAudit, type Actor } from '@starter/auth';
 import { AppError, type CreateProjectInput, type Project, type ProjectsQuery, type UpdateProjectInput } from '@starter/contracts';
-import { and, asc, count, desc, eq, ilike, likeTerm, normalizePage, offsetOf, or, projects, sql, toPage, users, type DbHandle } from '@starter/db';
+import { and, asc, count, desc, eq, ilike, isUniqueViolation, likeTerm, normalizePage, offsetOf, or, projects, sql, toPage, users, type DbHandle } from '@starter/db';
 import { DB } from '../../infra/tokens.js';
 
 type ProjectRow = typeof projects.$inferSelect;
+
+/**
+ * The unique index is the source of truth for names (a prior SELECT would race under concurrent
+ * requests); its violation becomes a field error the form shows next to "name".
+ */
+function rethrowNameTaken(err: unknown): never {
+  if (isUniqueViolation(err, 'projects_org_name_uq')) throw AppError.field('name', 'Ya existe un proyecto con ese nombre', 'CONFLICT');
+  throw err;
+}
 
 /**
  * Reference business module: organization-scoped CRUD with permission checks, audit,
@@ -71,21 +80,13 @@ export class ProjectsService {
     return this.load(actor, id);
   }
 
-  private async assertUniqueName(actor: Actor, name: string, exceptId?: string) {
-    const [dup] = await this.db
-      .select({ id: projects.id })
-      .from(projects)
-      .where(and(eq(projects.organizationId, actor.organizationId), sql`lower(${projects.name}) = lower(${name})`, exceptId ? sql`${projects.id} <> ${exceptId}` : undefined));
-    if (dup) throw AppError.conflict('Ya existe un proyecto con ese nombre', [{ path: 'name', message: 'Ya existe un proyecto con ese nombre' }]);
-  }
-
   async create(actor: Actor, input: CreateProjectInput) {
     assertCan(actor, 'projects.manage');
-    await this.assertUniqueName(actor, input.name);
     const [row] = await this.db
       .insert(projects)
       .values({ organizationId: actor.organizationId, name: input.name, description: input.description ?? null, createdBy: actor.userId })
-      .returning();
+      .returning()
+      .catch(rethrowNameTaken);
     await recordAudit(this.db, actor, { action: 'projects.create', resourceType: 'project', resourceId: row!.id, outcome: 'success', after: { name: row!.name, description: row!.description } });
     return this.load(actor, row!.id);
   }
@@ -93,7 +94,6 @@ export class ProjectsService {
   async update(actor: Actor, id: string, input: UpdateProjectInput) {
     assertCan(actor, 'projects.manage');
     const before = await this.load(actor, id);
-    if (input.name && input.name.toLowerCase() !== before.name.toLowerCase()) await this.assertUniqueName(actor, input.name, id);
     const patch: Partial<typeof projects.$inferInsert> = { version: sql`${projects.version} + 1` as unknown as number };
     if (input.name !== undefined) patch.name = input.name;
     if (input.description !== undefined) patch.description = input.description;
@@ -106,7 +106,8 @@ export class ProjectsService {
       .update(projects)
       .set(patch)
       .where(and(eq(projects.id, id), eq(projects.organizationId, actor.organizationId), eq(projects.version, input.version)))
-      .returning();
+      .returning()
+      .catch(rethrowNameTaken);
     if (!row) throw AppError.precondition('El proyecto fue modificado por otra persona; recarga para ver los cambios', { currentVersion: before.version });
     const after = await this.load(actor, id);
     await recordAudit(this.db, actor, {

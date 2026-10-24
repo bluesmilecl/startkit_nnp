@@ -64,10 +64,10 @@ export class OrganizationsService {
   private async assertManageable(actor: Actor, organizationId: string) {
     assertCan(actor, 'organizations.manage');
     if (!actor.platformPermissions.has('organizations.manage') && organizationId !== actor.organizationId) {
-      throw AppError.notFound('Organización');
+      throw AppError.notFound('Organización', 'f');
     }
     const [org] = await this.deps.db.select().from(organizations).where(eq(organizations.id, organizationId));
-    if (!org) throw AppError.notFound('Organización');
+    if (!org) throw AppError.notFound('Organización', 'f');
     return org;
   }
 
@@ -75,7 +75,7 @@ export class OrganizationsService {
     this.assertEnabled();
     assertCan(actor, 'organizations.read');
     if (!actor.platformPermissions.has('organizations.read') && !actor.organizationIds.includes(organizationId)) {
-      throw AppError.notFound('Organización');
+      throw AppError.notFound('Organización', 'f');
     }
     return this.deps.db
       .select({ id: users.id, email: users.email, name: users.name, joinedAt: memberships.createdAt })

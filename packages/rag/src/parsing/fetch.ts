@@ -33,7 +33,7 @@ export async function safeFetch(rawUrl: string, opts: { allowPrivate: boolean; m
       url = new URL(res.headers.get('location')!, url).toString();
       continue;
     }
-    if (!res.ok) throw new AppError('UPSTREAM_ERROR', `La URL respondió ${res.status}`);
+    if (!res.ok) throw AppError.upstream(`La URL respondió ${res.status}`, { retryable: res.status >= 500 || res.status === 408 || res.status === 429, details: { upstreamStatus: res.status } });
     const declared = Number(res.headers.get('content-length') ?? 0);
     if (declared > opts.maxBytes) throw AppError.validation(`El recurso supera ${Math.round(opts.maxBytes / 1024 / 1024)} MB`);
     const reader = res.body?.getReader();

@@ -124,14 +124,14 @@ export class CollectionsService {
 
   async findRow(organizationId: string, id: string) {
     const [r] = await this.baseQuery(and(eq(ragCollections.id, id), eq(ragCollections.organizationId, organizationId)));
-    if (!r) throw AppError.notFound('Colección');
+    if (!r) throw AppError.notFound('Colección', 'f');
     return r;
   }
 
   async get(actor: Actor, id: string) {
     if (!actor.permissions.has('rag.collections.manage')) assertCan(actor, 'rag.collections.read');
     const r = await this.findRow(actor.organizationId, id);
-    if (!canSeeCollection(actor, r.c)) throw AppError.notFound('Colección');
+    if (!canSeeCollection(actor, r.c)) throw AppError.notFound('Colección', 'f');
     return (await this.toDtos([r]))[0]!;
   }
 
@@ -279,7 +279,7 @@ export class SourcesService {
 
   private async findRow(actor: Actor, id: string) {
     const [s] = await this.deps.db.select().from(ragSources).where(and(eq(ragSources.id, id), eq(ragSources.organizationId, actor.organizationId)));
-    if (!s) throw AppError.notFound('Fuente');
+    if (!s) throw AppError.notFound('Fuente', 'f');
     return s;
   }
 

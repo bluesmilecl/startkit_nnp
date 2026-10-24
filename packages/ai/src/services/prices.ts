@@ -222,7 +222,7 @@ export class PricesService {
         .select({ id: providerConnections.id })
         .from(providerConnections)
         .where(and(eq(providerConnections.id, input.connectionId), eq(providerConnections.organizationId, actor.organizationId)));
-      if (!c) throw AppError.notFound('Conexión');
+      if (!c) throw AppError.notFound('Conexión', 'f');
     }
     const source = await this.sourceRow(`manual:${actor.organizationId}`, input.sourceName || 'Manual', input.connectionId ? 'agreement' : 'manual', null);
     const result = await this.deps.db.transaction(async (tx) => {
@@ -268,7 +268,7 @@ export class PricesService {
       const catalogProviders = providerKeys.map((k) => PROVIDERS[k]?.catalogKey).filter((k): k is string => !!k);
       if (catalogProviders.length) {
         const snapshot = await loadCatalog(url, true);
-        if (!snapshot) throw new Error(`Catálogo estructurado no disponible (${url})`);
+        if (!snapshot) throw AppError.upstream(`Catálogo estructurado no disponible (${url})`);
         const src = await this.sourceRow('models.dev', 'models.dev (catálogo estructurado)', 'catalog', url);
         for (const entry of snapshot.entries.values()) {
           const provider = providerKeys.find((k) => PROVIDERS[k].catalogKey === entry.provider);

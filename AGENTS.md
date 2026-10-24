@@ -10,6 +10,7 @@ Este archivo es para agentes (Claude Code u otros) que modifican este repositori
 | Tablas y migraciones | `packages/db/src/schema/*.ts`, `packages/db/migrations/` (Drizzle) |
 | Permisos y roles por defecto | `packages/contracts/src/permissions.ts` |
 | Reglas de acceso, auditoría, propuestas | `packages/auth/src/` (`actor.ts`, `policies.ts`, `audit.ts`, `proposals.ts`) |
+| Errores (catálogo, `AppError`, traducción de PostgreSQL, filtro, web) | `packages/contracts/src/errors.ts`, `packages/db/src/errors.ts`, `apps/api/src/common/error.filter.ts`, `packages/ui/app/lib/errors.ts`; guía en [docs/errors.md](docs/errors.md) |
 | Endpoints HTTP | `apps/api/src/modules/*/*.controller.ts` con el decorador `@Endpoint` (`apps/api/src/common/endpoint.ts`) |
 | IA (proveedores, costos, agentes, chat) | `packages/ai/src/` |
 | Conocimiento (RAG) | `packages/rag/src/` |
@@ -47,6 +48,7 @@ pnpm verify                        # verificación completa
 9. **Trabajo largo = trabajo durable.** Lo que tarda (ingesta, sincronizaciones, laboratorio) va a una cola de pg-boss con fila de estado, progreso, reintentos y cancelación; nunca en la petición HTTP.
 10. **Sin dependencias de infraestructura nuevas** (Redis, Kubernetes, otra base vectorial, frameworks de agentes) y sin imágenes `latest`.
 11. **Proveedor de prueba solo en desarrollo y pruebas.** `AI_TEST_PROVIDER_ENABLED` se rechaza en producción.
+12. **Errores del catálogo.** Lo que llega a una respuesta o a un trabajo se lanza como `AppError` (código de `ERROR_CATALOG`, mensaje en español seguro de mostrar, causa técnica solo en `cause`); nunca `new Error('…')` para la persona. La unicidad la garantiza un índice único con nombre traducido con `isUniqueViolation`, no un `SELECT` previo. En la web: `notify.error(err)`, `useApiData` + `LoadError`, `fatal: [404]` en detalles; nunca `err.message` crudo. Detalle en [docs/errors.md](docs/errors.md).
 
 ## Convenciones de código
 
@@ -60,6 +62,7 @@ pnpm verify                        # verificación completa
 - Confirmaciones destructivas con `useConfirm()` y `typeToConfirm` para eliminaciones irreversibles.
 - Paginación, orden y búsqueda siempre en el servidor (`normalizePage`, `toPage`, `likeTerm`).
 - Concurrencia optimista con `version` y respuesta 412 cuando corresponda (ver Proyectos).
+- Errores: helpers de `AppError` (`notFound(nombre, 'f')`, `field`, `conflict`, `notConfigured`, `unsupported`, `upstream({ retryable })`, `unavailable`); un tercero que fallará igual al reintentar lleva `retryable: false`. Un error = una línea de log (la escribe el filtro o `JobQueue`); no lo registres también en el servicio.
 
 ## Cómo agregar…
 
@@ -72,6 +75,7 @@ pnpm verify                        # verificación completa
 
 - [ ] `pnpm lint`, `pnpm typecheck` y `pnpm test` sin errores.
 - [ ] Integración o E2E nuevos para el comportamiento agregado (permisos incluidos: un rol sin permiso recibe 403).
+- [ ] Errores según [docs/errors.md](docs/errors.md): códigos del catálogo, mensajes en español, duplicados → 409 en el campo (nunca 500), id inexistente → página 404, cargas con `LoadError` y acciones con `notify.error`.
 - [ ] OpenAPI, referencia Markdown y cliente regenerados si cambió la API; `pnpm api:contract:check` sin cambios incompatibles no intencionales.
 - [ ] Migración generada y aplicada si cambió el esquema.
 - [ ] Documentación actualizada y `pnpm docs:check` en verde.

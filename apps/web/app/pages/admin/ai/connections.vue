@@ -30,6 +30,7 @@ definePageMeta({ permission: 'ai.providers.manage', feature: 'ai' });
 useHead({ title: 'Conexiones de IA' });
 
 const api = useApi();
+const notify = useNotify();
 const { confirm } = useConfirm();
 const { data: providers } = await useAsyncData('ai-providers', () => unwrap(aiProvidersList({ client: api })));
 const { data: connections, refresh } = await useAsyncData('ai-connections', () => unwrap(aiConnectionsList({ client: api })));
@@ -86,7 +87,7 @@ async function test(c: Connection) {
     else toast.error(`${c.alias}: ${ERROR_KIND[r.errorKind ?? 'unknown']}`, { description: r.message });
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   } finally {
     busy.value = null;
   }
@@ -96,7 +97,7 @@ async function syncModels(c: Connection) {
     await aiModelsSync({ client: api, body: { connectionId: c.id } });
     toast.success('Sincronización de modelos en cola', { description: 'El worker consulta el proveedor y el catálogo estructurado.', action: { label: 'Ver modelos', onClick: () => navigateTo('/admin/ai/models') } });
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function toggleDisabled(c: Connection) {
@@ -107,7 +108,7 @@ async function toggleDisabled(c: Connection) {
     toast.success(disabling ? 'Conexión desactivada' : 'Conexión reactivada');
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function remove(c: Connection) {
@@ -117,7 +118,7 @@ async function remove(c: Connection) {
     toast.success('Conexión eliminada');
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 

@@ -16,6 +16,7 @@ import DocumentChunksSheet from '~/components/knowledge/DocumentChunksSheet.vue'
 definePageMeta({ permission: 'rag.documents.read', feature: 'rag' });
 useHead({ title: 'Documentos' });
 const api = useApi();
+const notify = useNotify();
 const can = useCan();
 const { confirm } = useConfirm();
 const route = useRoute();
@@ -53,7 +54,7 @@ async function open(d: RagDocument) {
   try {
     viewing.value = await unwrap(ragDocumentsGet({ client: api, path: { id: d.collectionId, documentId: d.id } }));
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function reprocess(d: RagDocument) {
@@ -61,7 +62,7 @@ async function reprocess(d: RagDocument) {
     await ragDocumentsReprocess({ client: api, path: { id: d.collectionId, documentId: d.id } });
     toast.success('Reprocesamiento en cola', { description: 'Sigue el avance en Conocimiento → Trabajos.' });
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function remove(d: RagDocument) {
@@ -71,7 +72,7 @@ async function remove(d: RagDocument) {
     toast.success('Eliminación en cola');
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 const pages = computed(() => page.value?.pageCount ?? 1);

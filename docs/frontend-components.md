@@ -23,7 +23,7 @@ copia, así que cada módulo nuevo parte con el kit.
   globalmente**: en una página basta `<FormFields … />`. En funciones `h()` (celdas de tablas)
   impórtalos: `import ActionMenu from '#ui/components/common/ActionMenu.vue'`.
 - Los composables (`useZodForm`, `useWizard`, `useListQuery`, `useViewMode`, `useNotify`,
-  `useConfirm`) se **autoimportan**.
+  `useConfirm`, `useApiData`) se **autoimportan**.
 - Tipos del kit en `#ui/lib/kit` (`FormFieldDef`, `WizardStep`, `ActionItem`, `SectionNavItem`,
   `ChartSeries`, `ViewMode`, `FormLike`); íconos en `#ui/lib/icons`; formatos en `#ui/lib/format`.
 - Primitivas shadcn-vue: `import { Button } from '#ui/components/ui/button'`.
@@ -49,6 +49,9 @@ copia, así que cada módulo nuevo parte con el kit.
 | Tarjetas o anuncios que se desplazan | `ContentCarousel` |
 | Un aviso en la página | `AppAlert` (`info`, `success`, `warning`, `destructive`) |
 | Un aviso temporal | `useNotify()` (toasts) |
+| Cargar datos con su error en línea y «Reintentar» | `useApiData` + `LoadError` |
+| Un detalle cuyo id no existe | `useApiData(…, { fatal: [404] })` → página de error |
+| Mostrar el error de una acción | `notify.error(err)` (con `{ retry }` si conviene) |
 | Confirmar una acción | `useConfirm()` o `confirm` en `ActionMenu` |
 | Mostrar detalle sin salir de la página | `AppModal` |
 | Un botón con carga, solo ícono o copiar | `Button :loading`, `IconButton`, `CopyButton` |
@@ -345,9 +348,19 @@ o el foco encima, tiene botón de pausa y no corre si la persona pidió reducir 
 - `AppAlert`: `variant` (`info`, `success`, `warning`, `destructive`, `default`), `title`,
   `description`, `icon` (o `false`), `dismissible`, `v-model:open`; slots por defecto y
   `actions`. `warning` y `destructive` usan `role="alert"`; el resto `role="status"`.
-- `useNotify()`: `success`, `info`, `warning`, `error(err)` (errores de la API con su mensaje y
-  «Código de solicitud»), `undo(mensaje, deshacer)`, `promise(trabajo, { loading, success,
-  error? })`, `dismiss`. `describeError(err)` da el mensaje sin mostrar trazas.
+- `useNotify()`: `success`, `info`, `warning`, `error(err, { retry?, context?, fallback? })`
+  (mensaje de la API, «Código de solicitud», espera de `Retry-After` y botón «Reintentar» si el
+  error es transitorio), `undo(mensaje, deshacer)`, `promise(trabajo, { loading, success,
+  error? })`, `dismiss`.
+- `LoadError`: error de carga en línea. Props `error` (lo lanzado o el `problem` de
+  `useApiData`), `title?`, `retrying`, `testid` (`<testid>-retry`, `<testid>-request-id`);
+  evento `retry` (el botón aparece solo si el error es reintentable).
+- `useApiData(clave, handler, { fatal?, …opciones de useAsyncData })`: `useAsyncData` + `problem`
+  normalizado; los estados de `fatal` reemplazan la página por `error.vue` (también en SSR).
+  Siempre con `await`.
+- `normalizeError(err, fallback?)` (`#ui/lib/errors`): `{ code, status, title, message,
+  requestId, fieldErrors, retryable, retryAfterSeconds }` desde cualquier error; nunca muestra
+  texto del navegador ni de JavaScript. Estándar completo en [errors.md](errors.md).
 - `useConfirm()` + `ConfirmHost` (montado en `app.vue`): `confirm({ title, description,
   confirmLabel, cancelLabel, destructive, typeToConfirm })` → `Promise<boolean>`.
   `typeToConfirm` exige escribir un texto para acciones irreversibles.
@@ -381,10 +394,10 @@ servidor y cliente, por eso no producen diferencias de hidratación. Además: `c
 
 ## Recetas
 
-**Lista de un módulo** — copia la estructura de Proyectos: `useListQuery` → `useAsyncData` con
-`watch: [list.params]` → `DataToolbar` → `EmptyState` si no hay registros ni filtros →
-`DataTable` con `ActionMenu` en la columna `actions` → `FormDialog` + `FormFields` para crear y
-editar → `useNotify` para el resultado.
+**Lista de un módulo** — copia la estructura de Proyectos: `useListQuery` → `useApiData` con
+`watch: [list.params]` → `DataToolbar` → `LoadError` si la carga falló → `EmptyState` si no hay
+registros ni filtros → `DataTable` con `ActionMenu` en la columna `actions` → `FormDialog` +
+`FormFields` para crear y editar → `useNotify` para el resultado.
 
 **Alta en varios pasos** — un esquema Zod para todo, `FormWizard` con `fields` por paso, un paso
 «Resumen» que muestra `form.values` y `@complete` con `form.handleSubmit`.

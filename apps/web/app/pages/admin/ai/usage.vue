@@ -18,6 +18,7 @@ import StatusBadge from '~/components/shared/StatusBadge.vue';
 definePageMeta({ permission: 'ai.usage.read', feature: 'ai' });
 useHead({ title: 'Uso y costos' });
 const api = useApi();
+const notify = useNotify();
 const can = useCan();
 
 type GroupBy = 'provider' | 'model' | 'agent' | 'user' | 'feature' | 'organization';
@@ -44,7 +45,7 @@ async function refreshFx() {
     toast.success('Actualización de tasa en cola', { description: 'Requiere FX_PROVIDER=mindicador en la configuración del servidor.' });
     setTimeout(refresh, 4000);
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 

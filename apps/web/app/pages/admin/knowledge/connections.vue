@@ -32,6 +32,7 @@ import ModelSelect from '~/components/shared/ModelSelect.vue';
 definePageMeta({ permission: 'rag.collections.manage', feature: 'rag' });
 useHead({ title: 'Conexiones de conocimiento' });
 const api = useApi();
+const notify = useNotify();
 const { confirm } = useConfirm();
 const { data: connections, refresh } = await useAsyncData('rag-connections', () => unwrap(ragConnectionsList({ client: api })));
 const { data: profiles, refresh: refreshProfiles } = await useAsyncData('rag-profiles', () => unwrap(ragProfilesList({ client: api })));
@@ -57,7 +58,7 @@ async function run(c: RagConnection, action: 'diagnose' | 'activate') {
     else toast.warning(`${c.name}: revisa el diagnóstico`);
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   } finally {
     busy.value = null;
   }
@@ -68,7 +69,7 @@ async function remove(c: RagConnection) {
     await ragConnectionsDelete({ client: api, path: { id: c.id } });
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 
@@ -97,7 +98,7 @@ async function removeProfile(id: string) {
     await ragProfilesDelete({ client: api, path: { id } });
     await refreshProfiles();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 </script>

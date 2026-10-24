@@ -13,6 +13,7 @@
     "@starter/ai": "workspace:*",
     "@starter/auth": "workspace:*",
     "@starter/config": "workspace:*",
+    "@starter/contracts": "workspace:*",
     "@starter/db": "workspace:*",
     "@starter/jobs": "workspace:*",
     "@starter/mail": "workspace:*",

@@ -35,6 +35,7 @@ import CollectionsSelect from '~/components/shared/CollectionsSelect.vue';
 definePageMeta({ permission: 'rag.playground.use', feature: 'rag' });
 useHead({ title: 'Laboratorio de búsqueda' });
 const api = useApi();
+const notify = useNotify();
 const { confirm } = useConfirm();
 type Method = 'vector' | 'fulltext' | 'hybrid';
 const METHODS: Method[] = ['hybrid', 'vector', 'fulltext'];
@@ -128,7 +129,7 @@ async function removeSet(set: EvaluationSet) {
     if (selected.value?.id === set.id) selected.value = null;
     await refreshSets();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 
@@ -154,7 +155,7 @@ async function run() {
     toast.success('Evaluación completada');
     await selectSet(selected.value);
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   } finally {
     runForm.running = false;
   }
@@ -167,7 +168,7 @@ async function rate(r: EvaluationRun, caseId: string, rating: number) {
     const c = r.cases.find((x) => x.caseId === caseId);
     if (c) c.humanRating = rating;
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 function pct(v: number | null) {

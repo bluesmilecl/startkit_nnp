@@ -10,6 +10,7 @@ import express from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module.js';
 import { ErrorFilter } from './common/error.filter.js';
+import { requestContext } from './common/request-context.middleware.js';
 import { ResponseValidationInterceptor } from './common/response-validation.interceptor.js';
 import { AUTH, DB, FEATURES } from './infra/tokens.js';
 import { setupOpenApiDocs } from './modules/system/openapi-docs.js';
@@ -33,6 +34,7 @@ export async function createApp(opts: CreateAppOptions = {}): Promise<INestAppli
   });
   app.set('trust proxy', true);
   app.disable('x-powered-by');
+  app.use(requestContext);
   app.use(
     helmet({
       contentSecurityPolicy: false, // HTML pages are served by Nuxt; Swagger UI needs inline assets

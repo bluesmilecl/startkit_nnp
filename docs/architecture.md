@@ -81,7 +81,10 @@ flowchart LR
   aplican desde REST, el chat (herramientas), el worker y la CLI.
 - `CsrfMiddleware` rechaza solicitudes de escritura cuyo `Origin`/`Referer` no esté en
   `APP_URL` + `TRUSTED_ORIGINS` o que lleguen con `Sec-Fetch-Site: cross-site`.
-- Cada solicitud recibe un `x-request-id` que se propaga a logs, uso de IA y trabajos.
+- Cada solicitud recibe un `x-request-id` (primer middleware, antes de Better Auth y del body
+  parser) que se propaga a logs, uso de IA, trabajos y al cuerpo de cada error.
+- Los errores siguen un catálogo único (código, estado HTTP, mensaje en español, política de
+  reintento y nivel de log) compartido por API, worker y web: ver [errors.md](errors.md).
 
 ### Actor
 

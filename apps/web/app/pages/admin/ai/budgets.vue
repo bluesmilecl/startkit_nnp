@@ -21,6 +21,7 @@ import UserPicker from '~/components/shared/UserPicker.vue';
 definePageMeta({ permission: 'ai.budgets.manage', feature: 'ai' });
 useHead({ title: 'Presupuestos de IA' });
 const api = useApi();
+const notify = useNotify();
 const { confirm } = useConfirm();
 const { data: budgets, refresh } = await useAsyncData('ai-budgets', () => unwrap(aiBudgetsList({ client: api })));
 
@@ -75,7 +76,7 @@ async function remove(b: Budget) {
     toast.success('Presupuesto eliminado');
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 </script>

@@ -64,7 +64,7 @@ export class ConnectionsService {
       .from(providerConnections)
       .where(and(eq(providerConnections.id, id), eq(providerConnections.organizationId, actor.organizationId)))
       .limit(1);
-    if (!row) throw AppError.notFound('Conexión');
+    if (!row) throw AppError.notFound('Conexión', 'f');
     return row;
   }
 
@@ -187,7 +187,7 @@ export class ConnectionsService {
       .from(providerConnections)
       .where(and(eq(providerConnections.id, connectionId), eq(providerConnections.organizationId, organizationId)))
       .limit(1);
-    if (!row) throw AppError.notFound('Conexión');
+    if (!row) throw AppError.notFound('Conexión', 'f');
     if (row.status === 'disabled') throw new AppError('NOT_CONFIGURED', `La conexión ${row.alias} está deshabilitada`);
     if (!this.providerAvailable(row.provider as ProviderKey)) throw new AppError('FEATURE_DISABLED', 'Proveedor deshabilitado en esta instalación');
     return { row, client: createProviderClient(this.resolve(row)) };

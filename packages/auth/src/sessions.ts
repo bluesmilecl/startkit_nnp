@@ -28,7 +28,7 @@ export class SessionsService {
       .delete(sessions)
       .where(and(eq(sessions.id, sessionId), eq(sessions.userId, actor.userId)))
       .returning({ id: sessions.id });
-    if (!deleted.length) throw AppError.notFound('Sesión');
+    if (!deleted.length) throw AppError.notFound('Sesión', 'f');
     await recordAudit(this.deps.db, actor, { action: 'sessions.revoke', resourceType: 'session', resourceId: sessionId, outcome: 'success' });
   }
 

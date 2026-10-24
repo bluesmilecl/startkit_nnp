@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { meSwitchOrganization } from '@starter/api-client';
-import { toast } from 'vue-sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#ui/components/ui/select';
 
 const me = useMe();
+const notify = useNotify();
 const current = computed({
   get: () => me.value?.organization.id ?? '',
   set: async (organizationId: string) => {
@@ -12,7 +12,7 @@ const current = computed({
       await refreshMe();
       await refreshNuxtData();
     } catch (err) {
-      toast.error(apiError(err).message);
+      notify.error(err);
     }
   },
 });

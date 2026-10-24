@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import * as lucide from '@lucide/vue';
 import { ICON_GROUPS, ICON_KEYWORDS, ICON_LUCIDE, ICONS, searchIcons, type IconName } from '#ui/lib/icons';
 import { changedFilterKeys, listQueryParams, parseListQuery, serializeListQuery } from '#ui/lib/list-query';
-import { describeError } from '#ui/lib/errors';
+import { ApiError, describeError, isApiError, normalizeError, toApiError } from '#ui/lib/errors';
 import { formatPercent, formatPercentChange, formatUsd, setFormatLocale } from '#ui/lib/format';
 import { useWizard } from '#ui/composables/useWizard';
 
@@ -99,15 +99,55 @@ describe('useWizard', () => {
   });
 });
 
-describe('describeError', () => {
-  it('reads API error bodies with their request id', () => {
-    expect(describeError({ error: { code: 'BUDGET_EXCEEDED', message: 'Presupuesto agotado', requestId: 'r1' } })).toEqual({ message: 'Presupuesto agotado', requestId: 'r1', code: 'BUDGET_EXCEEDED' });
-    expect(describeError({ data: { error: { code: 'FORBIDDEN', message: 'Permiso requerido' } } }).message).toBe('Permiso requerido');
+describe('error normalization (web)', () => {
+  const body = { code: 'VALIDATION_FAILED', message: 'Algunos datos no son válidos', requestId: 'req-1', details: [{ path: 'name', message: 'Mínimo 2 caracteres' }, { path: 'name', message: 'otro' }, { path: 'email', message: 'Correo inválido' }] };
+
+  it('reads the API problem from every shape it travels in', () => {
+    const fromClient = normalizeError(new ApiError(422, body));
+    expect(fromClient).toMatchObject({ code: 'VALIDATION_FAILED', status: 422, title: 'Revisa los datos', message: 'Algunos datos no son válidos', requestId: 'req-1', retryable: false });
+    expect(fromClient.fieldErrors).toEqual({ name: 'Mínimo 2 caracteres', email: 'Correo inválido' });
+    // Raw body, $fetch error, NuxtError after SSR (`error: true` + data) and a cause chain.
+    expect(normalizeError({ error: body }).code).toBe('VALIDATION_FAILED');
+    expect(normalizeError({ statusCode: 404, data: { error: { code: 'NOT_FOUND', message: 'Usuario no encontrado', requestId: 'r' } } }).message).toBe('Usuario no encontrado');
+    expect(normalizeError({ error: true, statusCode: 404, message: 'x', data: { error: { code: 'NOT_FOUND', message: 'Rol no encontrado' } } })).toMatchObject({ status: 404, message: 'Rol no encontrado', title: 'No encontrado' });
+    expect(normalizeError({ message: 'wrapper', cause: new ApiError(403, { code: 'FORBIDDEN', message: 'Permiso requerido' }) })).toMatchObject({ status: 403, title: 'Sin permiso' });
+    // An AppError raised by the page itself.
+    expect(normalizeError({ name: 'AppError', code: 'CONFLICT', message: 'Ya existe' })).toMatchObject({ code: 'CONFLICT', status: 409, message: 'Ya existe' });
   });
-  it('hides browser network errors behind a Spanish message', () => {
-    expect(describeError(new TypeError('Failed to fetch')).message).toBe('No se pudo completar la solicitud');
+
+  it('keeps transient hints: retryable and Retry-After', () => {
+    const p = normalizeError(new ApiError(503, { code: 'UNAVAILABLE', message: 'Base de datos caída', details: { retryAfterSeconds: 5 } }));
+    expect(p).toMatchObject({ title: 'Servicio no disponible', retryable: true, retryAfterSeconds: 5 });
+  });
+
+  it('never shows browser or JavaScript text', () => {
+    expect(normalizeError(new TypeError('Failed to fetch'))).toMatchObject({ code: 'NETWORK', status: 0, title: 'Sin conexión', retryable: true });
+    expect(normalizeError(new DOMException('aborted', 'AbortError')).code).toBe('ABORTED');
+    expect(normalizeError(new TypeError("Cannot read properties of undefined (reading 'x')")).message).not.toContain('undefined');
+    expect(normalizeError(new Error('boom'), 'No se pudo guardar').message).toBe('No se pudo guardar');
+    expect(normalizeError({ statusCode: 404, message: 'Page not found: /x' })).toMatchObject({ code: 'NOT_FOUND', message: 'Lo que buscas no existe o ya no está disponible.' });
+    expect(normalizeError('<html>Bad gateway</html>', 'Falló').message).toBe('Falló');
+    expect(normalizeError('No se pudo copiar').message).toBe('No se pudo copiar');
+  });
+
+  it('turns what the generated client caught into ApiError', () => {
+    const json = toApiError({ error: { code: 'FORBIDDEN', message: 'Permiso requerido' } }, new Response(null, { status: 403, headers: { 'x-request-id': 'req-9' } }));
+    expect(isApiError(json) && json.status === 403 && json.error.requestId === 'req-9').toBe(true);
+    // A proxy's HTML 502 becomes the catalog message for its status.
+    const html = toApiError('<html><body>502 Bad Gateway</body></html>', new Response(null, { status: 502 }));
+    expect(isApiError(html) && html.error).toMatchObject({ code: 'UPSTREAM_ERROR', message: 'Un servicio externo no respondió correctamente.' });
+    const offline = toApiError(new TypeError('Failed to fetch'));
+    expect(isApiError(offline) && offline.error.code).toBe('NETWORK');
+    // Bugs in request interceptors keep propagating untouched.
+    const bug = new RangeError('bad');
+    expect(toApiError(bug)).toBe(bug);
+    // Nuxt serializes errors as { message, statusCode, data }: the problem survives SSR.
+    expect(new ApiError(404, { code: 'NOT_FOUND', message: 'x' })).toMatchObject({ statusCode: 404, data: { error: { code: 'NOT_FOUND' } } });
+  });
+
+  it('describeError stays compatible for toasts', () => {
+    expect(describeError({ error: { code: 'BUDGET_EXCEEDED', message: 'Presupuesto agotado', requestId: 'r1' } })).toEqual({ message: 'Presupuesto agotado', requestId: 'r1', code: 'BUDGET_EXCEEDED' });
     expect(describeError(null, 'Sin conexión').message).toBe('Sin conexión');
-    expect(describeError(new Error('Algo puntual')).message).toBe('Algo puntual');
   });
 });
 

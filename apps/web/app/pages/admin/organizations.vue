@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from '#ui/components/ui/alert';
 definePageMeta({ permission: 'organizations.read', feature: 'organizations' });
 useHead({ title: 'Organizaciones' });
 const api = useApi();
+const notify = useNotify();
 const can = useCan();
 const { confirm } = useConfirm();
 const { data: orgs, refresh } = await useAsyncData('orgs', () => unwrap(adminOrgsList({ client: api })));
@@ -42,7 +43,7 @@ async function addMember() {
     await refreshMembers();
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function removeMember(userId: string, email: string) {
@@ -52,7 +53,7 @@ async function removeMember(userId: string, email: string) {
     await refreshMembers();
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 </script>

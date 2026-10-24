@@ -1,5 +1,6 @@
 import { DeleteObjectCommand, GetObjectCommand, HeadBucketCommand, HeadObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import type { Env } from '@starter/config';
+import { AppError } from '@starter/contracts';
 import { createHash, randomUUID } from 'node:crypto';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { access, mkdir, rm, stat, writeFile } from 'node:fs/promises';
@@ -39,7 +40,7 @@ async function toBuffer(stream: Readable, maxBytes = Number.POSITIVE_INFINITY): 
   for await (const chunk of stream) {
     const b = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk as Uint8Array);
     size += b.length;
-    if (size > maxBytes) throw new Error('Object exceeds maximum size');
+    if (size > maxBytes) throw AppError.tooLarge('El archivo supera el tamaño máximo permitido');
     chunks.push(b);
   }
   return Buffer.concat(chunks);

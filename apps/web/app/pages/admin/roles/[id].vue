@@ -13,10 +13,11 @@ import { Alert, AlertDescription, AlertTitle } from '#ui/components/ui/alert';
 definePageMeta({ permission: 'roles.read', breadcrumb: 'Detalle' });
 const route = useRoute();
 const api = useApi();
+const notify = useNotify();
 const can = useCan();
 const { confirm } = useConfirm();
 const id = computed(() => String(route.params.id));
-const { data: role, refresh } = await useAsyncData(`role-${id.value}`, () => unwrap(adminRolesGet({ client: api, path: { id: id.value } })));
+const { data: role, refresh, problem } = await useApiData(`role-${id.value}`, () => unwrap(adminRolesGet({ client: api, path: { id: id.value } })), { fatal: [404] });
 const { data: catalog } = await useAsyncData('perm-catalog', async () => (can('permissions.read') ? unwrap(adminPermissionsList({ client: api })) : []));
 useHead({ title: computed(() => role.value?.name ?? 'Rol') });
 
@@ -48,7 +49,7 @@ async function savePerms() {
     role.value = await unwrap(adminRolesSetPermissions({ client: api, path: { id: id.value }, body: { permissions: perms.value, expectedVersion: role.value.version } }));
     toast.success('Permisos actualizados');
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
     await refresh();
   }
 }
@@ -60,13 +61,14 @@ async function remove() {
     toast.success('Rol eliminado');
     await navigateTo('/admin/roles');
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 </script>
 
 <template>
   <div><Button variant="ghost" size="sm" as-child><NuxtLink to="/admin/roles"><ArrowLeft class="size-4" /> Roles</NuxtLink></Button></div>
+  <LoadError v-if="problem" :error="problem" @retry="refresh()" />
   <template v-if="role">
     <PageHeader :title="role.name" :description="`Clave ${role.key} · jerarquía ${role.rank} · ${role.userCount} usuario(s)`">
       <template #actions>

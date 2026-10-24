@@ -17,6 +17,7 @@ import RelativeTime from '#ui/components/common/RelativeTime.vue';
 definePageMeta({ permission: 'ai.agents.manage', feature: 'ai' });
 useHead({ title: 'Agentes' });
 const api = useApi();
+const notify = useNotify();
 const { confirm } = useConfirm();
 const { data: agents, refresh } = await useAsyncData('ai-agents', () => unwrap(aiAgentsList({ client: api })));
 
@@ -36,7 +37,7 @@ async function makeDefault(a: AgentSummary) {
     toast.success(`${a.name} es ahora el agente del chat flotante`);
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function toggleArchive(a: AgentSummary) {
@@ -44,7 +45,7 @@ async function toggleArchive(a: AgentSummary) {
     await aiAgentsUpdate({ client: api, path: { id: a.id }, body: { archived: !a.archived } });
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 </script>

@@ -93,8 +93,11 @@ resumen(@CurrentActor() actor: Actor, @ZParams() p: z.infer<typeof IdParams>) {
 ```
 
 - Entradas con `@ZBody()`, `@ZQuery()`, `@ZParams()` (validación Zod → 422 con detalle por campo).
-- Errores con `AppError` (`notFound`, `conflict`, `precondition`, `forbidden`, `validation`); el
-  filtro global los convierte al esquema `ErrorResponse`.
+- Errores con `AppError` del catálogo (`notFound`, `field`, `conflict`, `precondition`, `forbidden`,
+  `validation`); el filtro global los convierte al esquema `ErrorResponse`. La unicidad del nombre
+  la garantiza el índice `projects_org_name_uq` (su violación se traduce con `isUniqueViolation`
+  a un error en el campo) y la vista usa `useApiData` + `LoadError`. Estándar completo en
+  [errors.md](errors.md).
 - Una ruta sin `@Endpoint` se rechaza siempre (denegar por defecto).
 - Regenera artefactos: `pnpm api:docs:generate` y `pnpm api:client:generate`. CI verifica que
   estén al día y `pnpm api:contract:check` avisa si rompiste el contrato.

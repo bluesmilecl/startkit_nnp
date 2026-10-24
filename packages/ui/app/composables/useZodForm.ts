@@ -1,9 +1,6 @@
 import { computed, reactive, ref, toRaw } from 'vue';
 import type { z } from 'zod';
-
-export interface ServerErrorLike {
-  error?: { code?: string; message?: string; details?: unknown };
-}
+import { normalizeError } from '#ui/lib/errors';
 
 /**
  * Minimal form state for shadcn-vue `Field` components validated with the same Zod 4 contracts
@@ -56,13 +53,15 @@ export function useZodForm<S extends z.ZodObject>(schema: S, initial: z.input<S>
     errors[name] = result.success ? undefined : result.error.issues.find((i) => i.path.join('.') === name)?.message;
   }
 
+  /**
+   * Maps a failed submit onto the form: field-level details (VALIDATION_FAILED, a uniqueness
+   * CONFLICT) next to each field, and the message above the actions. Server failures (5xx) add
+   * the request id so the person can quote it.
+   */
   function applyServerError(err: unknown) {
-    const body = ((err as { data?: ServerErrorLike })?.data ?? err) as ServerErrorLike;
-    const details = body?.error?.details;
-    if (Array.isArray(details)) {
-      for (const d of details as { path?: string; message?: string }[]) if (d.path) errors[d.path] = d.message;
-    }
-    formError.value = body?.error?.message ?? (err instanceof Error ? err.message : 'No se pudo guardar');
+    const p = normalizeError(err, 'No se pudo guardar');
+    for (const [path, message] of Object.entries(p.fieldErrors)) errors[path] = message;
+    formError.value = p.status >= 500 && p.requestId ? `${p.message} Código de solicitud: ${p.requestId}` : p.message;
   }
 
   function handleSubmit(fn: (data: z.output<S>) => Promise<unknown> | unknown) {

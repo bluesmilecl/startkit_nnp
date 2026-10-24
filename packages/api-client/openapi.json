@@ -1334,6 +1334,16 @@
               }
             }
           },
+          "404": {
+            "description": "No encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409": {
             "description": "Conflicto",
             "content": {
@@ -4963,6 +4973,16 @@
               }
             }
           },
+          "404": {
+            "description": "No encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409": {
             "description": "Conflicto",
             "content": {
@@ -5074,6 +5094,16 @@
           },
           "403": {
             "description": "Permiso insuficiente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -14806,6 +14836,16 @@
               }
             }
           },
+          "404": {
+            "description": "No encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Validación fallida",
             "content": {
@@ -16335,13 +16375,18 @@
             "properties": {
               "code": {
                 "type": "string",
-                "example": "FORBIDDEN"
+                "example": "FORBIDDEN",
+                "description": "Stable machine code from the error catalog (docs/errors.md); branch on this, never on the message"
               },
               "message": {
-                "type": "string"
+                "type": "string",
+                "description": "Spanish message safe to show to the person"
               },
-              "details": {},
+              "details": {
+                "description": "Code-specific data: VALIDATION_FAILED → [{ path, message, code }]; PRECONDITION_FAILED → { currentVersion }; RATE_LIMITED/UNAVAILABLE → { retryAfterSeconds }"
+              },
               "requestId": {
+                "description": "Same value as the x-request-id header; quote it to support",
                 "type": "string"
               }
             },

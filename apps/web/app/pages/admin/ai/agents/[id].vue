@@ -25,10 +25,11 @@ import StatusBadge from '~/components/shared/StatusBadge.vue';
 
 definePageMeta({ permission: 'ai.agents.manage', feature: 'ai', breadcrumb: 'Detalle' });
 const api = useApi();
+const notify = useNotify();
 const route = useRoute();
 const { confirm } = useConfirm();
 const id = computed(() => String(route.params.id));
-const { data: agent, refresh } = await useAsyncData(`ai-agent-${id.value}`, () => unwrap(aiAgentsGet({ client: api, path: { id: id.value } })));
+const { data: agent, refresh, problem } = await useApiData(`ai-agent-${id.value}`, () => unwrap(aiAgentsGet({ client: api, path: { id: id.value } })), { fatal: [404] });
 useHead({ title: () => agent.value?.name ?? 'Agente' });
 
 const draft = computed(() => agent.value?.versions.find((v) => v.status === 'draft') ?? null);
@@ -61,7 +62,7 @@ async function save() {
     toast.success('Borrador guardado');
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   } finally {
     saving.value = false;
   }
@@ -74,8 +75,7 @@ async function publish() {
     toast.success('Versión publicada');
     await refresh();
   } catch (err) {
-    const e = apiError(err);
-    toast.error(e.message);
+    notify.error(err);
     await refresh();
   }
 }
@@ -85,7 +85,7 @@ async function discard() {
     await aiAgentsDiscardDraft({ client: api, path: { id: id.value } });
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function rollback(v: AgentVersion) {
@@ -95,12 +95,12 @@ async function rollback(v: AgentVersion) {
     toast.success(`Versión ${v.version} restaurada`);
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function rename(name: string) {
   if (!name.trim() || name === agent.value?.name) return;
-  await aiAgentsUpdate({ client: api, path: { id: id.value }, body: { name: name.trim() } }).catch((err) => toast.error(apiError(err).message));
+  await aiAgentsUpdate({ client: api, path: { id: id.value }, body: { name: name.trim() } }).catch((err) => notify.error(err));
   await refresh();
 }
 
@@ -160,6 +160,7 @@ async function runTest() {
 </script>
 
 <template>
+  <LoadError v-if="problem" :error="problem" @retry="refresh()" />
   <div v-if="agent" class="space-y-6">
     <Button variant="ghost" size="sm" as-child class="-ml-2"><NuxtLink to="/admin/ai/agents"><ArrowLeft class="size-4" /> Agentes</NuxtLink></Button>
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

@@ -53,7 +53,7 @@ export class RagConnectionsService {
 
   async findRow(organizationId: string, id: string, db: Database = this.deps.db): Promise<ConnectionRow> {
     const [row] = await db.select().from(ragConnections).where(and(eq(ragConnections.id, id), eq(ragConnections.organizationId, organizationId))).limit(1);
-    if (!row) throw AppError.notFound('Conexión de conocimiento');
+    if (!row) throw AppError.notFound('Conexión de conocimiento', 'f');
     return row;
   }
 

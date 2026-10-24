@@ -1,5 +1,6 @@
 import { createAdminExecutors, loadActor, ProposalsService } from '@starter/auth';
 import { createAiServices, fetchClpRate, type AiServices } from '@starter/ai';
+import { AppError } from '@starter/contracts';
 import { and, attachments, eq, fxRates, lt, sql } from '@starter/db';
 import { QUEUES } from '@starter/jobs';
 import { createLogger } from '@starter/observability';
@@ -35,7 +36,7 @@ export async function registerAiHandlers(ctx: WorkerContext, ai: AiServices): Pr
       return;
     }
     const rate = await fetchClpRate();
-    if (!rate) throw new Error('mindicador.cl no devolvió un valor de dólar observado');
+    if (!rate) throw AppError.upstream('mindicador.cl no devolvió un valor de dólar observado');
     await ctx.db.db
       .insert(fxRates)
       .values({ base: 'USD', quote: 'CLP', rate: rate.rate, rateDate: rate.rateDate, source: rate.source, sourceUrl: rate.sourceUrl })

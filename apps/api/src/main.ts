@@ -1,8 +1,9 @@
 import { getEnv } from '@starter/config';
-import { createLogger } from '@starter/observability';
+import { createLogger, installProcessHandlers, sanitizeError } from '@starter/observability';
 import { createApp } from './create-app.js';
 
 const log = createLogger('api');
+installProcessHandlers(log);
 
 async function main(): Promise<void> {
   const env = getEnv();
@@ -12,8 +13,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err: unknown) => {
-  log.fatal({ err: err instanceof Error ? err.message : String(err) }, 'api failed to start');
-   
-  console.error(err);
+  log.fatal({ err: sanitizeError(err, 4000), stack: err instanceof Error ? err.stack : undefined }, 'api failed to start');
   process.exit(1);
 });

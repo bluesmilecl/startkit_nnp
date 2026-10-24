@@ -149,7 +149,7 @@ export class ProposalsService {
       .from(actionProposals)
       .where(and(eq(actionProposals.id, id), eq(actionProposals.actorUserId, actor.userId)))
       .limit(1);
-    if (!row) throw AppError.notFound('Propuesta');
+    if (!row) throw AppError.notFound('Propuesta', 'f');
     return ProposalsService.toDto(row);
   }
 
@@ -174,7 +174,7 @@ export class ProposalsService {
         .from(actionProposals)
         .where(and(eq(actionProposals.id, id), eq(actionProposals.actorUserId, actor.userId)))
         .limit(1);
-      if (!row) throw AppError.notFound('Propuesta');
+      if (!row) throw AppError.notFound('Propuesta', 'f');
       if (row.status === 'executed') {
         // Idempotent replay: the change already happened exactly once.
         const r = row.result as { href?: string | null } | null;

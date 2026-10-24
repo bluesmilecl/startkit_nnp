@@ -88,7 +88,11 @@ export function Endpoint(options: EndpointOptions): MethodDecorator {
       decorators.push(ApiResponse({ status, description: r.description ?? 'No content' }));
     }
   }
-  const errors = new Set([...(options.public ? DEFAULT_ERRORS.filter((s) => s !== 401 && s !== 403) : DEFAULT_ERRORS), ...(options.errors ?? [])]);
+  const errors = new Set([
+    ...(options.public ? DEFAULT_ERRORS.filter((s) => s !== 401 && s !== 403) : DEFAULT_ERRORS),
+    ...(options.params ? [404] : []),
+    ...(options.errors ?? []),
+  ]);
   for (const status of errors) {
     decorators.push(ApiResponse({ status, description: errorDescription(status), schema: { $ref: '#/components/schemas/ErrorResponse' } as never }));
   }
@@ -120,6 +124,8 @@ function errorDescription(status: number): string {
     429: 'Demasiadas solicitudes',
     500: 'Error interno',
     502: 'Error del proveedor externo',
+    503: 'Servicio no disponible temporalmente (ver Retry-After)',
+    504: 'Tiempo agotado',
   };
   return map[status] ?? 'Error';
 }
@@ -128,13 +134,16 @@ export function getEndpointOptions(ctx: ExecutionContext): EndpointOptions | und
   return Reflect.getMetadata(ENDPOINT_METADATA, ctx.getHandler()) as EndpointOptions | undefined;
 }
 
-function parseWith(schema: z.ZodType | undefined, value: unknown, where: string): unknown {
+const INVALID_MESSAGE = { body: 'Algunos datos no son válidos; revisa los campos marcados', query: 'Los parámetros de la consulta no son válidos' } as const;
+
+function parseWith(schema: z.ZodType | undefined, value: unknown, where: 'body' | 'query' | 'params'): unknown {
   if (!schema) return value;
   const result = schema.safeParse(value);
   if (!result.success) {
-    throw new AppError(
-      'VALIDATION_FAILED',
-      `Datos inválidos en ${where}`,
+    // Path params identify a resource: a malformed one cannot exist, so it reads as "not found".
+    if (where === 'params') throw new AppError('NOT_FOUND', 'No existe un recurso con ese identificador');
+    throw AppError.validation(
+      INVALID_MESSAGE[where],
       result.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message, code: i.code })),
     );
   }

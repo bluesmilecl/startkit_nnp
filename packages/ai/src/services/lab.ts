@@ -76,7 +76,7 @@ export class LabService {
   async get(actor: Actor, id: string) {
     assertCan(actor, 'ai.lab.use');
     const [row] = await this.deps.db.select().from(labRuns).where(and(eq(labRuns.id, id), eq(labRuns.organizationId, actor.organizationId)));
-    if (!row) throw AppError.notFound('Ejecución');
+    if (!row) throw AppError.notFound('Ejecución', 'f');
     return LabService.toDto(row);
   }
 

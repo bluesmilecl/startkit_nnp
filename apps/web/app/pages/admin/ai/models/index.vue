@@ -25,6 +25,7 @@ definePageMeta({ permission: 'ai.models.manage', feature: 'ai' });
 useHead({ title: 'Modelos' });
 
 const api = useApi();
+const notify = useNotify();
 const route = useRoute();
 const router = useRouter();
 type Fn = 'chat' | 'embedding' | 'transcription' | 'speech' | 'image' | 'moderation' | 'other';
@@ -80,7 +81,7 @@ async function verify(m: CatalogModel) {
     else toast.error(`${m.modelId}: ${r.message}`);
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   } finally {
     verifying.value = null;
   }
@@ -90,7 +91,7 @@ async function setEnabled(m: CatalogModel, enabled: boolean) {
     await aiModelsUpdate({ client: api, path: { id: m.id }, body: { enabled } });
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 

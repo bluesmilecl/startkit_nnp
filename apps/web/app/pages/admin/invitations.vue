@@ -15,6 +15,7 @@ import { formatDate } from '#ui/lib/format';
 definePageMeta({ permission: 'users.invite' });
 useHead({ title: 'Invitaciones' });
 const api = useApi();
+const notify = useNotify();
 const can = useCan();
 const { confirm } = useConfirm();
 const page = ref(1);
@@ -36,7 +37,7 @@ async function resend(id: string) {
     await adminInvitationsResend({ client: api, path: { id } });
     toast.success('Invitación reenviada');
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function revoke(id: string, email: string) {
@@ -46,7 +47,7 @@ async function revoke(id: string, email: string) {
     toast.success('Invitación revocada');
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 </script>

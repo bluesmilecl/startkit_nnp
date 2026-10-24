@@ -11,10 +11,13 @@ export const UsdAmount = z
 export const ErrorResponse = z
   .object({
     error: z.object({
-      code: z.string().meta({ example: 'FORBIDDEN' }),
-      message: z.string(),
-      details: z.unknown().optional(),
-      requestId: z.string().optional(),
+      code: z.string().meta({ example: 'FORBIDDEN', description: 'Stable machine code from the error catalog (docs/errors.md); branch on this, never on the message' }),
+      message: z.string().meta({ description: 'Spanish message safe to show to the person' }),
+      details: z.unknown().optional().meta({
+        description:
+          'Code-specific data: VALIDATION_FAILED → [{ path, message, code }]; PRECONDITION_FAILED → { currentVersion }; RATE_LIMITED/UNAVAILABLE → { retryAfterSeconds }',
+      }),
+      requestId: z.string().optional().meta({ description: 'Same value as the x-request-id header; quote it to support' }),
     }),
   })
   .meta({ id: 'ErrorResponse' });
@@ -69,6 +72,8 @@ export const ErrorCodes = [
   'NOT_CONFIGURED',
   'CAPABILITY_UNSUPPORTED',
   'UPSTREAM_ERROR',
+  'UNAVAILABLE',
+  'TIMEOUT',
   'INTERNAL',
 ] as const;
 export type ErrorCode = (typeof ErrorCodes)[number];

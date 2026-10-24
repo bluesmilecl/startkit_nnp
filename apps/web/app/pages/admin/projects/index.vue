@@ -28,7 +28,7 @@ type Sort = 'name' | 'createdAt' | 'updatedAt';
 const list = useListQuery({ page: 1, pageSize: 20, search: '', status: undefined as Project['status'] | undefined, sort: 'updatedAt' as Sort, direction: 'desc' as 'asc' | 'desc' });
 const statusFilter = list.filter('status');
 const view = useViewMode('projects');
-const { data, status, refresh } = await useAsyncData('projects', () => unwrap(projectsList({ client: api, query: list.params.value })), { watch: [list.params] });
+const { data, status, refresh, problem } = await useApiData('projects', () => unwrap(projectsList({ client: api, query: list.params.value })), { watch: [list.params] });
 
 // ── create / edit ───────────────────────────────────────────────────────
 const formOpen = ref(false);
@@ -149,7 +149,8 @@ const columns: ColumnDef<Project>[] = [
     </template>
   </DataToolbar>
 
-  <EmptyState v-if="data && data.total === 0 && !list.filtered.value" title="Aún no hay proyectos" description="Crea el primero para ver cómo funciona un módulo completo." :icon="FolderKanban">
+  <LoadError v-if="problem" :error="problem" :retrying="status === 'pending'" testid="project-load-error" @retry="refresh()" />
+  <EmptyState v-else-if="data && data.total === 0 && !list.filtered.value" title="Aún no hay proyectos" description="Crea el primero para ver cómo funciona un módulo completo." :icon="FolderKanban">
     <Button v-if="can('projects.manage')" @click="openCreate"><Plus class="size-4" /> Nuevo proyecto</Button>
   </EmptyState>
   <DataTable

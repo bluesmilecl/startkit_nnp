@@ -44,6 +44,7 @@ interface Meta {
 type ChatMessage = UIMessage<Meta>;
 
 const api = useApi();
+const notify = useNotify();
 const me = useMe();
 const can = useCan();
 const open = useLocalStorage('starter.chat.open', false);
@@ -119,7 +120,7 @@ async function rate(m: ChatMessage, rating: 1 | -1) {
   } catch (err) {
     if (previous) ratings[m.id] = previous;
     else delete ratings[m.id];
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 
@@ -212,7 +213,7 @@ async function onFiles(e: Event) {
       try {
         pending.value.push(await unwrap(aiAttachmentsUpload({ client: api, body: { file: f } })));
       } catch (err) {
-        toast.error(`«${f.name}»: ${apiError(err).message}`);
+        notify.error(err, { context: `«${f.name}»` });
       }
     }
   } finally {
@@ -242,7 +243,7 @@ async function toggleMic() {
       await nextTick();
       (textarea.value?.$el as HTMLTextAreaElement | undefined)?.focus();
     } catch (err) {
-      toast.error(apiError(err).message);
+      notify.error(err);
     } finally {
       recorder.state.value = 'idle';
     }

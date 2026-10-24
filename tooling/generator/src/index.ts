@@ -97,6 +97,7 @@ const FEMININE: [RegExp, Replacement][] = [
   [/» (archivado|restaurado)/g, (_m, w) => `» ${w!.slice(0, -1)}a`],
   [/Crea el primero/g, 'Crea la primera'],
   [/Ya existe un proyecto/g, 'Ya existe una proyecto'],
+  [/AppError\.notFound\('Proyecto'\)/g, "AppError.notFound('Proyecto', 'f')"],
   [/El proyecto fue modificado/g, 'La proyecto fue modificada'],
 ];
 

@@ -1,20 +1,21 @@
 import type { Client } from '@starter/api-client';
+import { normalizeError, type ApiErrorBody } from '#ui/lib/errors';
 
-export interface ApiErrorBody {
-  error: { code: string; message: string; details?: unknown; requestId?: string };
-}
+export type { ApiErrorBody };
 
 /** Access the typed API client: `adminUsersList({ client: api(), query })`. */
 export function useApi(): Client {
   return useNuxtApp().$api as Client;
 }
 
-/** Normalizes errors thrown by the generated client (ErrorResponse body) or by fetch. */
+/**
+ * Code, Spanish message, details and request id of anything thrown by an API call. Prefer
+ * `notify.error(err)` for toasts and `normalizeError(err)` for everything else (status, title,
+ * field errors, retryable); this stays for code that branches on `.code`.
+ */
 export function apiError(err: unknown): ApiErrorBody['error'] {
-  const body = err as Partial<ApiErrorBody> | undefined;
-  if (body?.error?.message) return body.error;
-  const e = err as { message?: string; code?: string };
-  return { code: e?.code ?? 'NETWORK', message: e?.message ?? 'No se pudo completar la solicitud' };
+  const p = normalizeError(err);
+  return { code: p.code, message: p.message, details: p.details, requestId: p.requestId };
 }
 
 /** Unwraps `{ data }` from generated SDK calls (the client is configured with throwOnError). */

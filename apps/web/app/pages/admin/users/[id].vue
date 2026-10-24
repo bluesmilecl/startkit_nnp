@@ -26,12 +26,13 @@ definePageMeta({ permission: 'users.read', breadcrumb: 'Detalle' });
 
 const route = useRoute();
 const api = useApi();
+const notify = useNotify();
 const can = useCan();
 const me = useMe();
 const { confirm } = useConfirm();
 const id = computed(() => String(route.params.id));
 
-const { data: user, refresh, error } = await useAsyncData(`user-${id.value}`, () => unwrap(adminUsersGet({ client: api, path: { id: id.value } })));
+const { data: user, refresh, problem } = await useApiData(`user-${id.value}`, () => unwrap(adminUsersGet({ client: api, path: { id: id.value } })), { fatal: [404] });
 const { data: audit, refresh: refreshAudit } = await useAsyncData(`user-audit-${id.value}`, async () =>
   can('audit.read') ? unwrap(adminAuditList({ client: api, query: { resourceId: id.value, page: 1, pageSize: 10 } })) : null,
 );
@@ -64,7 +65,7 @@ async function assignRole() {
     toast.success('Rol asignado');
     await refreshAudit();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function removeRole(roleId: string, name: string, organizationId: string | null) {
@@ -74,7 +75,7 @@ async function removeRole(roleId: string, name: string, organizationId: string |
     toast.success('Rol quitado');
     await refreshAudit();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function toggle() {
@@ -88,7 +89,7 @@ async function toggle() {
     toast.success('Estado actualizado');
     await refreshAudit();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function revoke() {
@@ -98,7 +99,7 @@ async function revoke() {
     toast.success(`${r.revoked} sesión(es) cerrada(s)`);
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function remove() {
@@ -109,7 +110,7 @@ async function remove() {
     toast.success('Usuario eliminado');
     await navigateTo('/admin/users');
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 </script>
@@ -118,7 +119,7 @@ async function remove() {
   <div class="flex items-center gap-2">
     <Button variant="ghost" size="sm" as-child><NuxtLink to="/admin/users"><ArrowLeft class="size-4" /> Usuarios</NuxtLink></Button>
   </div>
-  <Alert v-if="error" variant="destructive"><AlertDescription>{{ apiError(error).message }}</AlertDescription></Alert>
+  <LoadError v-if="problem" :error="problem" @retry="refresh()" />
   <template v-else-if="user">
     <PageHeader :title="user.name || user.email" :description="user.email">
       <template #actions>

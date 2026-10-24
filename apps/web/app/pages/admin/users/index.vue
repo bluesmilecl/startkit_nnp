@@ -23,6 +23,7 @@ definePageMeta({ permission: 'users.read' });
 useHead({ title: 'Usuarios' });
 
 const api = useApi();
+const notify = useNotify();
 const can = useCan();
 const { confirm } = useConfirm();
 const route = useRoute();
@@ -77,7 +78,7 @@ async function toggleDisabled(u: UserSummary) {
     }
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 
@@ -95,7 +96,7 @@ async function remove(u: UserSummary) {
     toast.success('Usuario eliminado');
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 

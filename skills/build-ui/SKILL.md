@@ -27,14 +27,15 @@ Ejemplos vivos con su código: `/admin/components` (`?tab=forms`, `wizard`, `dat
 ```ts
 const list = useListQuery({ page: 1, pageSize: 20, search: '', status: undefined as string | undefined, sort: 'updatedAt', direction: 'desc' });
 const view = useViewMode('clientes');
-const { data, status, refresh } = await useAsyncData('clientes', () => unwrap(customersList({ client: api, query: list.params.value })), { watch: [list.params] });
+const { data, status, refresh, problem } = await useApiData('clientes', () => unwrap(customersList({ client: api, query: list.params.value })), { watch: [list.params] });
 const columns: ColumnDef<Customer>[] = [/* …, { id: 'actions', cell: ({ row }) => h(ActionMenu, { label, items }) } */];
 ```
 
 ```vue
 <PageHeader title="Clientes"><template #actions><Button @click="openCreate"><AppIcon name="create" /> Nuevo cliente</Button></template></PageHeader>
 <DataToolbar v-model:search="list.search.value" v-model:view="view" :filtered="list.filtered.value" testid="customer" @clear="list.reset()" />
-<DataTable :columns="columns" :data="data?.items ?? []" :total="data?.total ?? 0" :view="view" :page="list.query.page"
+<LoadError v-if="problem" :error="problem" :retrying="status === 'pending'" @retry="refresh()" />
+<DataTable v-else :columns="columns" :data="data?.items ?? []" :total="data?.total ?? 0" :view="view" :page="list.query.page"
   :page-size="list.query.pageSize" :sort="list.sort.value" :loading="status === 'pending'" caption="Clientes"
   @update:page="list.query.page = $event" @update:sort="list.setSort" />
 <FormDialog v-model:open="open" variant="sheet" title="Nuevo cliente" :loading="form.submitting.value" :error="form.formError.value" testid="customer-form" @submit="submit">
@@ -54,9 +55,16 @@ para rankings), `DonutChart`.
 
 **Configuración**: `SectionNav` + `FormSection` por sección.
 
-**Avisos**: `useNotify()` para resultados (`notify.error(err)` muestra el mensaje de la API y su
-código), `AppAlert` para estados de la página, `useConfirm()` o `confirm` en `ActionMenu` para
-acciones destructivas (`typeToConfirm` si es irreversible).
+**Detalle**: `await useApiData(`cliente-${id}`, () => …, { fatal: [404] })`: un id inexistente
+muestra la página de error en español (con estado 404 también en SSR).
+
+**Errores** ([docs/errors.md](../../docs/errors.md)): cargas con `useApiData` + `LoadError`;
+acciones con `try { … } catch (err) { notify.error(err) }` (mensaje de la API + código de solicitud,
+`{ retry }` para «Reintentar»); formularios con `form.handleSubmit` (errores por campo). Para
+decidir por tipo usa `normalizeError(err).code`, nunca el texto. Nunca `toast.error(err.message)`.
+
+**Avisos**: `useNotify()` para resultados, `AppAlert` para estados de la página, `useConfirm()` o
+`confirm` en `ActionMenu` para acciones destructivas (`typeToConfirm` si es irreversible).
 
 **Íconos**: `<AppIcon name="…" />` con nombres semánticos (`create`, `edit`, `delete`, `archive`,
 `warning`, `money`…); busca en `/admin/components?tab=icons`.

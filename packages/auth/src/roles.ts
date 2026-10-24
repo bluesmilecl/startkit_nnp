@@ -312,7 +312,7 @@ export class RolesService {
 
   async planUnassign(actor: Actor, userId: string, roleId: string, organizationId?: string | null, db: DbOrTx = this.deps.db): Promise<AssignmentPlan> {
     const plan = await this.planAssign(actor, userId, roleId, organizationId, db);
-    if (!plan.alreadyAssigned) throw AppError.notFound('Asignación de rol');
+    if (!plan.alreadyAssigned) throw AppError.notFound('Asignación de rol', 'f');
     if (plan.role.key === 'owner') await assertNotLastOwner(db, await targetUserInfo(db, userId), 'quitar el rol');
     return plan;
   }

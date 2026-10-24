@@ -2,7 +2,7 @@ import { featureFlags, getEnv, SecretBox } from '@starter/config';
 import { createDb, sql, waitForDatabase } from '@starter/db';
 import { JobQueue } from '@starter/jobs';
 import { createMailer } from '@starter/mail';
-import { createLogger } from '@starter/observability';
+import { createLogger, installProcessHandlers, sanitizeError } from '@starter/observability';
 import { createStorage } from '@starter/storage';
 import { createServer } from 'node:http';
 import type { WorkerContext } from './context.js';
@@ -11,6 +11,7 @@ import { registerSystemHandlers } from './handlers/system.js';
 import { registerModuleHandlers } from './modules.js';
 
 const log = createLogger('worker');
+installProcessHandlers(log);
 
 async function main(): Promise<void> {
   const env = getEnv();
@@ -65,7 +66,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err: unknown) => {
-   
-  console.error(err);
+  log.fatal({ err: sanitizeError(err, 4000), stack: err instanceof Error ? err.stack : undefined }, 'worker failed to start');
   process.exit(1);
 });

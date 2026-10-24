@@ -11,9 +11,21 @@ export type UsdAmount = string;
 
 export type ErrorResponse = {
     error: {
+        /**
+         * Stable machine code from the error catalog (docs/errors.md); branch on this, never on the message
+         */
         code: string;
+        /**
+         * Spanish message safe to show to the person
+         */
         message: string;
+        /**
+         * Code-specific data: VALIDATION_FAILED → [{ path, message, code }]; PRECONDITION_FAILED → { currentVersion }; RATE_LIMITED/UNAVAILABLE → { retryAfterSeconds }
+         */
         details?: unknown;
+        /**
+         * Same value as the x-request-id header; quote it to support
+         */
         requestId?: string;
     };
 };
@@ -2758,6 +2770,10 @@ export type AdminInvitationsResendErrors = {
      */
     403: ErrorResponse;
     /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
      * Conflicto
      */
     409: ErrorResponse;
@@ -4413,6 +4429,10 @@ export type AiAgentsTestErrors = {
      */
     403: ErrorResponse;
     /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
      * Conflicto
      */
     409: ErrorResponse;
@@ -4463,6 +4483,10 @@ export type AiAgentsValidateErrors = {
      * Permiso insuficiente
      */
     403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
     /**
      * Validación fallida
      */
@@ -8845,6 +8869,10 @@ export type RagEvaluationsDeleteErrors = {
      * Permiso insuficiente
      */
     403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
     /**
      * Validación fallida
      */

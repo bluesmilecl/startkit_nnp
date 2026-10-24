@@ -16,6 +16,7 @@ import JobProgress from '~/components/knowledge/JobProgress.vue';
 definePageMeta({ permission: 'rag.jobs.manage', feature: 'rag' });
 useHead({ title: 'Trabajos de indexación' });
 const api = useApi();
+const notify = useNotify();
 const route = useRoute();
 const query = reactive({ page: 1, status: 'all', collectionId: String(route.query.collection ?? 'all'), active: false });
 watch(() => [query.status, query.collectionId, query.active], () => (query.page = 1));
@@ -58,7 +59,7 @@ async function cancel(j: RagJob) {
     toast.success(updated.status === 'cancelled' ? 'Trabajo cancelado' : 'Cancelación solicitada', { description: updated.status === 'cancelled' ? undefined : 'Se detendrá en el siguiente punto seguro.' });
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 async function retry(j: RagJob) {
@@ -67,7 +68,7 @@ async function retry(j: RagJob) {
     toast.success('Trabajo reencolado');
     await refresh();
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { adminOnboardingComplete, adminSettingsGet, adminSettingsUpdate, meUpdate } from '@starter/api-client';
 import { Check } from '@lucide/vue';
-import { toast } from 'vue-sonner';
 import { Button } from '#ui/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#ui/components/ui/card';
 import { Input } from '#ui/components/ui/input';
@@ -12,6 +11,7 @@ import { Progress } from '#ui/components/ui/progress';
 definePageMeta({ layout: 'auth' });
 useHead({ title: 'Configuración inicial' });
 const api = useApi();
+const notify = useNotify();
 const me = useMe();
 const { data: settings } = await useAsyncData('onboarding-settings', () => unwrap(adminSettingsGet({ client: api })));
 const step = ref(0);
@@ -40,7 +40,7 @@ async function next() {
     }
     step.value++;
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   } finally {
     busy.value = false;
   }

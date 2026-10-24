@@ -127,4 +127,23 @@ class MetricsRegistry {
 }
 
 export const metrics = new MetricsRegistry();
+
+/**
+ * Last-resort handlers for API and worker processes. An unhandled rejection is a bug (a promise
+ * nobody awaited) but leaves the process consistent, so it is logged with its stack and counted;
+ * an uncaught exception may leave state half-updated, so it is logged and the process exits for
+ * the orchestrator to restart it.
+ */
+export function installProcessHandlers(log: Logger): void {
+  const processErrors = metrics.counter('process_errors_total');
+  process.on('unhandledRejection', (reason) => {
+    processErrors.inc({ kind: 'unhandled_rejection' });
+    log.error({ err: sanitizeError(reason), stack: reason instanceof Error ? reason.stack : undefined }, 'unhandled promise rejection');
+  });
+  process.on('uncaughtException', (err) => {
+    processErrors.inc({ kind: 'uncaught_exception' });
+    log.fatal({ err: sanitizeError(err), stack: err.stack }, 'uncaught exception; exiting');
+    process.exit(1);
+  });
+}
 export type { Logger };

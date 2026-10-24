@@ -199,7 +199,7 @@ export class AiRuntime {
     const cost = await this.ledger.finish(aiRequestId, { status: 'failed', errorKind: c.kind, error: c.message });
     if (cost.costStatus === 'unknown') await this.budgets.settle(reservation, null);
     else await this.budgets.release(reservation);
-    throw new AppError('UPSTREAM_ERROR', `El proveedor IA falló (${c.kind}): ${c.message}`, { errorKind: c.kind, aiRequestId });
+    throw new AppError('UPSTREAM_ERROR', `El proveedor IA falló (${c.kind}): ${c.message}`, { errorKind: c.kind, aiRequestId }, { retryable: c.retryable });
   }
 
   /** Embeddings for RAG indexing and queries (batched, recorded and budgeted). */
@@ -231,7 +231,7 @@ export class AiRuntime {
       await this.ledger.finishAttempt(attemptId, { status: opts.abortSignal?.aborted ? 'cancelled' : 'failed', usageStatus: 'unknown', billable: false, errorKind: c.kind, error: c.message });
       await this.ledger.finish(aiRequestId, { status: 'failed', errorKind: c.kind, error: c.message });
       await this.budgets.release(reservation);
-      throw new AppError('UPSTREAM_ERROR', `Embeddings fallaron (${c.kind}): ${c.message}`, { errorKind: c.kind });
+      throw new AppError('UPSTREAM_ERROR', `Embeddings fallaron (${c.kind}): ${c.message}`, { errorKind: c.kind }, { retryable: c.retryable });
     }
   }
 
@@ -269,7 +269,7 @@ export class AiRuntime {
       await this.ledger.finishAttempt(attemptId, { status: cancelled ? 'cancelled' : 'failed', usageStatus: 'unknown', billable: false, errorKind: c.kind, error: c.message });
       await this.ledger.finish(aiRequestId, { status: cancelled ? 'cancelled' : 'failed', errorKind: c.kind, error: c.message });
       await this.budgets.release(reservation);
-      throw new AppError('UPSTREAM_ERROR', `La transcripción falló (${c.kind}): ${c.message}`, { errorKind: c.kind });
+      throw new AppError('UPSTREAM_ERROR', `La transcripción falló (${c.kind}): ${c.message}`, { errorKind: c.kind }, { retryable: c.retryable });
     }
   }
 }

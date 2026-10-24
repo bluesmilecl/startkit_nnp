@@ -22,6 +22,7 @@ import StatusBadge from '~/components/shared/StatusBadge.vue';
 definePageMeta({ permission: 'ai.models.manage', feature: 'ai' });
 useHead({ title: 'Tarifas' });
 const api = useApi();
+const notify = useNotify();
 const query = reactive({ page: 1, pageSize: 50, provider: '', modelId: '', includeHistory: false });
 const modelInput = ref('');
 let debounce: ReturnType<typeof setTimeout> | undefined;
@@ -82,7 +83,7 @@ async function sync() {
       await refresh();
     }, 4000);
   } catch (err) {
-    toast.error(apiError(err).message);
+    notify.error(err);
   }
 }
 

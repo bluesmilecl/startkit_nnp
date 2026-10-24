@@ -228,7 +228,7 @@ export class AgentsService {
       await this.findAgent(actor, id, tx);
       await tx.execute(sql`select pg_advisory_xact_lock(727003, hashtext(${id}))`);
       const [v] = await tx.select().from(agentVersions).where(and(eq(agentVersions.id, versionId), eq(agentVersions.agentId, id))).limit(1);
-      if (!v) throw AppError.notFound('Versión');
+      if (!v) throw AppError.notFound('Versión', 'f');
       if (v.status !== 'draft') throw AppError.conflict('Solo se publica un borrador; para volver a una versión anterior usa «restaurar»');
       const config = AgentConfig.parse(v.config);
       const validation = await this.validate(actor.organizationId, config, tx);
@@ -262,7 +262,7 @@ export class AgentsService {
       await this.findAgent(actor, id, tx);
       await tx.execute(sql`select pg_advisory_xact_lock(727003, hashtext(${id}))`);
       const [target] = await tx.select().from(agentVersions).where(and(eq(agentVersions.id, versionId), eq(agentVersions.agentId, id))).limit(1);
-      if (!target) throw AppError.notFound('Versión');
+      if (!target) throw AppError.notFound('Versión', 'f');
       if (target.status !== 'archived') throw AppError.conflict('Solo se restauran versiones archivadas');
       const config = AgentConfig.parse(target.config);
       const validation = await this.validate(actor.organizationId, config, tx);
@@ -398,7 +398,7 @@ export class AgentsService {
   async loadVersion(actor: Actor, agentId: string, versionId: string): Promise<PublishedAgent> {
     const agent = await this.findAgent(actor, agentId);
     const [version] = await this.deps.db.select().from(agentVersions).where(and(eq(agentVersions.id, versionId), eq(agentVersions.agentId, agentId))).limit(1);
-    if (!version) throw AppError.notFound('Versión');
+    if (!version) throw AppError.notFound('Versión', 'f');
     return { agent, version, config: AgentConfig.parse(version.config) };
   }
 

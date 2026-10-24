@@ -204,7 +204,7 @@ export class ModelsService {
         discovered = await client.listModels(AbortSignal.timeout(20_000));
       } catch (err) {
         const c = classifyAiError(err);
-        if (c.kind === 'auth') throw new AppError('UPSTREAM_ERROR', `El proveedor rechazó la credencial: ${c.message}`);
+        if (c.kind === 'auth') throw new AppError('UPSTREAM_ERROR', `El proveedor rechazó la credencial: ${c.message}`, { errorKind: c.kind }, { retryable: false });
       }
       if (discovered) {
         for (const d of discovered) {
