@@ -21,6 +21,7 @@ const steps = [
   ['Generated client compiles', 'pnpm api:client:generate && git diff --exit-code -- packages/api-client/src/generated && pnpm exec tsc -b packages/api-client'],
   ['API contract (breaking changes)', 'pnpm api:contract:check'],
   ['Manifest up to date', 'node scripts/manifest.mjs --check'],
+  ['JSON Schemas up to date', 'node scripts/schemas.mjs --check'],
   ['Documentation', 'pnpm docs:check'],
   ['Compose variants', 'docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail config -q && docker compose -f docker/compose.yaml -f docker/compose.production.yaml config -q'],
   ['Web build', 'pnpm --filter @starter/web build'],

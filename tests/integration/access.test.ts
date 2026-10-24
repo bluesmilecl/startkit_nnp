@@ -1,5 +1,5 @@
-import { InvitationsService, ProposalsService, RolesService, UsersService, createAdminExecutors, type Actor } from '@starter/auth';
-import { actionProposals, eq, organizations } from '@starter/db';
+import { InvitationsService, ProposalsService, RolesService, UsersService, createAdminExecutors, syncAccessCatalog, type Actor } from '@starter/auth';
+import { actionProposals, and, eq, organizations, permissions, rolePermissions } from '@starter/db';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { actorFor, deps, makeUser, resetOwners, roleId, testContext } from './helpers.js';
 
@@ -55,6 +55,22 @@ describe('authorization in services (same rules for REST, CLI and chat tools)', 
     const owner = await actorFor(ctx.handle, (await makeUser(ctx.handle, { roles: ['owner'] })).id);
     await rolesSvc.unassign(owner, u.id, await roleId(ctx.handle, 'editor'));
     expect((await actorFor(ctx.handle, u.id)).permissions.has('users.read')).toBe(false);
+  });
+
+  it('catalog sync grants newly introduced permissions to system roles but keeps administrator changes', async () => {
+    const editor = await roleId(ctx.handle, 'editor');
+    const viewer = await roleId(ctx.handle, 'viewer');
+    // Simulate a permission that did not exist in the previous version of the catalog…
+    await ctx.handle.db.delete(rolePermissions).where(eq(rolePermissions.permissionKey, 'projects.manage'));
+    await ctx.handle.db.delete(permissions).where(eq(permissions.key, 'projects.manage'));
+    // …and an administrator who removed a known permission from a system role.
+    await ctx.handle.db.delete(rolePermissions).where(and(eq(rolePermissions.roleId, viewer), eq(rolePermissions.permissionKey, 'projects.read')));
+    await syncAccessCatalog(ctx.handle.db);
+    const keys = async (role: string) => (await ctx.handle.db.select({ k: rolePermissions.permissionKey }).from(rolePermissions).where(eq(rolePermissions.roleId, role))).map((r) => r.k);
+    expect(await keys(editor)).toContain('projects.manage');
+    expect(await keys(viewer)).not.toContain('projects.manage');
+    expect(await keys(viewer)).not.toContain('projects.read');
+    await ctx.handle.db.insert(rolePermissions).values({ roleId: viewer, permissionKey: 'projects.read' }).onConflictDoNothing();
   });
 
   it('role summaries report real user and permission counts', async () => {

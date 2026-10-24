@@ -335,7 +335,7 @@ async function removeCollection() {
                 <TableCell class="text-sm">{{ jobKindLabel(j.kind) }}</TableCell>
                 <TableCell><JobProgress :job="j" /></TableCell>
                 <TableCell class="tabular-nums">{{ j.attempts }}/{{ j.maxAttempts }}</TableCell>
-                <TableCell class="tabular-nums">{{ formatUsd(j.costUsd) }}</TableCell>
+                <TableCell class="tabular-nums">{{ formatUsd(j.costUsd) }}<span v-if="j.units.unpriced_calls" class="text-amber-600 dark:text-amber-400"> + desconocido</span></TableCell>
                 <TableCell><RelativeTime :value="j.createdAt" /></TableCell>
               </TableRow>
               <TableRow v-if="!jobs?.items.length"><TableCell colspan="5" class="text-muted-foreground text-center">Sin trabajos.</TableCell></TableRow>

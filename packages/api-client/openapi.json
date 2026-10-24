@@ -6997,7 +6997,7 @@
     },
     "/api/ai/fx/refresh": {
       "post": {
-        "description": "**Permiso requerido:** `ai.usage.read`.\n\n**Módulo:** `ai` debe estar habilitado.",
+        "description": "Encola una consulta al proveedor de tipo de cambio configurado (FX_PROVIDER).\n\n**Permiso requerido:** `ai.models.manage`.\n\n**Módulo:** `ai` debe estar habilitado.",
         "operationId": "ai_fx_refresh",
         "parameters": [],
         "responses": {
@@ -8104,7 +8104,7 @@
     },
     "/api/ai/prices": {
       "get": {
-        "description": "Cada tarifa conserva fuente, fecha de consulta, vigencia, moneda, unidad y ámbito de facturación.\n\n**Acceso:** cualquier sesión válida.\n\n**Módulo:** `ai` debe estar habilitado.",
+        "description": "Cada tarifa conserva fuente, fecha de consulta, vigencia, moneda, unidad y ámbito de facturación. Requiere ai.models.manage o ai.usage.read (verificado en el servicio).\n\n**Acceso:** cualquier sesión válida.\n\n**Módulo:** `ai` debe estar habilitado.",
         "operationId": "ai_prices_list",
         "parameters": [
           {

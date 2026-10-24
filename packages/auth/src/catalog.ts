@@ -9,6 +9,10 @@ import { and, eq, inArray, isNull, notInArray, permissions, rolePermissions, rol
  */
 export async function syncAccessCatalog(db: Database): Promise<{ permissions: number; createdRoles: string[] }> {
   return db.transaction(async (tx) => {
+    // Keys never seen before (new module or new feature): their default grants are applied to
+    // existing system roles below. Keys already known keep whatever administrators configured.
+    const known = new Set((await tx.select({ key: permissions.key }).from(permissions)).map((r) => r.key));
+    const introduced = PERMISSION_KEYS.filter((k) => !known.has(k));
     for (const key of PERMISSION_KEYS) {
       const def = PERMISSIONS[key] as { group: string; description: string; sensitive?: boolean };
       await tx
@@ -42,6 +46,9 @@ export async function syncAccessCatalog(db: Database): Promise<{ permissions: nu
         createdRoles.push(key);
         const perms = SYSTEM_ROLE_PERMISSIONS[key];
         if (perms.length) await tx.insert(rolePermissions).values(perms.map((p) => ({ roleId: roleId!, permissionKey: p })));
+      } else if (known.size && introduced.length) {
+        const grants = SYSTEM_ROLE_PERMISSIONS[key].filter((p) => introduced.includes(p));
+        if (grants.length) await tx.insert(rolePermissions).values(grants.map((p) => ({ roleId: roleId!, permissionKey: p }))).onConflictDoNothing();
       }
       if (key === 'owner') {
         await tx

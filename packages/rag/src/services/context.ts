@@ -54,7 +54,9 @@ export class StoreRegistry {
     const readOnly = row.access === 'read-only';
     if (row.kind === 'internal') {
       const pool = createPgPool(this.deps.env.DATABASE_URL, { ssl: this.deps.env.DATABASE_SSL, max: 5, timeoutMs: row.timeoutMs, applicationName: 'starter-rag' });
-      return new PgVectorStore(pool, { kind: 'internal', schema: config.schema ?? 'rag', readOnly });
+      const ddlUrl = internalDdlUrl(this.deps);
+      const ddl = ddlUrl !== this.deps.env.DATABASE_URL ? () => createPgPool(ddlUrl, { ssl: this.deps.env.DATABASE_SSL, max: 1, timeoutMs: 120_000, applicationName: 'starter-rag-ddl' }) : undefined;
+      return new PgVectorStore(pool, { kind: 'internal', schema: config.schema ?? 'rag', readOnly, ddl });
     }
     if (row.kind === 'postgres') {
       const url = connectionSecret(this.deps, row);

@@ -55,6 +55,12 @@ const DEFINITIONS: QueueDefinition[] = [
   { name: QUEUES.ragScheduleTick, retryLimit: 0, retryDelay: 0, retryBackoff: false, expireInSeconds: 120, policy: 'singleton' },
 ];
 
+/** Total attempts pg-boss makes for a queue (first run + retries). */
+export function queueAttempts(name: QueueName): number {
+  const d = DEFINITIONS.find((x) => x.name === name);
+  return (d?.retryLimit ?? 0) + 1;
+}
+
 /** Periodic schedules (cron, UTC). pg-boss guarantees a single firing across replicas. */
 export const SCHEDULES: { name: QueueName; cron: string }[] = [
   { name: QUEUES.maintenance, cron: '*/5 * * * *' },

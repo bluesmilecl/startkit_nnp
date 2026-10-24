@@ -36,7 +36,8 @@ type Resolved<T> = { ok: true; value: T } | { ok: false; output: Record<string, 
 export function buildAdminTools(ctx: ToolContext, enabled: AdminToolKey[]): ToolSet {
   const usersSvc = new UsersService(ctx.access);
   const rolesSvc = new RolesService(ctx.access);
-  const actor = ctx.actor;
+  // Same person and permissions, but audited as acting through the agent and conversation.
+  const actor: Actor = { ...ctx.actor, channel: 'chat', agent: { agentId: ctx.agentId, conversationId: ctx.conversationId, aiRequestId: ctx.aiRequestId } };
 
   const resolveUser = async (term: string): Promise<Resolved<UserCandidate>> => {
     const t = term.trim();

@@ -1,7 +1,8 @@
 /**
  * Catalog of implemented permissions. Every key must be enforced by at least one server
- * operation; the catalog is synchronized to the `permissions` table on boot.
- * Extension modules register additional keys through `definePermissions` in @starter/auth.
+ * operation. `pnpm db:migrate` synchronizes it to the `permissions` table: new keys receive the
+ * default grants of the system roles below; keys that already existed keep the matrix that
+ * administrators configured. Modules add their keys here (`pnpm starter generate module` does it).
  */
 export const PERMISSIONS = {
   'users.read': { group: 'users', description: 'Ver usuarios' },

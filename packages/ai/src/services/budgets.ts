@@ -7,7 +7,9 @@ import {
   budgetUsage,
   eq,
   inArray,
+  isNull,
   lt,
+  memberships,
   or,
   reservations,
   rolePermissions,
@@ -243,10 +245,18 @@ export class BudgetsService {
         const recipients = await this.deps.db
           .selectDistinct({ email: users.email })
           .from(users)
+          .innerJoin(memberships, and(eq(memberships.userId, users.id), eq(memberships.organizationId, b.organizationId)))
           .innerJoin(userRoles, eq(userRoles.userId, users.id))
           .innerJoin(roles, eq(roles.id, userRoles.roleId))
           .leftJoin(rolePermissions, eq(rolePermissions.roleId, roles.id))
-          .where(and(sql`${users.disabledAt} is null`, or(eq(roles.key, 'owner'), eq(rolePermissions.permissionKey, 'ai.budgets.manage'))));
+          // Members of the budget's organization whose platform role, or role in that organization, can manage budgets.
+          .where(
+            and(
+              sql`${users.disabledAt} is null`,
+              or(isNull(userRoles.organizationId), eq(userRoles.organizationId, b.organizationId)),
+              or(eq(roles.key, 'owner'), eq(rolePermissions.permissionKey, 'ai.budgets.manage')),
+            ),
+          );
         const branding = await settings.branding();
         const tpl = budgetAlertEmail({ appName: branding.appName, primaryColor: branding.primaryColor, appUrl: this.deps.env.APP_URL }, b.name, threshold, displayUsd(u.spentUsd), displayUsd(b.limitUsd));
         for (const r of recipients) await this.deps.mailer.send({ to: r.email, ...tpl, category: 'budget-alert' }).catch(() => undefined);

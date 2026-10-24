@@ -121,7 +121,8 @@ export interface SearchHit {
   title: string | null;
   sourceUrl: string | null;
   score: number;
-  scoreType: 'cosine_similarity' | 'ts_rank' | 'rrf' | 'external';
+  /** Vector scores are similarities in [0, 1] (l2: 1 / (1 + distance)); labels name the metric. */
+  scoreType: 'cosine_similarity' | 'l2_similarity' | 'inner_product' | 'vector_similarity' | 'ts_rank' | 'rrf' | 'external';
   vectorRank: number | null;
   textRank: number | null;
 }
@@ -139,7 +140,7 @@ export interface RagStore {
   replaceChunks(documentId: string, collectionId: string, space: IndexSpace, chunks: ChunkInput[]): Promise<void>;
   activateIndexVersion(collectionId: string, indexVersionId: string): Promise<{ retired: string[] }>;
   deleteIndexVersion(indexVersionId: string): Promise<void>;
-  deleteDocument(id: string): Promise<{ storageKey: string | null }>;
+  deleteDocument(id: string, collectionId?: string | null): Promise<{ storageKey: string | null }>;
   deleteCollection(collectionId: string): Promise<{ storageKeys: string[] }>;
   // Browse side (only when capabilities().browse)
   /** `principal` filters by document ACL; null lists everything (knowledge managers). */

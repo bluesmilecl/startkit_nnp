@@ -1,5 +1,5 @@
 # Development / local evaluation overrides:
-#   docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail up -d
+#   pnpm infra:up   (= docker compose --env-file .env -f docker/compose.yaml -f docker/compose.dev.yaml --profile local-db --profile dev-mail up -d --wait postgres mailpit)
 # - edge proxy always on at http://localhost:8080 (single origin for web + /api)
 # - Mailpit UI at http://localhost:8025, PostgreSQL at localhost:5432
 # - local database URLs point to the compose services
@@ -20,6 +20,8 @@ services:
   mailpit:
     ports:
       - '127.0.0.1:${MAILPIT_PORT:-8025}:8025'
+      # SMTP for apps running on the host (pnpm dev): SMTP_URL=smtp://localhost:1025
+      - '127.0.0.1:${MAILPIT_SMTP_PORT:-1025}:1025'
   migrate:
     environment: *dev-env
   api:

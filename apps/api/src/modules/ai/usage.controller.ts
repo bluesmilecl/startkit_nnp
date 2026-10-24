@@ -82,7 +82,7 @@ export class AiUsageController {
 
   @Post('fx/refresh')
   @HttpCode(202)
-  @Endpoint({ operationId: 'ai_fx_refresh', summary: 'Actualizar tasa USD→CLP de visualización', feature: 'ai', permission: 'ai.usage.read', response: { status: 202, schema: JobAccepted } })
+  @Endpoint({ operationId: 'ai_fx_refresh', summary: 'Actualizar tasa USD→CLP de visualización', description: 'Encola una consulta al proveedor de tipo de cambio configurado (FX_PROVIDER).', feature: 'ai', permission: 'ai.models.manage', response: { status: 202, schema: JobAccepted } })
   async fx(@CurrentActor() actor: Actor) {
     assertCan(actor, 'ai.usage.read');
     const jobId = await this.jobs.send(QUEUES.aiFxRates, { force: true }, { idempotencyKey: 'fx-refresh' });

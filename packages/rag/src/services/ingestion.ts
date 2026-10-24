@@ -28,7 +28,10 @@ interface IngestParams {
   filename?: string | null;
   contentHash?: string | null;
   bytes?: number | null;
+  /** Reprocess even when the content did not change (manual "reprocess"). */
   force?: boolean;
+  /** Download the URL again (scheduled/manual source sync); unchanged content is not re-embedded. */
+  refetch?: boolean;
   acl?: { roles: string[]; users: string[] };
 }
 
@@ -137,7 +140,7 @@ export class IngestionService {
   }
 
   private async loadBody(params: IngestParams, orgId: string): Promise<{ body: Buffer; storageKey: string; mediaType: string; url: string | null }> {
-    if (params.url && (!params.storageKey || params.force)) {
+    if (params.url && (!params.storageKey || params.force || params.refetch)) {
       const res = await safeFetch(params.url, { allowPrivate: this.deps.env.RAG_FETCH_ALLOW_PRIVATE, maxBytes: this.deps.env.RAG_FETCH_MAX_BYTES });
       // The fetched original is kept so reindexing never depends on the remote site.
       const key = params.storageKey ?? newKey(`rag/${orgId}`, res.contentType === 'application/pdf' ? '.pdf' : '.html');
@@ -196,6 +199,7 @@ export class IngestionService {
     await this.deps.db.execute(sql`update rag_jobs set document_id = ${document.id} where id = ${job.id}`);
     if (!changed && !params.force) {
       await this.jobs.stage(job.id, 'unchanged', 1, 1);
+      if (job.sourceId) await this.countUnchanged(job.sourceId);
       if (params.storageKey !== loaded.storageKey || (document.storageKey && document.storageKey !== loaded.storageKey)) await this.deps.storage.delete(loaded.storageKey).catch(() => {});
       return;
     }
@@ -248,7 +252,7 @@ export class IngestionService {
             kind: 'ingest-document',
             collectionId: c.id,
             sourceId: s.id,
-            params: { externalId: url, url, storageKey: prev?.storageKey ?? null, force: true, acl },
+            params: { externalId: url, url, storageKey: prev?.storageKey ?? null, refetch: true, acl },
             createdBy: job.createdBy,
             idempotencyKey: `ingest:${c.id}:${createHash('sha1').update(url).digest('hex')}`,
           });
@@ -273,6 +277,17 @@ export class IngestionService {
       await this.deps.db.update(ragSources).set({ lastError: message, status: 'error', nextSyncAt: s.schedule ? nextRun(s.schedule) : null }).where(eq(ragSources.id, s.id));
       throw err;
     }
+  }
+
+  /** A re-synced page whose content did not change counts as unchanged, not updated. */
+  private async countUnchanged(sourceId: string) {
+    await this.deps.db.execute(sql`
+      update sync_runs set unchanged = unchanged + 1, updated = greatest(updated - 1, 0)
+      where id = (select id from sync_runs where source_id = ${sourceId} order by started_at desc limit 1)`);
+    await this.deps.db.execute(sql`
+      update rag_sources set stats = jsonb_set(jsonb_set(coalesce(stats, '{}'::jsonb), '{unchanged}', to_jsonb(coalesce((stats->>'unchanged')::int, 0) + 1)),
+        '{updated}', to_jsonb(greatest(coalesce((stats->>'updated')::int, 0) - 1, 0)))
+      where id = ${sourceId}`);
   }
 
   private async discoverSitemap(url: string, maxUrls: number, include: string | null, exclude: string | null): Promise<string[]> {
@@ -312,6 +327,7 @@ export class IngestionService {
     const space = this.space(profile, versionId, c.language);
     const started = new Date();
     const chunking = { ...DEFAULT_CHUNKING, ...(c.chunking as object) };
+    const failures = new Map<string, string>();
     try {
       const process = async (docs: StoredDocument[], offset: number, total: number) => {
         for (const [i, d] of docs.entries()) {
@@ -325,6 +341,7 @@ export class IngestionService {
             await store.replaceChunks(d.id, c.id, space, chunks.map((ch, k) => ({ ...ch, embedding: vectors[k] ?? null })));
           } catch (err) {
             if (err instanceof JobCancelledError || (isAppError(err) && err.code === 'BUDGET_EXCEEDED')) throw err;
+            failures.set(d.id, isAppError(err) ? err.message : sanitizeError(err, 300));
             log.warn({ documentId: d.id, err: sanitizeError(err) }, 'document failed during reindex');
           }
         }
@@ -341,7 +358,11 @@ export class IngestionService {
         .set({ activeIndexVersionId: versionId, buildingIndexVersionId: null, embeddingProfileId: profile.id, cacheEpoch: sql`${ragCollections.cacheEpoch} + 1` })
         .where(eq(ragCollections.id, c.id));
       for (const r of retired) await store.deleteIndexVersion(r);
-      await recordAudit(this.deps.db, systemActor(job.organizationId), { action: 'rag.collections.reindexed', resourceType: 'rag_collection', resourceId: c.id, outcome: 'success', metadata: { profile: profile.name, documents: all.length + late.length, jobId: job.id } });
+      // Documents that could not be rebuilt have no fragments in the new version: make them
+      // visible as failed (with the reason) so they can be reprocessed from the panel.
+      for (const [id, message] of failures) await store.setDocumentStatus(id, 'failed', `Reindexación: ${message}`.slice(0, 1000)).catch(() => {});
+      if (failures.size) await this.jobs.addCost(job.id, { failed: failures.size }, '0');
+      await recordAudit(this.deps.db, systemActor(job.organizationId), { action: 'rag.collections.reindexed', resourceType: 'rag_collection', resourceId: c.id, outcome: 'success', metadata: { profile: profile.name, documents: all.length + late.length, failed: failures.size, jobId: job.id } });
     } catch (err) {
       await store.deleteIndexVersion(versionId).catch(() => {});
       await this.deps.db.update(ragCollections).set({ buildingIndexVersionId: null }).where(eq(ragCollections.id, c.id));
@@ -353,7 +374,7 @@ export class IngestionService {
     const { store } = await this.context(job);
     if (!job.documentId) throw AppError.validation('Trabajo sin documento');
     await this.jobs.stage(job.id, 'delete');
-    const { storageKey } = await store.deleteDocument(job.documentId);
+    const { storageKey } = await store.deleteDocument(job.documentId, job.collectionId);
     if (storageKey) await this.deps.storage.delete(storageKey).catch(() => {});
     await recordAudit(this.deps.db, systemActor(job.organizationId), { action: 'rag.documents.purged', resourceType: 'rag_document', resourceId: job.documentId, outcome: 'success', metadata: { jobId: job.id } });
   }

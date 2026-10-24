@@ -156,7 +156,8 @@ export class PricesService {
       .select({ p: modelPrices, s: priceSources })
       .from(modelPrices)
       .leftJoin(priceSources, eq(priceSources.id, modelPrices.sourceId))
-      .where(and(inArray(modelPrices.modelId, models), isNull(modelPrices.effectiveTo)));
+      // Same rule as cost calculation: tier-specific prices (batch, priority…) are never applied by default.
+      .where(and(inArray(modelPrices.modelId, models), isNull(modelPrices.effectiveTo), isNull(modelPrices.serviceTier)));
     for (const k of keys) {
       const list = rows
         .filter((r) => r.p.provider === k.provider && r.p.modelId === k.modelId && (!r.p.connectionId || r.p.connectionId === k.connectionId))

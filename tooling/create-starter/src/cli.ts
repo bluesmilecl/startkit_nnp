@@ -5,6 +5,7 @@ import { create } from './commands/create.js';
 import { doctor } from './commands/doctor.js';
 import { generateModule } from './commands/generate.js';
 import { aiSync, configValidate, docsCheck, ownerAssign, ragDoctor, ragReindex } from './commands/ops.js';
+import { secretsReencrypt } from './commands/secrets.js';
 import { c, CliError } from './lib/ui.js';
 
 const HELP = `${c.bold('create-ecortes-app')} · instalador y CLI del Starter Kit Nuxt + NestJS IA
@@ -30,6 +31,7 @@ ${c.bold('Comandos')}
       [--gender m|f] [--icon NombreLucide] [--dry-run] [--force]
   docs check                 Verifica enlaces, comandos, llms.txt y configuración de ejemplo
   owner assign <correo>      Asigna el rol propietario desde el servidor [--additional] [--yes]
+  secrets reencrypt          Re-cifra credenciales guardadas con la APP_ENCRYPTION_KEY actual [--dry-run] [--yes]
 `;
 
 async function main(argv: string[]): Promise<number> {
@@ -73,13 +75,13 @@ async function main(argv: string[]): Promise<number> {
   }
   // Invoked as `create-ecortes-app [dir]` (pnpm create): the default command is create.
   const invokedAsCreate = /create-ecortes-app/.test(basename(process.argv[1] ?? ''));
-  const known = new Set(['create', 'doctor', 'config', 'ai', 'rag', 'generate', 'docs', 'owner', 'help']);
+  const known = new Set(['create', 'doctor', 'config', 'ai', 'rag', 'generate', 'docs', 'owner', 'secrets', 'help']);
   const [cmd, sub, arg] = invokedAsCreate && !known.has(positionals[0] ?? '') ? ['create', ...positionals] : positionals;
   if (values.help || !cmd || cmd === 'help') {
     console.log(HELP);
     return values.help || cmd === 'help' ? 0 : 1;
   }
-  switch (`${cmd}${['config', 'ai', 'rag', 'generate', 'docs', 'owner'].includes(cmd) ? ` ${sub ?? ''}` : ''}`) {
+  switch (`${cmd}${['config', 'ai', 'rag', 'generate', 'docs', 'owner', 'secrets'].includes(cmd) ? ` ${sub ?? ''}` : ''}`) {
     case 'create':
       await create({
         dir: sub,
@@ -123,6 +125,8 @@ async function main(argv: string[]): Promise<number> {
     case 'owner assign':
       if (!arg) throw new CliError('Uso: starter owner assign <correo>');
       return ownerAssign(arg, { additional: values.additional, yes: values.yes });
+    case 'secrets reencrypt':
+      return secretsReencrypt({ yes: values.yes, dryRun: values['dry-run'] });
     default:
       throw new CliError(`Comando desconocido: ${positionals.join(' ')}\n\n${HELP}`);
   }

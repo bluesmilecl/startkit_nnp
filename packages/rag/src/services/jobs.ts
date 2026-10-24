@@ -1,7 +1,7 @@
 import { assertCan, type Actor } from '@starter/auth';
 import { AppError } from '@starter/contracts';
 import { and, count, desc, eq, inArray, isNull, normalizePage, offsetOf, ragCollections, ragJobs, sql, toPage } from '@starter/db';
-import { QUEUES, type QueueName } from '@starter/jobs';
+import { QUEUES, queueAttempts, type QueueName } from '@starter/jobs';
 import { add, compare } from '@starter/ai';
 import type { RagDeps } from './context.js';
 
@@ -15,6 +15,14 @@ const QUEUE: Record<RagJobKind, QueueName> = {
   'delete-document': QUEUES.ragDeleteDocument,
   'purge-collection': QUEUES.ragPurge,
 };
+
+/**
+ * Attempts recorded on the job row. It never exceeds what the queue will actually run, so the
+ * last transient failure marks the job failed instead of leaving it "retrying" forever.
+ */
+export const MAX_ATTEMPTS: Record<RagJobKind, number> = Object.fromEntries(
+  (Object.keys(QUEUE) as RagJobKind[]).map((k) => [k, Math.min(5, queueAttempts(QUEUE[k]))]),
+) as Record<RagJobKind, number>;
 
 export class JobCancelledError extends Error {
   constructor() {
@@ -76,6 +84,7 @@ export class RagJobsService {
         params: input.params ?? {},
         createdBy: input.createdBy ?? null,
         idempotencyKey: input.idempotencyKey ? `${input.idempotencyKey}:${Date.now()}` : null,
+        maxAttempts: MAX_ATTEMPTS[input.kind],
         budgetUsd: input.budgetUsd ?? null,
       })
       .returning();
@@ -182,7 +191,9 @@ export class RagJobsService {
     if (!j) return;
     const merged = { ...j.units };
     for (const [k, v] of Object.entries(units)) merged[k] = (merged[k] ?? 0) + v;
-    const cost = add(j.cost, costUsd ?? '0');
+    // A call without a tariff has an unknown cost: it is counted, never added as zero.
+    if (costUsd === null) merged.unpriced_calls = (merged.unpriced_calls ?? 0) + 1;
+    const cost = costUsd === null ? j.cost : add(j.cost, costUsd);
     await this.deps.db.update(ragJobs).set({ units: merged, costUsd: cost, heartbeatAt: new Date() }).where(eq(ragJobs.id, id));
     if (j.budget && compare(cost, j.budget) > 0) throw new AppError('BUDGET_EXCEEDED', 'El trabajo alcanzó su presupuesto');
   }

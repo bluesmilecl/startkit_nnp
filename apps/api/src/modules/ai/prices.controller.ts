@@ -21,7 +21,7 @@ export class AiPricesController {
   ) {}
 
   @Get()
-  @Endpoint({ operationId: 'ai_prices_list', summary: 'Tarifas vigentes (o historial)', description: 'Cada tarifa conserva fuente, fecha de consulta, vigencia, moneda, unidad y ámbito de facturación.', feature: 'ai', query: PricesQuery, response: { schema: PricesPage } })
+  @Endpoint({ operationId: 'ai_prices_list', summary: 'Tarifas vigentes (o historial)', description: 'Cada tarifa conserva fuente, fecha de consulta, vigencia, moneda, unidad y ámbito de facturación. Requiere ai.models.manage o ai.usage.read (verificado en el servicio).', feature: 'ai', query: PricesQuery, response: { schema: PricesPage } })
   list(@CurrentActor() actor: Actor, @ZQuery() q: z.infer<typeof PricesQuery>) {
     return this.ai.prices.list(actor, q);
   }

@@ -1,4 +1,4 @@
-import { loadActor } from '@starter/auth';
+import { createAdminExecutors, loadActor, ProposalsService } from '@starter/auth';
 import { createAiServices, fetchClpRate, type AiServices } from '@starter/ai';
 import { and, attachments, eq, fxRates, lt, sql } from '@starter/db';
 import { QUEUES } from '@starter/jobs';
@@ -48,9 +48,14 @@ export async function registerAiHandlers(ctx: WorkerContext, ai: AiServices): Pr
     if (sent) log.info({ sent }, 'budget alerts sent');
   });
 
+  const access = { db: ctx.db.db, env: ctx.env, features: ctx.features, mailer: ctx.mailer };
+  const proposals = new ProposalsService(access, createAdminExecutors(access));
   onMaintenance(async () => {
-    const released = await ai.budgets.expireStale();
-    if (released) log.info({ released }, 'stale budget reservations released');
+    // Reservations whose call never settled (crash, lost connection) are charged at their estimate.
+    const settled = await ai.budgets.expireStale();
+    if (settled) log.info({ settled }, 'stale budget reservations settled at their estimate');
+    const expired = await proposals.expireStale();
+    if (expired) log.info({ expired }, 'pending chat action proposals expired');
     // Uploads never attached to a message (abandoned composer) are removed after 24 h.
     const orphans = await ctx.db.db
       .delete(attachments)

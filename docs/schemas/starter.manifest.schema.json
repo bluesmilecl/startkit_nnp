@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://starter.local/schemas/starter.manifest.schema.json",
+  "title": "starter.manifest.json",
+  "description": "Versiones exactas del stack, política de runtime e imágenes. Generado por scripts/manifest.mjs.",
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "runtime",
+    "stack",
+    "images",
+    "modules"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "generatedBy": {
+      "type": "string"
+    },
+    "runtime": {
+      "type": "object",
+      "required": [
+        "node",
+        "packageManager",
+        "postgres"
+      ],
+      "properties": {
+        "node": {
+          "type": "object",
+          "required": [
+            "lts",
+            "supported"
+          ],
+          "properties": {
+            "lts": {
+              "type": "string"
+            },
+            "supported": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "testedCurrent": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "packageManager": {
+          "type": "string"
+        },
+        "postgres": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string"
+            },
+            "pgvector": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "stack": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^\\d+\\.\\d+\\.\\d+"
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "not": {
+          "pattern": ":latest$"
+        }
+      }
+    },
+    "modules": {
+      "type": "object",
+      "additionalProperties": {
+        "enum": [
+          "optional",
+          "default-on",
+          "required"
+        ]
+      }
+    }
+  }
+}

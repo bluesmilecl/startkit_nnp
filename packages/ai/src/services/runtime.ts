@@ -209,7 +209,10 @@ export class AiRuntime {
     const tokens = values.reduce((s, v) => s + estimateTokens(v.length), 0);
     const estimate = await this.estimate(model, { embedding_tokens: tokens });
     const aiRequestId = await this.ledger.start({ ...ctx, provider: model.provider, connectionId: model.connectionId, modelId: model.modelId, estimatedCostUsd: estimate });
-    const reservation = await this.reserve({ organizationId: ctx.organizationId, userId: ctx.userId, agentId: ctx.agentId, feature: ctx.feature }, estimate, aiRequestId);
+    const reservation = await this.reserve({ organizationId: ctx.organizationId, userId: ctx.userId, agentId: ctx.agentId, feature: ctx.feature }, estimate, aiRequestId).catch(async (err) => {
+      await this.ledger.finish(aiRequestId, { status: 'failed', errorKind: 'budget', error: (err as Error).message });
+      throw err;
+    });
     const attemptId = await this.ledger.startAttempt(aiRequestId, { provider: model.provider, connectionId: model.connectionId, modelId: model.modelId });
     try {
       const em = await this.embeddingModel(ctx.organizationId, model);
@@ -238,7 +241,10 @@ export class AiRuntime {
     if (!model.functions.includes('transcription')) throw new AppError('CAPABILITY_UNSUPPORTED', `${model.modelId} no es un modelo de transcripción`);
     const estimate = await this.estimate(model, { audio_seconds: opts.maxSeconds });
     const aiRequestId = await this.ledger.start({ ...ctx, provider: model.provider, connectionId: model.connectionId, modelId: model.modelId, estimatedCostUsd: estimate });
-    const reservation = await this.reserve({ organizationId: ctx.organizationId, userId: ctx.userId, agentId: ctx.agentId, feature: 'transcription' }, estimate, aiRequestId);
+    const reservation = await this.reserve({ organizationId: ctx.organizationId, userId: ctx.userId, agentId: ctx.agentId, feature: 'transcription' }, estimate, aiRequestId).catch(async (err) => {
+      await this.ledger.finish(aiRequestId, { status: 'failed', errorKind: 'budget', error: (err as Error).message });
+      throw err;
+    });
     const attemptId = await this.ledger.startAttempt(aiRequestId, { provider: model.provider, connectionId: model.connectionId, modelId: model.modelId });
     try {
       const tm = await this.transcriptionModel(ctx.organizationId, model);

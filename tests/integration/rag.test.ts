@@ -2,7 +2,7 @@ import { createAiServices, type AiServices } from '@starter/ai';
 import type { Actor } from '@starter/auth';
 import { SecretBox } from '@starter/config';
 import { CreateCollectionInput, CreateRagConnectionInput, CreateSourceInput } from '@starter/contracts';
-import { aiRequests, and, eq, ragCollections, ragJobs, retrievalHits, retrievalRuns } from '@starter/db';
+import { aiRequests, and, eq, isNull, modelPrices, ragCollections, ragJobs, retrievalHits, retrievalRuns } from '@starter/db';
 import type { JobQueue } from '@starter/jobs';
 import { createRagServices, type RagServices } from '@starter/rag';
 import { createStorage } from '@starter/storage';
@@ -312,6 +312,56 @@ describe('internal store (same database)', () => {
     expect(a.topQueries?.[0]?.query).toBe('¿dónde estaciono?');
   });
 
+  it('re-syncing unchanged pages downloads them again but does not re-embed or charge', async () => {
+    const col = await collection('Resync');
+    const src = await rag.sources.create(owner, col.id, CreateSourceInput.parse({ kind: 'sitemap', name: 'Sitio', url: `${serverUrl}/site/sitemap.xml`, maxUrls: 10, exclude: 'privado', acl: { roles: [], users: [] } }));
+    await drain();
+    const before = await ctx.handle.db.select().from(ragJobs).where(and(eq(ragJobs.collectionId, col.id), eq(ragJobs.kind, 'ingest-document')));
+    await rag.sources.sync(owner, src.id);
+    await drain();
+    const after = (await ctx.handle.db.select().from(ragJobs).where(and(eq(ragJobs.collectionId, col.id), eq(ragJobs.kind, 'ingest-document')))).filter((j) => !before.some((b) => b.id === j.id));
+    expect(after).toHaveLength(2);
+    expect(after.every((j) => j.stage === 'unchanged' && Number(j.costUsd) === 0)).toBe(true);
+    const [s2] = await rag.sources.list(owner, col.id);
+    expect(s2!.stats).toMatchObject({ discovered: 2, unchanged: 2, updated: 0 });
+  });
+
+  it('uses the collection retrieval settings when the caller does not choose', async () => {
+    const col = await collection('Solo texto', { retrieval: { method: 'fulltext', topK: 1, minScore: 0 } });
+    await textSource(col.id, 'Casino', 'El casino abre a las doce.');
+    await textSource(col.id, 'Casino 2', 'El casino cierra a las quince.');
+    const r = await rag.retrieval.search(owner, { query: 'casino', collectionIds: [col.id], origin: 'chat' });
+    expect(r.method).toBe('fulltext');
+    expect(r.hits).toHaveLength(1);
+    expect(r.hits[0]!.scoreType).toBe('ts_rank');
+  });
+
+  it('labels vector scores with the profile metric', async () => {
+    const base = (await rag.profiles.list(owner)).find((p) => p.id === profileId)!;
+    const l2 = await rag.profiles.create(owner, { key: `it-l2b-${Date.now().toString(36)}`, name: 'IT L2 b', modelCatalogId: base.modelCatalogId!, metric: 'l2' });
+    const col = await collection('Métrica L2', { embeddingProfileId: l2.id });
+    await textSource(col.id, 'Bodega', 'La bodega central está en Quilicura.');
+    const r = await rag.retrieval.search(owner, { query: 'bodega', collectionIds: [col.id], method: 'vector', origin: 'playground', management: true });
+    expect(r.hits[0]!.scoreType).toBe('l2_similarity');
+  });
+
+  it('an embedding call without a tariff is counted as unpriced, never as zero cost', async () => {
+    const col = await collection('Sin tarifa');
+    const saved = await ctx.handle.db.select().from(modelPrices).where(and(eq(modelPrices.modelId, 'test-embedding-64'), isNull(modelPrices.effectiveTo)));
+    await ctx.handle.db.update(modelPrices).set({ effectiveTo: new Date() }).where(and(eq(modelPrices.modelId, 'test-embedding-64'), isNull(modelPrices.effectiveTo)));
+    try {
+      await textSource(col.id, 'Gratis', 'Este documento se indexa sin tarifa vigente para el modelo de embeddings.');
+    } finally {
+      for (const p of saved) await ctx.handle.db.update(modelPrices).set({ effectiveTo: null }).where(eq(modelPrices.id, p.id));
+    }
+    const [job] = await ctx.handle.db.select().from(ragJobs).where(and(eq(ragJobs.collectionId, col.id), eq(ragJobs.kind, 'ingest-document')));
+    expect(job!.status).toBe('succeeded');
+    expect(job!.units.unpriced_calls).toBeGreaterThanOrEqual(1);
+    expect(Number(job!.costUsd)).toBe(0);
+    const ledger = await ctx.handle.db.select().from(aiRequests).where(eq(aiRequests.jobId, job!.id));
+    expect(ledger.every((l) => l.costStatus === 'unknown')).toBe(true);
+  });
+
   it('deletes documents and purges collections from store and storage', async () => {
     const col = await collection('Purga');
     await textSource(col.id, 'Uno', 'Documento uno sobre la purga.');
@@ -358,6 +408,9 @@ describe('external retrieval API', () => {
     const hybrid = await rag.retrieval.search(owner, { query: 'horario soporte', collectionIds: [col.id], method: 'hybrid', origin: 'playground', management: true });
     expect(hybrid.hits[0]?.title).toBe('Horario de soporte');
     expect(hybrid.warnings.join(' ')).toMatch(/no soporta búsqueda híbrida/);
+    expect(hybrid.method).toBe('vector');
+    const [run] = await ctx.handle.db.select().from(retrievalRuns).where(eq(retrievalRuns.id, hybrid.runId!));
+    expect(run!.method).toBe('vector');
   });
 
   it('rejects a wrong token with a clear diagnostic', async () => {

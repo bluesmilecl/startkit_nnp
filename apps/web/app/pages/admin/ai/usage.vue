@@ -122,7 +122,7 @@ const columns: ColumnDef<AiRequestRow>[] = [
       <span class="text-muted-foreground text-xs">Conversión visual: 1 USD = {{ Number(summary.fx.rate).toLocaleString('es-CL') }} CLP · {{ summary.fx.rateDate }} · {{ summary.fx.source }}</span>
     </template>
     <span v-else class="text-muted-foreground text-xs">Conversión a CLP no configurada (FX_PROVIDER).</span>
-    <Button variant="ghost" size="sm" @click="refreshFx">Actualizar tasa</Button>
+    <Button v-if="can('ai.models.manage')" variant="ghost" size="sm" @click="refreshFx">Actualizar tasa</Button>
   </div>
 
   <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

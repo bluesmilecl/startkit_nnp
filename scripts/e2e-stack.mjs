@@ -28,6 +28,7 @@ function writeEnv() {
     APP_URL: `http://localhost:${port}`,
     PROXY_PORT: port,
     MAILPIT_PORT: mailPort,
+    MAILPIT_SMTP_PORT: process.env.E2E_MAIL_SMTP_PORT ?? '51025',
     POSTGRES_PORT: process.env.E2E_PG_PORT ?? '55433',
     BETTER_AUTH_SECRET: randomBytes(32).toString('hex'),
     APP_ENCRYPTION_KEY: randomBytes(32).toString('base64'),

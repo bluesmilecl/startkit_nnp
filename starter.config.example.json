@@ -1,0 +1,65 @@
+{
+  "$schema": "./docs/schemas/starter.config.schema.json",
+  "schemaVersion": 1,
+  "project": {
+    "name": "Mesa de Ayuda",
+    "slug": "mesa-de-ayuda",
+    "locale": "es-CL",
+    "timezone": "America/Santiago",
+    "ownerEmail": "propietaria@empresa.cl"
+  },
+  "features": {
+    "organizations": false,
+    "ai": true,
+    "rag": true
+  },
+  "auth": {
+    "method": "email-otp",
+    "registration": "invite-only"
+  },
+  "database": {
+    "mode": "docker"
+  },
+  "mail": {
+    "transport": "smtp",
+    "from": "Mesa de Ayuda <no-reply@empresa.cl>"
+  },
+  "ai": {
+    "connectionRef": "primary-ai",
+    "agent": {
+      "name": "Asistente",
+      "systemPrompt": "Ayuda al usuario con las funciones autorizadas de esta aplicación. Cita las fuentes del conocimiento.",
+      "modelRef": "gpt-5-mini",
+      "maxOutputTokens": 1200,
+      "media": {
+        "images": true,
+        "documents": false
+      },
+      "microphone": {
+        "enabled": true,
+        "connectionRef": "primary-ai",
+        "modelRef": "gpt-4o-mini-transcribe",
+        "maxSeconds": 60,
+        "autoSend": false
+      }
+    },
+    "usage": {
+      "record": true,
+      "dashboard": true
+    }
+  },
+  "rag": {
+    "mode": "internal",
+    "location": "same-database",
+    "connectionRef": null,
+    "embeddingProfileRef": "openai-small",
+    "retrieval": {
+      "strategy": "hybrid",
+      "topK": 6
+    },
+    "indexing": {
+      "automatic": true,
+      "concurrency": 2
+    }
+  }
+}

@@ -101,6 +101,12 @@ export interface PgStoreOptions {
   kind: 'internal' | 'postgres';
   schema: string;
   readOnly: boolean;
+  /**
+   * DDL-capable pool for per-profile vector indexes (index creation requires owning the table).
+   * Internal stores run with the least-privilege application role, so the registry passes the
+   * migration connection here; when omitted the main pool is used.
+   */
+  ddl?: () => pg.Pool;
 }
 
 type DocRow = {
@@ -231,9 +237,17 @@ export class PgVectorStore implements RagStore {
     const ops = OPS[space.metric]!;
     const cast = castFor(space);
     const name = `chunks_emb_${space.profileId.replace(/-/g, '').slice(0, 20)}`;
-    await this.q(
-      `create index if not exists ${name} on ${this.s}.chunks using hnsw ((embedding::${cast}) ${space.indexType === 'hnsw_halfvec' ? ops.halfvec : ops.vector}) where profile_id = '${space.profileId}'`,
-    );
+    const ddl = `create index if not exists ${name} on ${this.s}.chunks using hnsw ((embedding::${cast}) ${space.indexType === 'hnsw_halfvec' ? ops.halfvec : ops.vector}) where profile_id = '${space.profileId}'`;
+    if (!this.opts.ddl) {
+      await this.q(ddl);
+      return;
+    }
+    const pool = this.opts.ddl();
+    try {
+      await pool.query(ddl);
+    } finally {
+      await pool.end().catch(() => {});
+    }
   }
 
   async replaceChunks(documentId: string, collectionId: string, space: IndexSpace, chunks: ChunkInput[]) {
@@ -437,7 +451,9 @@ export class PgVectorStore implements RagStore {
       textRank: tr,
     });
 
-    if (input.method === 'vector') return vectorHits.filter((r) => r.score >= input.minScore).slice(0, input.topK).map((r, i) => toHit(r, r.score, 'cosine_similarity', i + 1, null));
+    const metrics = new Set(input.spaces.map((sp) => sp.metric));
+    const vectorType: SearchHit['scoreType'] = metrics.size !== 1 ? 'vector_similarity' : ({ cosine: 'cosine_similarity', l2: 'l2_similarity', inner_product: 'inner_product' } as const)[[...metrics][0] as 'cosine'] ?? 'vector_similarity';
+    if (input.method === 'vector') return vectorHits.filter((r) => r.score >= input.minScore).slice(0, input.topK).map((r, i) => toHit(r, r.score, vectorType, i + 1, null));
     if (input.method === 'fulltext') return textHits.slice(0, input.topK).map((r, i) => toHit(r, r.score, 'ts_rank', null, i + 1));
 
     // Reciprocal Rank Fusion (k = 60). minScore applies to the vector similarity when present.

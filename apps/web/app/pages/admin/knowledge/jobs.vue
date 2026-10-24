@@ -75,7 +75,7 @@ const detail = ref<RagJob | null>(null);
 watch(page, (p) => {
   if (detail.value) detail.value = p?.items.find((j) => j.id === detail.value!.id) ?? detail.value;
 });
-const UNIT_LABELS: Record<string, string> = { documents: 'Documentos', chunks: 'Fragmentos', tokens: 'Tokens de embeddings', bytes: 'Bytes', urls: 'URLs', skipped: 'Omitidos', failed: 'Fallidos', deleted: 'Eliminados' };
+const UNIT_LABELS: Record<string, string> = { unpriced_calls: 'Llamadas sin tarifa (costo desconocido)', embedding_tokens: 'Tokens de embeddings', documents: 'Documentos', chunks: 'Fragmentos', tokens: 'Tokens de embeddings', bytes: 'Bytes', urls: 'URLs', skipped: 'Omitidos', failed: 'Fallidos', deleted: 'Eliminados' };
 </script>
 
 <template>
@@ -125,7 +125,7 @@ const UNIT_LABELS: Record<string, string> = { documents: 'Documentos', chunks: '
             <TableCell><JobProgress :job="j" /></TableCell>
             <TableCell class="tabular-nums">{{ j.attempts }}/{{ j.maxAttempts }}</TableCell>
             <TableCell class="tabular-nums text-sm">
-              {{ formatUsd(j.costUsd) }}
+              {{ formatUsd(j.costUsd) }}<span v-if="j.units.unpriced_calls" class="text-amber-600 dark:text-amber-400" title="Hubo llamadas sin tarifa vigente: el costo real es mayor"> + desconocido</span>
               <div v-if="j.budgetUsd" class="text-muted-foreground text-xs">de {{ formatUsd(j.budgetUsd) }}</div>
             </TableCell>
             <TableCell class="text-sm"><RelativeTime :value="j.createdAt" /></TableCell>
@@ -157,7 +157,7 @@ const UNIT_LABELS: Record<string, string> = { documents: 'Documentos', chunks: '
             <dt class="text-muted-foreground">Terminado</dt><dd>{{ detail.finishedAt ? formatDate(detail.finishedAt) : '—' }}</dd>
             <dt class="text-muted-foreground">Último latido</dt><dd><RelativeTime v-if="detail.heartbeatAt" :value="detail.heartbeatAt" /><span v-else>—</span></dd>
             <dt class="text-muted-foreground">Intentos</dt><dd>{{ detail.attempts }} de {{ detail.maxAttempts }}</dd>
-            <dt class="text-muted-foreground">Costo de embeddings</dt><dd>{{ formatUsd(detail.costUsd) }}<template v-if="detail.budgetUsd"> (tope {{ formatUsd(detail.budgetUsd) }})</template></dd>
+            <dt class="text-muted-foreground">Costo de embeddings</dt><dd>{{ formatUsd(detail.costUsd) }}<template v-if="detail.units.unpriced_calls"> + desconocido</template><template v-if="detail.budgetUsd"> (tope {{ formatUsd(detail.budgetUsd) }})</template></dd>
           </dl>
           <section v-if="Object.keys(detail.units).length">
             <h3 class="mb-2 font-medium">Unidades procesadas</h3>

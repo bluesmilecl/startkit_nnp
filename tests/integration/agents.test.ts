@@ -2,7 +2,7 @@ import { AgentsService, buildAdminTools, type ChatService, createAiServices, cre
 import { createAdminExecutors, ProposalsService, type Actor } from '@starter/auth';
 import { SecretBox } from '@starter/config';
 import { AgentConfig } from '@starter/contracts';
-import { agents, aiRequests, eq, toolExecutions } from '@starter/db';
+import { agents, aiRequests, and, auditEvents, eq, sql, toolExecutions } from '@starter/db';
 import { createStorage } from '@starter/storage';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { actorFor, deps, makeUser, testContext } from './helpers.js';
@@ -130,6 +130,17 @@ describe('chat tools run with the actor permissions', () => {
     // the run is in the ledger as one logical request with two model calls
     const [req] = await ctx.handle.db.select().from(aiRequests).where(eq(aiRequests.agentId, a.id));
     expect(req!.costStatus).toBe('calculated');
+  });
+
+  it('direct tool actions are audited as the agent acting for the person, with its conversation', async () => {
+    const d = deps(ctx.env, ctx.handle);
+    const conversationId = '00000000-0000-4000-8000-0000000000cc';
+    const tools = buildAdminTools({ actor: owner, db: ctx.handle.db, access: d, proposals, agentId: '00000000-0000-4000-8000-0000000000aa', conversationId, aiRequestId: null }, ['users_create']);
+    const email = `via-chat-${Date.now()}@example.test`;
+    const out = (await tools.users_create!.execute!({ name: 'Vía chat', email, role: null }, { toolCallId: 'call-1', messages: [] })) as { status?: string };
+    expect(out.status).not.toBe('error');
+    const [ev] = await ctx.handle.db.select().from(auditEvents).where(and(eq(auditEvents.action, 'users.create'), sql`${auditEvents.after}->>'email' = ${email}`));
+    expect(ev).toMatchObject({ actorType: 'agent', actorUserId: owner.userId, agentId: '00000000-0000-4000-8000-0000000000aa', conversationId });
   });
 
   it('hierarchy denials come back to the model as data and are recorded as denied', async () => {

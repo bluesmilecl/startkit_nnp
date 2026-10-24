@@ -1070,7 +1070,7 @@ Aparecer en un catálogo no implica acceso: esta llamada explícita (con costo r
 - **200**: OK — `application/json` `PricesPage`
 - **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
 
-Cada tarifa conserva fuente, fecha de consulta, vigencia, moneda, unidad y ámbito de facturación.
+Cada tarifa conserva fuente, fecha de consulta, vigencia, moneda, unidad y ámbito de facturación. Requiere ai.models.manage o ai.usage.read (verificado en el servicio).
 
 **Acceso:** cualquier sesión válida.
 
@@ -1160,7 +1160,9 @@ Una nueva tarifa cierra la vigencia de la anterior; el historial y las estimacio
 - **202**: OK — `application/json` `JobAccepted`
 - **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
 
-**Permiso requerido:** `ai.usage.read`.
+Encola una consulta al proveedor de tipo de cambio configurado (FX_PROVIDER).
+
+**Permiso requerido:** `ai.models.manage`.
 
 **Módulo:** `ai` debe estar habilitado.
 

@@ -183,9 +183,10 @@ export class ApiStore implements RagStore {
     return { retired: [] };
   }
   async deleteIndexVersion(): Promise<void> {}
-  async deleteDocument(id: string): Promise<{ storageKey: string | null }> {
+  async deleteDocument(id: string, collectionId?: string | null): Promise<{ storageKey: string | null }> {
     if (!this.capabilities().delete) throw new Error('La API externa no admite eliminar documentos');
-    await this.call('DELETE', `/documents/${encodeURIComponent(id)}`);
+    const ref = collectionId ? (this.opts.externalRefs.get(collectionId) ?? collectionId) : null;
+    await this.call('DELETE', `/documents/${encodeURIComponent(id)}${ref ? `?collection=${encodeURIComponent(ref)}` : ''}`);
     return { storageKey: null };
   }
   async deleteCollection(): Promise<{ storageKeys: string[] }> {

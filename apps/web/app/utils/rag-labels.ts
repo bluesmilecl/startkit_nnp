@@ -14,6 +14,9 @@ export const SEARCH_METHOD_LABELS: Record<string, string> = {
 
 export const SCORE_TYPE_LABELS: Record<string, string> = {
   cosine_similarity: 'similitud coseno',
+  l2_similarity: 'similitud L2',
+  inner_product: 'producto interno',
+  vector_similarity: 'similitud vectorial',
   ts_rank: 'rango de texto',
   rrf: 'fusión RRF',
   external: 'puntaje externo',

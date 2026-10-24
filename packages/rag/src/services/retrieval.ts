@@ -42,9 +42,12 @@ export class RetrievalService {
     const readable = await this.collections.readable(actor, o.collectionIds, !!o.management);
     const warnings: string[] = [];
     if (readable.length < new Set(o.collectionIds).size) warnings.push('Algunas colecciones no están disponibles o no tienes acceso');
-    const method = o.method ?? 'hybrid';
-    const topK = o.topK ?? 6;
-    const minScore = o.minScore ?? 0;
+    // Explicit options win (lab, evaluations, agent limits); otherwise the collection's retrieval settings apply.
+    const defaults = (readable[0]?.c.retrieval ?? {}) as { method?: 'vector' | 'fulltext' | 'hybrid'; topK?: number; minScore?: number };
+    const method = o.method ?? defaults.method ?? 'hybrid';
+    const topK = o.topK ?? defaults.topK ?? 6;
+    const minScore = o.minScore ?? defaults.minScore ?? 0;
+    const usedMethods = new Set<string>();
     const principal = { userId: actor.userId, roleKeys: roleKeys(actor) };
     let embeddingSum = '0';
     let embedded = false;
@@ -70,6 +73,7 @@ export class RetrievalService {
         let queryEmbedding: number[] | null = null;
         const caps = store.capabilities();
         const m = method === 'fulltext' && !caps.fullText ? 'vector' : method === 'hybrid' && !caps.hybrid && first.conn.kind === 'api' ? 'vector' : method;
+        usedMethods.add(m);
         if (m !== method) warnings.push(`${first.conn.name} no soporta búsqueda ${method === 'hybrid' ? 'híbrida' : 'de texto completo'}; se usó búsqueda vectorial`);
         if (m !== 'fulltext' && first.p && first.conn.kind !== 'api') {
           const r = await this.deps.ai.runtime.embed(
@@ -113,6 +117,8 @@ export class RetrievalService {
     }
     const latencyMs = Date.now() - t0;
     const embeddingCost = embedded && !embeddingUnknown ? embeddingSum : null;
+    // Record what actually ran (a store without hybrid search falls back to vector).
+    const effectiveMethod = usedMethods.size === 1 ? [...usedMethods][0]! : method;
     const [run] = await this.deps.db
       .insert(retrievalRuns)
       .values({
@@ -123,7 +129,7 @@ export class RetrievalService {
         aiRequestId: o.aiRequestId ?? null,
         origin: o.origin,
         query: o.query.slice(0, 2000),
-        method,
+        method: effectiveMethod,
         collectionIds: readable.map((r) => r.c.id),
         topK,
         hitCount: hits.length,
@@ -137,7 +143,7 @@ export class RetrievalService {
         hits.map((h, i) => ({ runId: run!.id, rank: i + 1, chunkId: h.chunkId, documentId: h.documentId, title: h.title, collectionId: h.collectionId, score: h.score, scoreType: h.scoreType })),
       );
     }
-    return { runId: run!.id, method, hits, latencyMs, embeddingCostUsd: embeddingCost, warnings };
+    return { runId: run!.id, method: effectiveMethod, hits, latencyMs, embeddingCostUsd: embeddingCost, warnings };
   }
 
   /** Records which hits the answer cited and whether the assistant abstained. */

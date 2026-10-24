@@ -178,7 +178,7 @@ export async function create(opts: CreateOptions): Promise<void> {
   const steps = [
     `cd ${!rel ? '.' : rel.startsWith('..') ? dir : rel}`,
     ...(opts.install === false ? ['pnpm install'] : []),
-    db === 'docker' ? 'pnpm infra:up             # PostgreSQL 18 + pgvector y Mailpit en Docker' : '# Asegura pgvector en tu PostgreSQL externo (CREATE EXTENSION vector) o deja que la migración lo cree',
+    db === 'docker' ? 'pnpm infra:up             # PostgreSQL 18 + pgvector y Mailpit en Docker' : '# PostgreSQL externo: pgvector debe estar disponible; la extensión se crea al activar el conocimiento interno (o: CREATE EXTENSION vector)',
     'pnpm build:ts && pnpm db:migrate',
     'pnpm starter doctor',
     'pnpm dev',

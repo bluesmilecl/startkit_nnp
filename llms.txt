@@ -1,0 +1,55 @@
+# Starter Kit Nuxt + NestJS IA
+
+> Monorepo pnpm para aplicaciones internas: Nuxt 4 (SSR con Nitro) + NestJS + PostgreSQL 18/pgvector + worker pg-boss. Autenticación por código OTP al correo, roles y permisos aplicados en el servidor, panel de administración, IA con costos medidos (tarifas, libro de uso, presupuestos), agentes versionados con chat flotante y herramientas con propuestas confirmadas, y conocimiento (RAG) interno, en PostgreSQL externo o en una API externa. Contratos Zod → OpenAPI → cliente TypeScript generado. Textos de interfaz en español (es-CL).
+
+Antes de modificar código, lee AGENTS.md: reglas de seguridad (sin secretos en configuración exportable, deny by default, actor inyectado en el servidor, documentos como datos no confiables) y definición de terminado.
+
+## Empezar
+
+- [README](README.md): qué incluye, inicio rápido y comandos
+- [AGENTS.md](AGENTS.md): guía para agentes de código
+- [Instalación](docs/installation.md): requisitos, create-ecortes-app, primer ingreso, producción
+- [Arquitectura](docs/architecture.md): componentes, flujo de peticiones y decisiones
+
+## Identidad y acceso
+
+- [Autenticación](docs/authentication.md): OTP, sesiones, invitaciones, propietario
+- [Permisos](docs/permissions.md): catálogo, roles por defecto y reglas de jerarquía
+- [Herramientas de administración del chat](docs/admin-tools.md): herramientas, propuestas y confirmación
+
+## IA
+
+- [Proveedores](docs/ai-providers.md): conexiones, claves cifradas, endpoints y verificación
+- [Modelos y tarifas](docs/models-and-pricing.md): catálogo, capacidades, historial de precios
+- [Costos](docs/costs.md): libro de uso, presupuestos, CLP, recomendación y laboratorio
+- [Agentes y chat](docs/agents-and-chat.md): versiones, chat flotante, streaming, conocimiento
+- [Audio y multimedia](docs/audio-and-media.md): adjuntos y dictado
+
+## Conocimiento (RAG)
+
+- [RAG](docs/rag.md): modos, conexiones, colecciones, permisos, recuperación híbrida y citas
+- [API externa de recuperación](docs/rag-external.md): contrato HTTP y servidor de referencia
+- [Indexación](docs/indexing.md): trabajos durables, reindexación atómica, costos
+
+## Desarrollo y operación
+
+- [Extender el starter](docs/extending.md): generador de módulos y módulo Proyectos
+- [Componentes de interfaz](docs/frontend-components.md): componentes compartidos y reglas
+- [Referencia de la API](docs/api-reference.md): generada desde OpenAPI
+- [Docker](docs/docker.md): perfiles, imágenes y producción
+- [Pruebas E2E](docs/e2e.md): Playwright, pila E2E e integración
+- [Actualizaciones](docs/upgrades.md) y [dependencias](docs/dependency-updates.md)
+- [Problemas frecuentes](docs/troubleshooting.md)
+
+## Skills
+
+- [Instalar](skills/install-starter/SKILL.md)
+- [Extender](skills/extend-starter/SKILL.md)
+- [Configurar IA](skills/configure-ai/SKILL.md)
+- [Administrar conocimiento](skills/manage-rag/SKILL.md)
+
+## Archivos de referencia
+
+- [Configuración de ejemplo](starter.config.example.json) y [su esquema](docs/schemas/starter.config.schema.json)
+- [Manifiesto de versiones](starter.manifest.json)
+- [OpenAPI](packages/api-client/openapi.json)

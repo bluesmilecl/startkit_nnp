@@ -1237,7 +1237,9 @@ export const aiConversationsRename = <ThrowOnError extends boolean = false>(opti
 /**
  * Actualizar tasa USD→CLP de visualización
  *
- * **Permiso requerido:** `ai.usage.read`.
+ * Encola una consulta al proveedor de tipo de cambio configurado (FX_PROVIDER).
+ *
+ * **Permiso requerido:** `ai.models.manage`.
  *
  * **Módulo:** `ai` debe estar habilitado.
  */
@@ -1450,7 +1452,7 @@ export const aiModelsSync = <ThrowOnError extends boolean = false>(options: Opti
 /**
  * Tarifas vigentes (o historial)
  *
- * Cada tarifa conserva fuente, fecha de consulta, vigencia, moneda, unidad y ámbito de facturación.
+ * Cada tarifa conserva fuente, fecha de consulta, vigencia, moneda, unidad y ámbito de facturación. Requiere ai.models.manage o ai.usage.read (verificado en el servicio).
  *
  * **Acceso:** cualquier sesión válida.
  *

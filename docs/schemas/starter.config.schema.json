@@ -1,0 +1,350 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://starter.local/schemas/starter.config.schema.json",
+  "title": "starter.config.json",
+  "description": "Configuración exportable del proyecto. Nunca contiene secretos ni cadenas de conexión: solo referencias.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,62}$"
+        },
+        "locale": {
+          "default": "es-CL",
+          "type": "string"
+        },
+        "timezone": {
+          "default": "America/Santiago",
+          "type": "string"
+        },
+        "ownerEmail": {
+          "type": "string",
+          "format": "email",
+          "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "features": {
+      "default": {
+        "organizations": false,
+        "ai": true,
+        "rag": false
+      },
+      "type": "object",
+      "properties": {
+        "organizations": {
+          "default": false,
+          "type": "boolean"
+        },
+        "ai": {
+          "default": true,
+          "type": "boolean"
+        },
+        "rag": {
+          "default": false,
+          "type": "boolean"
+        }
+      }
+    },
+    "auth": {
+      "default": {
+        "method": "email-otp",
+        "registration": "invite-only"
+      },
+      "type": "object",
+      "properties": {
+        "method": {
+          "default": "email-otp",
+          "type": "string",
+          "const": "email-otp"
+        },
+        "registration": {
+          "default": "invite-only",
+          "type": "string",
+          "enum": [
+            "open",
+            "invite-only",
+            "disabled"
+          ]
+        }
+      }
+    },
+    "database": {
+      "default": {
+        "mode": "docker"
+      },
+      "type": "object",
+      "properties": {
+        "mode": {
+          "default": "docker",
+          "type": "string",
+          "enum": [
+            "docker",
+            "external"
+          ]
+        }
+      }
+    },
+    "mail": {
+      "default": {
+        "transport": "smtp"
+      },
+      "type": "object",
+      "properties": {
+        "transport": {
+          "default": "smtp",
+          "type": "string",
+          "enum": [
+            "smtp",
+            "resend",
+            "log"
+          ]
+        },
+        "from": {
+          "type": "string"
+        }
+      }
+    },
+    "ai": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "connectionRef": {
+          "default": null,
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-_.]{0,62}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "agent": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "name": {
+              "default": "Asistente",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            },
+            "systemPrompt": {
+              "default": "Ayuda al usuario con las funciones autorizadas de esta aplicación.",
+              "type": "string",
+              "maxLength": 20000
+            },
+            "modelRef": {
+              "default": null,
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "maxOutputTokens": {
+              "default": 1200,
+              "type": "integer",
+              "minimum": 16,
+              "maximum": 200000
+            },
+            "media": {
+              "default": {
+                "images": false,
+                "documents": false
+              },
+              "type": "object",
+              "properties": {
+                "images": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "documents": {
+                  "default": false,
+                  "type": "boolean"
+                }
+              }
+            },
+            "microphone": {
+              "default": {
+                "enabled": false,
+                "connectionRef": null,
+                "modelRef": null,
+                "maxSeconds": 60,
+                "autoSend": false
+              },
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "connectionRef": {
+                  "default": null,
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[a-z0-9][a-z0-9-_.]{0,62}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "modelRef": {
+                  "default": null,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "maxSeconds": {
+                  "default": 60,
+                  "type": "integer",
+                  "minimum": 5,
+                  "maximum": 600
+                },
+                "autoSend": {
+                  "default": false,
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "usage": {
+          "default": {
+            "record": true,
+            "dashboard": true
+          },
+          "type": "object",
+          "properties": {
+            "record": {
+              "default": true,
+              "type": "boolean",
+              "const": true
+            },
+            "dashboard": {
+              "default": true,
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "rag": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "mode": {
+          "default": "disabled",
+          "type": "string",
+          "enum": [
+            "disabled",
+            "internal",
+            "postgres",
+            "api"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "enum": [
+            "same-database",
+            "same-server",
+            "other-server"
+          ]
+        },
+        "connectionRef": {
+          "default": null,
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-_.]{0,62}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "embeddingProfileRef": {
+          "default": null,
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-_.]{0,62}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "retrieval": {
+          "default": {
+            "strategy": "hybrid",
+            "topK": 6
+          },
+          "type": "object",
+          "properties": {
+            "strategy": {
+              "default": "hybrid",
+              "type": "string",
+              "enum": [
+                "vector",
+                "text",
+                "hybrid"
+              ]
+            },
+            "topK": {
+              "default": 6,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "indexing": {
+          "default": {
+            "automatic": false,
+            "concurrency": 2
+          },
+          "type": "object",
+          "properties": {
+            "automatic": {
+              "default": false,
+              "type": "boolean"
+            },
+            "concurrency": {
+              "default": 2,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 16
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "project"
+  ]
+}
