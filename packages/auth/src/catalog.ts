@@ -4,8 +4,9 @@ import { and, eq, inArray, isNull, notInArray, permissions, rolePermissions, rol
 /**
  * Synchronizes the implemented permission catalog and the system roles.
  * - New permissions are inserted; removed ones are marked deprecated (they grant nothing).
- * - System roles are created with default permissions the first time only, so local
- *   customizations survive upgrades. The owner role always holds the full catalog.
+ * - System roles are created with their default permissions. Afterwards only keys that are new
+ *   to the catalog receive their default grants, so local customizations of existing keys
+ *   survive upgrades. The owner role always holds the full catalog.
  */
 export async function syncAccessCatalog(db: Database): Promise<{ permissions: number; createdRoles: string[] }> {
   return db.transaction(async (tx) => {
