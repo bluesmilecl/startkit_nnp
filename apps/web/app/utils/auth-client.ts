@@ -1,3 +1,4 @@
+import { ERROR_CATALOG } from '@starter/contracts';
 import { createAuthClient } from 'better-auth/vue';
 import { emailOTPClient } from 'better-auth/client/plugins';
 
@@ -32,7 +33,8 @@ export function authErrorMessage(err: { code?: string; message?: string; status?
     case 'REGISTRATION_CLOSED':
       return 'Este correo no tiene acceso. Solicita una invitación.';
     default:
-      if (err?.status === 429) return err.message ?? 'Demasiadas solicitudes. Espera un momento.';
+      // The auth rate limiter answers in English; show the catalog message instead.
+      if (err?.status === 429) return ERROR_CATALOG.RATE_LIMITED.message;
       return err?.message ?? 'No se pudo completar la solicitud.';
   }
 }
