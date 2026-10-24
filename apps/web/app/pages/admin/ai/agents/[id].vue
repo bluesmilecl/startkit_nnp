@@ -164,7 +164,7 @@ async function runTest() {
     <Button variant="ghost" size="sm" as-child class="-ml-2"><NuxtLink to="/admin/ai/agents"><ArrowLeft class="size-4" /> Agentes</NuxtLink></Button>
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div class="space-y-1">
-        <Input :model-value="agent.name" class="h-auto border-transparent px-0 text-2xl font-semibold shadow-none focus-visible:border-input focus-visible:px-2" aria-label="Nombre del agente" @change="(e: Event) => rename((e.target as HTMLInputElement).value)" />
+        <Input :model-value="agent.name" class="h-auto border-transparent px-0 text-2xl font-semibold md:text-2xl shadow-none focus-visible:border-input focus-visible:px-2" aria-label="Nombre del agente" @change="(e: Event) => rename((e.target as HTMLInputElement).value)" />
         <div class="text-muted-foreground flex flex-wrap items-center gap-2 text-sm">
           {{ agent.key }}
           <Badge v-if="agent.isDefault" variant="secondary">chat flotante</Badge>

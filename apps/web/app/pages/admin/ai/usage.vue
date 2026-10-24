@@ -110,7 +110,7 @@ const columns: ColumnDef<AiRequestRow>[] = [
         <SelectContent><SelectItem value="1">Últimas 24 h</SelectItem><SelectItem value="7">7 días</SelectItem><SelectItem value="30">30 días</SelectItem><SelectItem value="90">90 días</SelectItem></SelectContent>
       </Select>
       <Select v-model="filters.feature">
-        <SelectTrigger class="w-40" aria-label="Función"><SelectValue /></SelectTrigger>
+        <SelectTrigger class="w-48" aria-label="Función"><SelectValue /></SelectTrigger>
         <SelectContent><SelectItem value="all">Todas las funciones</SelectItem><SelectItem v-for="(l, k) in FEATURE_LABELS" :key="k" :value="k">{{ l }}</SelectItem></SelectContent>
       </Select>
     </template>

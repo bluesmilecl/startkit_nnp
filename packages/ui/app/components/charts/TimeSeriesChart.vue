@@ -35,7 +35,8 @@ const palette = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--ch
 const config = computed<ChartConfig>(() =>
   Object.fromEntries(props.series.map((s, i) => [s.key, { label: s.label, color: s.color ?? palette[i % palette.length] }])),
 );
-// Lines and areas need two points; a single day is drawn as bars.
+// Lines and areas need two points; a single day is drawn as bars. Grouped bars ignore
+// barMaxWidth with a single point, so one series (or one point) uses the stacked renderer.
 const effectiveKind = computed(() => (props.data.length < 2 && (props.kind === 'line' || props.kind === 'area') ? 'bar' : props.kind));
 const indexed = computed(() => props.data.map((d, i) => ({ ...d, __i: i })));
 const x = (d: { __i: number }) => d.__i;
@@ -95,7 +96,7 @@ function exportCsv() {
         <template v-else-if="effectiveKind === 'line'">
           <VisLine v-for="(y, i) in ys" :key="i" :x="x" :y="y" :color="colors[i]" />
         </template>
-        <VisGroupedBar v-else-if="effectiveKind === 'bar'" :x="x" :y="ys" :color="colors" :rounded-corners="4" :bar-max-width="48" />
+        <VisGroupedBar v-else-if="effectiveKind === 'bar' && series.length > 1 && data.length > 1" :x="x" :y="ys" :color="colors" :rounded-corners="4" :bar-max-width="48" />
         <VisStackedBar v-else :x="x" :y="ys" :color="colors" :rounded-corners="2" :bar-max-width="48" />
         <VisAxis type="x" :x="x" :tick-line="false" :domain-line="false" :grid-line="false" :tick-format="tickFormat" :num-ticks="6" />
         <VisAxis type="y" :tick-line="false" :domain-line="false" :tick-format="fmt" :num-ticks="4" />

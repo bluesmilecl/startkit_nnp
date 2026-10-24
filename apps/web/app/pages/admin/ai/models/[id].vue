@@ -90,7 +90,7 @@ async function update(body: { enabled?: boolean; capabilities?: Record<string, '
           <div v-for="(label, k) in CAPABILITY_LABELS" :key="k" class="flex items-center justify-between gap-2 text-sm">
             <span>{{ label }}</span>
             <Select :model-value="model.capabilities[k] ?? 'unknown'" @update:model-value="(v) => update({ capabilities: { [k]: v as 'yes' | 'no' | 'unknown' } })">
-              <SelectTrigger class="h-8 w-32" :aria-label="label" :data-testid="`cap-${k}`"><SelectValue /></SelectTrigger>
+              <SelectTrigger class="h-8 w-36" :aria-label="label" :data-testid="`cap-${k}`"><SelectValue /></SelectTrigger>
               <SelectContent><SelectItem value="yes">Sí</SelectItem><SelectItem value="no">No</SelectItem><SelectItem value="unknown">Desconocido</SelectItem></SelectContent>
             </Select>
           </div>

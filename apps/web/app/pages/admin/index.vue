@@ -27,7 +27,7 @@ const CHECK_LABELS: Record<string, string> = { database: 'Base de datos', migrat
   </Alert>
 
   <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-    <StatCard v-if="can('users.read')" title="Usuarios activos" :value="data?.users.active" :hint="`${data?.users.disabled ?? 0} desactivados · ${data?.users.pendingInvitations ?? 0} invitaciones`" :icon="Users" :loading="loading" />
+    <StatCard v-if="can('users.read')" title="Usuarios activos" :value="data?.users.active" :hint="`${Math.max(0, (data?.users.total ?? 0) - (data?.users.active ?? 0) - (data?.users.disabled ?? 0))} sin ingresar aún · ${data?.users.disabled ?? 0} desactivados · ${data?.users.pendingInvitations ?? 0} invitaciones`" :icon="Users" :loading="loading" />
     <StatCard v-if="me?.features.ai && can('ai.usage.read')" title="Costo IA (7 días)" :value="data ? formatUsd(data.ai.cost7dUsd, 2) : null" :hint="`${data?.ai.requests7d ?? 0} solicitudes${data?.ai.unknownCostRequests7d ? ` · ${data.ai.unknownCostRequests7d} con costo desconocido` : ''}`" :icon="DollarSign" :loading="loading" />
     <StatCard v-if="me?.features.ai" title="Agentes publicados" :value="data?.ai.agentsPublished" :hint="`${data?.ai.connections ?? 0} conexiones`" :icon="Bot" :loading="loading" />
     <StatCard v-if="me?.features.rag && can('rag.collections.read')" title="Documentos" :value="data?.rag.documents" :hint="data?.rag.enabled ? `${data.rag.collections} colecciones · ${data.rag.runningJobs} trabajos en curso` : 'RAG desactivado'" :icon="Database" :loading="loading" />
