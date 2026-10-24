@@ -28,6 +28,7 @@ Swagger UI: `/api/docs` (según `OPENAPI_DOCS`). Documento JSON: `/api/docs-json
 - [ai-usage](#ai-usage) (8)
 - [auth](#auth) (12)
 - [health](#health) (3)
+- [mail](#mail) (21)
 - [me](#me) (6)
 - [projects](#projects) (5)
 - [public](#public) (1)
@@ -1355,6 +1356,251 @@ Comprueba base de datos y migraciones. pgvector solo se verifica si RAG está ha
 
 **Acceso:** público.
 
+## mail
+
+### `GET /api/admin/mail/automations`
+
+- **operationId:** `mail_automations_list`
+- **Resumen:** Automatizaciones de correo
+- **200**: OK — `application/json` `MailAutomationList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.read`.
+
+### `POST /api/admin/mail/automations`
+
+- **operationId:** `mail_automations_create`
+- **Resumen:** Crear automatización
+- **Cuerpo** (`application/json`): `MailAutomationInput`
+- **201**: OK — `application/json` `MailAutomation`
+- **Errores:** 400, 401, 403, 409, 422, 500 (`ErrorResponse`)
+
+Se dispara con una acción auditada (MAIL_EVENTS) o con una programación cron (UTC). Solo considera eventos posteriores a su activación.
+
+**Permiso requerido:** `mail.manage`.
+
+### `DELETE /api/admin/mail/automations/{id}`
+
+- **operationId:** `mail_automations_delete`
+- **Resumen:** Eliminar automatización
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.manage`.
+
+### `GET /api/admin/mail/automations/{id}`
+
+- **operationId:** `mail_automations_get`
+- **Resumen:** Automatización
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `MailAutomation`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.read`.
+
+### `PATCH /api/admin/mail/automations/{id}`
+
+- **operationId:** `mail_automations_update`
+- **Resumen:** Editar, activar o desactivar automatización
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `UpdateMailAutomationInput`
+- **200**: OK — `application/json` `MailAutomation`
+- **Errores:** 400, 401, 403, 404, 409, 412, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.manage`.
+
+### `POST /api/admin/mail/automations/{id}/test`
+
+- **operationId:** `mail_automations_test`
+- **Resumen:** Enviar la automatización con valores de ejemplo
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `MailTestTo`
+- **200**: OK — `application/json` `MailTestResult`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.manage`.
+
+### `GET /api/admin/mail/deliveries`
+
+- **operationId:** `mail_deliveries_list`
+- **Resumen:** Envíos de correo
+- **Parámetros:**
+  - `page` (query): `integer`
+  - `pageSize` (query): `integer`
+  - `status` (query): `string`
+  - `automationId` (query): `uuid`
+  - `search` (query): `string`
+- **200**: OK — `application/json` `MailDeliveriesPage`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Sistema, pruebas y automatizaciones. No guarda asuntos (pueden contener códigos).
+
+**Permiso requerido:** `mail.read`.
+
+### `POST /api/admin/mail/deliveries/{id}/retry`
+
+- **operationId:** `mail_deliveries_retry`
+- **Resumen:** Reintentar un envío fallido de automatización
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.manage`.
+
+### `DELETE /api/admin/mail/settings`
+
+- **operationId:** `mail_settings_reset`
+- **Resumen:** Volver a las variables de entorno
+- **200**: OK — `application/json` `MailProviderSettings`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Elimina la configuración guardada (incluido el secreto).
+
+**Permiso requerido:** `mail.manage`.
+
+### `GET /api/admin/mail/settings`
+
+- **operationId:** `mail_settings_get`
+- **Resumen:** Proveedor de correo en uso
+- **200**: OK — `application/json` `MailProviderSettings`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Configurado en la plataforma (base de datos) o por variables MAIL_*. El secreto nunca se devuelve, solo una pista.
+
+**Permiso requerido:** `mail.read`.
+
+### `PUT /api/admin/mail/settings`
+
+- **operationId:** `mail_settings_update`
+- **Resumen:** Guardar proveedor de correo
+- **Cuerpo** (`application/json`): `UpdateMailProviderInput`
+- **200**: OK — `application/json` `MailProviderSettings`
+- **Errores:** 400, 401, 403, 412, 422, 500 (`ErrorResponse`)
+
+La API key o contraseña SMTP se cifra con APP_ENCRYPTION_KEY; omitirla conserva la guardada (mismo proveedor). Requiere la versión leída (412 si cambió).
+
+**Permiso requerido:** `mail.manage`.
+
+### `POST /api/admin/mail/settings/check`
+
+- **operationId:** `mail_settings_check`
+- **Resumen:** Comprobar credenciales sin enviar
+- **Cuerpo** (`application/json`): `MailCheckInput`
+- **200**: OK — `application/json` `MailCheck`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Con `draft` prueba los valores del formulario antes de guardarlos.
+
+**Permiso requerido:** `mail.manage`.
+
+### `POST /api/admin/mail/settings/test`
+
+- **operationId:** `mail_settings_test`
+- **Resumen:** Enviar un correo de prueba
+- **Cuerpo** (`application/json`): `MailTestInput`
+- **200**: OK — `application/json` `MailTestResult`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+Devuelve el resultado del proveedor (ok: false con el motivo si lo rechaza).
+
+**Permiso requerido:** `mail.manage`.
+
+### `GET /api/admin/mail/templates`
+
+- **operationId:** `mail_templates_list`
+- **Resumen:** Plantillas de correo
+- **200**: OK — `application/json` `MailTemplateList`
+- **Errores:** 400, 401, 403, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.read`.
+
+### `POST /api/admin/mail/templates`
+
+- **operationId:** `mail_templates_create`
+- **Resumen:** Crear plantilla
+- **Cuerpo** (`application/json`): `CreateMailTemplateInput`
+- **201**: OK — `application/json` `MailTemplate`
+- **Errores:** 400, 401, 403, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.manage`.
+
+### `DELETE /api/admin/mail/templates/{id}`
+
+- **operationId:** `mail_templates_delete`
+- **Resumen:** Eliminar plantilla propia
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `OkResponse`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.manage`.
+
+### `GET /api/admin/mail/templates/{id}`
+
+- **operationId:** `mail_templates_get`
+- **Resumen:** Plantilla
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `MailTemplate`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.read`.
+
+### `PATCH /api/admin/mail/templates/{id}`
+
+- **operationId:** `mail_templates_update`
+- **Resumen:** Editar plantilla
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `UpdateMailTemplateInput`
+- **200**: OK — `application/json` `MailTemplate`
+- **Errores:** 400, 401, 403, 404, 412, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.manage`.
+
+### `POST /api/admin/mail/templates/{id}/reset`
+
+- **operationId:** `mail_templates_reset`
+- **Resumen:** Restablecer plantilla del sistema
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **200**: OK — `application/json` `MailTemplate`
+- **Errores:** 400, 401, 403, 404, 409, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.manage`.
+
+### `POST /api/admin/mail/templates/{id}/test`
+
+- **operationId:** `mail_templates_test`
+- **Resumen:** Enviar la plantilla guardada a un correo
+- **Parámetros:**
+  - `id` (path, requerido): `uuid`
+- **Cuerpo** (`application/json`): `MailTemplateTestInput`
+- **200**: OK — `application/json` `MailTestResult`
+- **Errores:** 400, 401, 403, 404, 422, 500 (`ErrorResponse`)
+
+**Permiso requerido:** `mail.manage`.
+
+### `POST /api/admin/mail/templates/generate`
+
+- **operationId:** `mail_templates_generate`
+- **Resumen:** Generar asunto y HTML con IA
+- **Cuerpo** (`application/json`): `GenerateMailTemplateInput`
+- **200**: OK — `application/json` `GeneratedMailTemplate`
+- **Errores:** 400, 401, 403, 422, 500, 502, 503 (`ErrorResponse`)
+
+Usa el modelo indicado o el del asistente predeterminado; el costo queda en el libro de uso (función mail_template). No guarda nada.
+
+**Permiso requerido:** `mail.manage`.
+
+**Módulo:** `ai` debe estar habilitado.
+
 ## me
 
 ### `GET /api/me`
@@ -2033,5 +2279,5 @@ Búsqueda vectorial, de texto completo o híbrida (RRF) sobre las colecciones au
 
 ## Esquemas
 
-165 esquemas en `components.schemas` (ver `openapi.json`).
+193 esquemas en `components.schemas` (ver `openapi.json`).
 

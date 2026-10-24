@@ -44,6 +44,7 @@ export const FEATURE_LABELS: Record<string, string> = {
   connection_test: 'Prueba de conexión',
   evaluation: 'Evaluación',
   summary: 'Resumen',
+  mail_template: 'Plantillas de correo',
 };
 
 export const COST_STATUS_LABELS: Record<string, string> = {

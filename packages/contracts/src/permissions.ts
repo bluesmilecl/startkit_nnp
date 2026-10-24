@@ -37,6 +37,8 @@ export const PERMISSIONS = {
   'rag.jobs.manage': { group: 'rag', description: 'Gestionar trabajos de indexación' },
   'rag.playground.use': { group: 'rag', description: 'Usar el laboratorio de búsqueda' },
   'rag.analytics.read': { group: 'rag', description: 'Ver analítica de conocimiento' },
+  'mail.read': { group: 'mail', description: 'Ver configuración, plantillas, automatizaciones y envíos de correo' },
+  'mail.manage': { group: 'mail', description: 'Configurar el proveedor de correo, plantillas y automatizaciones', sensitive: true },
   'projects.read': { group: 'projects', description: 'Ver proyectos' },
   'projects.manage': { group: 'projects', description: 'Crear y editar proyectos' },
 } as const satisfies Record<string, { group: string; description: string; sensitive?: boolean }>;

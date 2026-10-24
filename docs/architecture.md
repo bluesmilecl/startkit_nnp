@@ -50,7 +50,8 @@ flowchart LR
 | `packages/auth` | Better Auth (OTP por correo), actor, políticas, roles, usuarios, invitaciones, auditoría, propuestas. |
 | `packages/ai` | Conexiones a proveedores, catálogo de modelos, tarifas, libro de uso, presupuestos, agentes y chat. |
 | `packages/rag` | Almacenes de conocimiento (pgvector interno/externo, API externa), ingesta, recuperación. |
-| `packages/jobs`, `packages/storage`, `packages/mail`, `packages/observability` | Cola pg-boss, archivos (local/S3), correo (SMTP/Resend/log) y logs estructurados. |
+| `packages/jobs`, `packages/storage`, `packages/mail`, `packages/observability` | Cola pg-boss, archivos (local/S3), correo (Resend, SMTP, Postmark, SendGrid, Mailgun, Brevo, log; plantillas editables) y logs estructurados. |
+| `packages/messaging` | Administración del correo: proveedor guardado y cifrado, plantillas (con IA), automatizaciones por evento auditado o cron y registro de envíos. |
 | `packages/ui` | Capa Nuxt compartida: componentes shadcn-vue vendorizados, componentes comunes y gráficos. |
 | `tooling/create-starter` | CLI `create-ecortes-app` / `pnpm starter`: `create`, `doctor`, `config validate`, `ai sync`, `rag doctor`, `rag reindex`, `generate module`, `docs check`, `owner assign`, `secrets reencrypt`. Usa los mismos paquetes de dominio que la API y el worker. |
 | `tooling/generator` | Generador de módulos a partir del módulo de referencia Proyectos. |

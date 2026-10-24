@@ -15,16 +15,20 @@ import {
   Gauge,
   KeyRound,
   LayoutDashboard,
+  LayoutTemplate,
   ListChecks,
   Mail,
   Palette,
   Plug,
   ScrollText,
+  Send,
+  Server,
   Settings,
   ShieldCheck,
   Stethoscope,
   Users,
   Wallet,
+  Workflow,
 } from '@lucide/vue';
 
 export interface NavItem {
@@ -80,6 +84,15 @@ export const NAVIGATION: NavSection[] = [
       { title: 'Trabajos', to: '/admin/knowledge/jobs', icon: ListChecks, permission: 'rag.jobs.manage', feature: 'rag' },
       { title: 'Laboratorio de búsqueda', to: '/admin/knowledge/search', icon: FileSearch, permission: 'rag.playground.use', feature: 'rag' },
       { title: 'Analítica', to: '/admin/knowledge/analytics', icon: Activity, permission: 'rag.analytics.read', feature: 'rag' },
+    ],
+  },
+  {
+    title: 'Correo',
+    items: [
+      { title: 'Proveedor', to: '/admin/mail', icon: Server, permission: 'mail.read' },
+      { title: 'Plantillas', to: '/admin/mail/templates', icon: LayoutTemplate, permission: 'mail.read' },
+      { title: 'Automatizaciones', to: '/admin/mail/automations', icon: Workflow, permission: 'mail.read' },
+      { title: 'Envíos', to: '/admin/mail/deliveries', icon: Send, permission: 'mail.read' },
     ],
   },
   {

@@ -41,6 +41,9 @@
     },
     {
       "path": "../../packages/rag"
+    },
+    {
+      "path": "../../packages/messaging"
     }
   ]
 }

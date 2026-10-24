@@ -22,7 +22,8 @@ Este archivo es para agentes (Claude Code u otros) que modifican este repositori
 | Vistas del panel | `apps/web/app/pages/admin/**`, navegación en `apps/web/app/utils/navigation.ts` |
 | Kit de interfaz (formularios, asistente, tablas/tarjetas, gráficos, carrusel, menús, avisos, modales, íconos) | `packages/ui/app/components/common/**`, `charts/**`, `composables/**`, `lib/icons.ts`; guía en [docs/frontend-components.md](docs/frontend-components.md); catálogo vivo en `/admin/components` |
 | Variables de entorno | `packages/config/src/env.ts` y `.env.example` |
-| Correo (Resend, SMTP, Postmark, SendGrid, Mailgun, Brevo) | `packages/mail/src/mailer.ts`; `pnpm starter mail use` y `mail test`; guía en [docs/mail.md](docs/mail.md) |
+| Correo (Resend, SMTP, Postmark, SendGrid, Mailgun, Brevo) | `packages/mail/src/mailer.ts` (transportes), `configured.ts` (`ConfiguredMailer`: proveedor del panel o `MAIL_*`, plantillas, registro de envíos), `defaults.ts` (plantillas del sistema); `pnpm starter mail use` y `mail test`; guía en [docs/mail.md](docs/mail.md) |
+| Administración de correo (proveedor cifrado, plantillas con IA, automatizaciones, envíos) | `packages/messaging/src/`, contratos en `packages/contracts/src/mail.ts` (`MAIL_EVENTS`, renderizador `{{variable}}`), `apps/api/src/modules/mail`, `apps/worker/src/handlers/mail.ts`, vistas en `apps/web/app/pages/admin/mail/**` |
 | Módulo de referencia | **Proyectos**: contrato, tabla, `apps/api/src/modules/projects`, `apps/web/app/pages/admin/projects`, `tests/e2e/projects.spec.ts` |
 
 ## Comandos que debes usar
@@ -75,6 +76,7 @@ pnpm verify                        # verificación completa
 - **Un permiso:** agrégalo al catálogo y a los roles por defecto en `permissions.ts`; se sincroniza al arrancar. Úsalo en `@Endpoint` y en `assertCan`.
 - **Una herramienta del chat:** catálogo en `packages/contracts/src/agents.ts` (`ADMIN_TOOLS`) e implementación en `packages/ai/src/chat/admin-tools.ts`; las mutaciones deben pasar por propuestas. Ver [docs/admin-tools.md](docs/admin-tools.md).
 - **Un trabajo del worker:** cola en `packages/jobs/src/index.ts`, manejador en `apps/worker/src/handlers/`.
+- **Un correo:** envíalo con `mailer.send({ …, template: { key, data } })`; una plantilla nueva del sistema va en `DEFAULT_MAIL_TEMPLATES` (`packages/mail/src/defaults.ts`) con sus variables obligatorias. Para que una acción dispare automatizaciones, audítala con `recordAudit` y agrégala a `MAIL_EVENTS`. Ver [docs/mail.md](docs/mail.md).
 
 ## Definición de terminado
 

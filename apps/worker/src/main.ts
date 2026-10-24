@@ -1,7 +1,7 @@
 import { featureFlags, getEnv, SecretBox } from '@starter/config';
 import { createDb, sql, waitForDatabase } from '@starter/db';
 import { JobQueue } from '@starter/jobs';
-import { createMailer } from '@starter/mail';
+import { ConfiguredMailer } from '@starter/mail';
 import { createLogger, installProcessHandlers, sanitizeError } from '@starter/observability';
 import { createStorage } from '@starter/storage';
 import { createServer } from 'node:http';
@@ -18,14 +18,15 @@ async function main(): Promise<void> {
   await waitForDatabase(env.DATABASE_URL, { ssl: env.DATABASE_SSL });
   const db = createDb(env.DATABASE_URL, { max: env.DATABASE_POOL_MAX, ssl: env.DATABASE_SSL, applicationName: 'starter-worker' });
   const jobs = await JobQueue.create({ connectionString: env.DATABASE_URL, role: 'worker' });
+  const secrets = new SecretBox(env.APP_ENCRYPTION_KEY, env.APP_ENCRYPTION_PREVIOUS_KEYS);
   const ctx: WorkerContext = {
     env,
     features: featureFlags(env),
     db,
     jobs,
-    mailer: createMailer(env),
+    mailer: new ConfiguredMailer({ env, db: db.db, secrets }),
     storage: createStorage(env),
-    secrets: new SecretBox(env.APP_ENCRYPTION_KEY, env.APP_ENCRYPTION_PREVIOUS_KEYS),
+    secrets,
   };
   await registerSystemHandlers(ctx);
   await registerStorageHandlers(ctx);

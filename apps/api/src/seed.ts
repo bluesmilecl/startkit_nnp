@@ -2,6 +2,7 @@ import { AgentsService } from '@starter/ai';
 import { InvitationsService, syncAccessCatalog } from '@starter/auth';
 import type { Env } from '@starter/config';
 import { DEFAULT_ORGANIZATION_ID, organizations, type Database } from '@starter/db';
+import { syncMailTemplates } from '@starter/mail';
 
 /** Idempotent base data required by every installation. */
 export async function seedBaseData(db: Database, env: Env) {
@@ -13,5 +14,7 @@ export async function seedBaseData(db: Database, env: Env) {
   const owner = env.OWNER_EMAIL ? await InvitationsService.bootstrapOwner(db, env.OWNER_EMAIL) : { result: 'not-configured' as const };
   // Unpublished default assistant: the floating chat stays hidden until an admin publishes it.
   if (env.FEATURE_AI) await AgentsService.ensureDefault(db, DEFAULT_ORGANIZATION_ID);
-  return { organization: DEFAULT_ORGANIZATION_ID, permissions: catalog.permissions, createdRoles: catalog.createdRoles, owner: owner.result };
+  // System e-mail templates (edited ones are kept) and the default automations, once.
+  const mail = await syncMailTemplates(db);
+  return { organization: DEFAULT_ORGANIZATION_ID, permissions: catalog.permissions, createdRoles: catalog.createdRoles, owner: owner.result, mailTemplatesCreated: mail.templatesCreated };
 }

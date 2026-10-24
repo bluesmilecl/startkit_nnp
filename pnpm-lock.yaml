@@ -235,6 +235,9 @@ importers:
       '@starter/mail':
         specifier: workspace:*
         version: link:../../packages/mail
+      '@starter/messaging':
+        specifier: workspace:*
+        version: link:../../packages/messaging
       '@starter/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -345,6 +348,9 @@ importers:
       '@starter/mail':
         specifier: workspace:*
         version: link:../../packages/mail
+      '@starter/messaging':
+        specifier: workspace:*
+        version: link:../../packages/messaging
       '@starter/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -493,6 +499,9 @@ importers:
       '@starter/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@starter/db':
+        specifier: workspace:*
+        version: link:../db
       '@starter/observability':
         specifier: workspace:*
         version: link:../observability
@@ -506,6 +515,42 @@ importers:
       '@types/nodemailer':
         specifier: 8.0.2
         version: 8.0.2
+
+  packages/messaging:
+    dependencies:
+      '@starter/ai':
+        specifier: workspace:*
+        version: link:../ai
+      '@starter/auth':
+        specifier: workspace:*
+        version: link:../auth
+      '@starter/config':
+        specifier: workspace:*
+        version: link:../config
+      '@starter/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@starter/db':
+        specifier: workspace:*
+        version: link:../db
+      '@starter/jobs':
+        specifier: workspace:*
+        version: link:../jobs
+      '@starter/mail':
+        specifier: workspace:*
+        version: link:../mail
+      '@starter/observability':
+        specifier: workspace:*
+        version: link:../observability
+      cron-parser:
+        specifier: 5.10.2
+        version: 5.10.2
+      ipaddr.js:
+        specifier: 2.5.0
+        version: 2.5.0
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
 
   packages/observability:
     dependencies:
@@ -673,6 +718,9 @@ importers:
       '@starter/mail':
         specifier: workspace:*
         version: link:../packages/mail
+      '@starter/messaging':
+        specifier: workspace:*
+        version: link:../packages/messaging
       '@starter/rag':
         specifier: workspace:*
         version: link:../packages/rag

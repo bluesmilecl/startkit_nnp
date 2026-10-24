@@ -162,7 +162,8 @@ export class InvitationsService {
     const branding = await new SettingsService(this.deps).branding();
     const tpl = invitationEmail({ appName: branding.appName, primaryColor: branding.primaryColor, appUrl: this.deps.env.APP_URL }, inviter, roleName, email);
     try {
-      await this.deps.mailer.send({ to: email, ...tpl, category: 'invitation' });
+      const loginUrl = `${this.deps.env.APP_URL.replace(/\/$/, '')}/login?email=${encodeURIComponent(email)}`;
+      await this.deps.mailer.send({ to: email, ...tpl, category: 'invitation', template: { key: 'users.invitation', data: { inviterName: inviter ?? '', roleName: roleName ?? '', email, loginUrl } } });
     } catch (err) {
       log.error({ err: sanitizeError(err) }, 'invitation e-mail failed');
       throw new AppError('UPSTREAM_ERROR', 'La invitación se registró pero el correo no pudo enviarse; revisa la configuración de correo');

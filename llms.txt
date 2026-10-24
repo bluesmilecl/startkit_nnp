@@ -15,7 +15,7 @@ Antes de modificar código, lee AGENTS.md: reglas de seguridad (sin secretos en 
 ## Identidad y acceso
 
 - [Autenticación](docs/authentication.md): OTP, sesiones, invitaciones, propietario
-- [Correo](docs/mail.md): Resend (predeterminado), SMTP propio o de cualquier proveedor, Postmark, SendGrid, Mailgun y Brevo; `pnpm starter mail use|test`
+- [Correo](docs/mail.md): proveedor configurable y probado desde el panel con claves cifradas (Resend predeterminado, SMTP propio o de cualquier proveedor, Postmark, SendGrid, Mailgun, Brevo) o con `MAIL_*`; plantillas con variables y vista previa, generación con IA, automatizaciones por evento o programación y registro de envíos; `pnpm starter mail use|test`
 - [Permisos](docs/permissions.md): catálogo, roles por defecto y reglas de jerarquía
 - [Herramientas de administración del chat](docs/admin-tools.md): herramientas, propuestas y confirmación
 

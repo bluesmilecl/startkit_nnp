@@ -14,7 +14,7 @@ export const env: Record<string, string> = existsSync(`${root}.env.e2e`)
   : {};
 
 export const OWNER = process.env.E2E_OWNER_EMAIL ?? env.OWNER_EMAIL ?? 'owner@e2e.test';
-const MAILPIT = process.env.E2E_MAILPIT_URL ?? `http://localhost:${env.MAILPIT_PORT ?? '8025'}`;
+export const MAILPIT = process.env.E2E_MAILPIT_URL ?? `http://localhost:${env.MAILPIT_PORT ?? '8025'}`;
 
 export function uniqueEmail(prefix = 'e2e'): string {
   return `${prefix}-${randomUUID().slice(0, 8)}@e2e.test`;

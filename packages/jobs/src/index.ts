@@ -25,6 +25,8 @@ export const QUEUES = {
   ragDeleteDocument: 'rag.delete-document',
   ragPurge: 'rag.purge',
   ragScheduleTick: 'rag.schedule-tick',
+  mailSend: 'mail.send',
+  mailAutomationsTick: 'mail.automations-tick',
 } as const;
 
 export type QueueName = (typeof QUEUES)[keyof typeof QUEUES];
@@ -55,6 +57,8 @@ const DEFINITIONS: QueueDefinition[] = [
   { name: QUEUES.ragDeleteDocument, retryLimit: 8, retryDelay: 15, retryBackoff: true, expireInSeconds: 600 },
   { name: QUEUES.ragPurge, retryLimit: 8, retryDelay: 60, retryBackoff: true, expireInSeconds: 3600 },
   { name: QUEUES.ragScheduleTick, retryLimit: 0, retryDelay: 0, retryBackoff: false, expireInSeconds: 120, policy: 'singleton' },
+  { name: QUEUES.mailSend, retryLimit: 5, retryDelay: 30, retryBackoff: true, expireInSeconds: 120, deleteAfterSeconds: 7 * 86_400 },
+  { name: QUEUES.mailAutomationsTick, retryLimit: 0, retryDelay: 0, retryBackoff: false, expireInSeconds: 120, policy: 'singleton', deleteAfterSeconds: 3600 },
 ];
 
 /** Total attempts pg-boss makes for a queue (first run + retries). */
@@ -72,6 +76,7 @@ export const SCHEDULES: { name: QueueName; cron: string }[] = [
   { name: QUEUES.aiFxRates, cron: '41 13 * * 1-5' },
   { name: QUEUES.aiBudgetAlerts, cron: '*/10 * * * *' },
   { name: QUEUES.ragScheduleTick, cron: '* * * * *' },
+  { name: QUEUES.mailAutomationsTick, cron: '* * * * *' },
 ];
 
 export interface JobsOptions {

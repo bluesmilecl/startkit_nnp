@@ -106,6 +106,8 @@ export const envSchema = z.object({
 
   /** Enables the deterministic "test" AI provider. Never enable in production. */
   AI_TEST_PROVIDER_ENABLED: bool.default(false),
+  /** Allow an SMTP server on a private network address in production (internal relay). */
+  MAIL_ALLOW_PRIVATE_HOSTS: bool.default(false),
   /** Allow provider connections to private network endpoints (e.g. local Ollama). */
   AI_ALLOW_PRIVATE_ENDPOINTS: bool.default(false),
   MODEL_CATALOG_URL: z.url().default('https://models.dev/api.json'),

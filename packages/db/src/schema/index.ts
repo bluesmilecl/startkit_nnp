@@ -6,3 +6,4 @@ export * from './ai.js';
 export * from './agents.js';
 export * from './rag.js';
 export * from './projects.js';
+export * from './mail.js';

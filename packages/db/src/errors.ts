@@ -36,10 +36,10 @@ export function isUniqueViolation(err: unknown, constraint?: string): boolean {
   return pg?.code === '23505' && (!constraint || pg.constraint === constraint);
 }
 
-/** Foreign key violation (23503), optionally for one named constraint. */
+/** Foreign key violation (23503, or 23001 from ON DELETE RESTRICT), optionally for one named constraint. */
 export function isForeignKeyViolation(err: unknown, constraint?: string): boolean {
   const pg = pgErrorOf(err);
-  return pg?.code === '23503' && (!constraint || pg.constraint === constraint);
+  return (pg?.code === '23503' || pg?.code === '23001') && (!constraint || pg.constraint === constraint);
 }
 
 /**
@@ -56,6 +56,7 @@ export function mapDatabaseError(err: unknown): AppError | null {
     case '23505':
       return new AppError('CONFLICT', 'Ya existe un registro con esos datos.', undefined, opts);
     case '23503':
+    case '23001':
       return new AppError('CONFLICT', 'La operación no es posible porque hay datos relacionados.', undefined, opts);
     case '23502':
     case '23514':

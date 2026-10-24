@@ -2,7 +2,7 @@
 
 import { client } from './client.gen.js';
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type ServerSentEventsResult, type TDataShape } from './client/index.js';
-import type { AdminAuditExportData, AdminAuditExportErrors, AdminAuditExportResponses, AdminAuditListData, AdminAuditListErrors, AdminAuditListResponses, AdminDashboardData, AdminDashboardErrors, AdminDashboardResponses, AdminDiagnosticsData, AdminDiagnosticsErrors, AdminDiagnosticsResponses, AdminInvitationsCreateData, AdminInvitationsCreateErrors, AdminInvitationsCreateResponses, AdminInvitationsListData, AdminInvitationsListErrors, AdminInvitationsListResponses, AdminInvitationsResendData, AdminInvitationsResendErrors, AdminInvitationsResendResponses, AdminInvitationsRevokeData, AdminInvitationsRevokeErrors, AdminInvitationsRevokeResponses, AdminOnboardingCompleteData, AdminOnboardingCompleteErrors, AdminOnboardingCompleteResponses, AdminOrgsAddMemberData, AdminOrgsAddMemberErrors, AdminOrgsAddMemberResponses, AdminOrgsCreateData, AdminOrgsCreateErrors, AdminOrgsCreateResponses, AdminOrgsListData, AdminOrgsListErrors, AdminOrgsListResponses, AdminOrgsMembersData, AdminOrgsMembersErrors, AdminOrgsMembersResponses, AdminOrgsRemoveMemberData, AdminOrgsRemoveMemberErrors, AdminOrgsRemoveMemberResponses, AdminPermissionsListData, AdminPermissionsListErrors, AdminPermissionsListResponses, AdminPermissionsMatrixData, AdminPermissionsMatrixErrors, AdminPermissionsMatrixResponses, AdminProposalsCancelData, AdminProposalsCancelErrors, AdminProposalsCancelResponses, AdminProposalsConfirmData, AdminProposalsConfirmErrors, AdminProposalsConfirmResponses, AdminProposalsCreateData, AdminProposalsCreateErrors, AdminProposalsCreateResponses, AdminProposalsGetData, AdminProposalsGetErrors, AdminProposalsGetResponses, AdminRolesCreateData, AdminRolesCreateErrors, AdminRolesCreateResponses, AdminRolesDeleteData, AdminRolesDeleteErrors, AdminRolesDeleteResponses, AdminRolesGetData, AdminRolesGetErrors, AdminRolesGetResponses, AdminRolesListData, AdminRolesListErrors, AdminRolesListResponses, AdminRolesSetPermissionsData, AdminRolesSetPermissionsErrors, AdminRolesSetPermissionsResponses, AdminRolesUpdateData, AdminRolesUpdateErrors, AdminRolesUpdateResponses, AdminSettingsGetData, AdminSettingsGetErrors, AdminSettingsGetResponses, AdminSettingsUpdateData, AdminSettingsUpdateErrors, AdminSettingsUpdateResponses, AdminUsersAssignRoleData, AdminUsersAssignRoleErrors, AdminUsersAssignRoleResponses, AdminUsersCreateData, AdminUsersCreateErrors, AdminUsersCreateResponses, AdminUsersDeleteData, AdminUsersDeleteErrors, AdminUsersDeleteResponses, AdminUsersDisableData, AdminUsersDisableErrors, AdminUsersDisableResponses, AdminUsersEnableData, AdminUsersEnableErrors, AdminUsersEnableResponses, AdminUsersGetData, AdminUsersGetErrors, AdminUsersGetResponses, AdminUsersListData, AdminUsersListErrors, AdminUsersListResponses, AdminUsersRemoveRoleData, AdminUsersRemoveRoleErrors, AdminUsersRemoveRoleResponses, AdminUsersRevokeSessionsData, AdminUsersRevokeSessionsErrors, AdminUsersRevokeSessionsResponses, AdminUsersUpdateData, AdminUsersUpdateErrors, AdminUsersUpdateResponses, AiAgentsCreateData, AiAgentsCreateErrors, AiAgentsCreateResponses, AiAgentsDiscardDraftData, AiAgentsDiscardDraftErrors, AiAgentsDiscardDraftResponses, AiAgentsGetData, AiAgentsGetErrors, AiAgentsGetResponses, AiAgentsListData, AiAgentsListErrors, AiAgentsListResponses, AiAgentsPublishData, AiAgentsPublishErrors, AiAgentsPublishResponses, AiAgentsRollbackData, AiAgentsRollbackErrors, AiAgentsRollbackResponses, AiAgentsSaveDraftData, AiAgentsSaveDraftErrors, AiAgentsSaveDraftResponses, AiAgentsTestData, AiAgentsTestErrors, AiAgentsTestResponses, AiAgentsUpdateData, AiAgentsUpdateErrors, AiAgentsUpdateResponses, AiAgentsValidateData, AiAgentsValidateErrors, AiAgentsValidateResponses, AiAttachmentsContentData, AiAttachmentsContentErrors, AiAttachmentsContentResponses, AiAttachmentsDeleteData, AiAttachmentsDeleteErrors, AiAttachmentsDeleteResponses, AiAttachmentsUploadData, AiAttachmentsUploadErrors, AiAttachmentsUploadResponses, AiBudgetsCreateData, AiBudgetsCreateErrors, AiBudgetsCreateResponses, AiBudgetsDeleteData, AiBudgetsDeleteErrors, AiBudgetsDeleteResponses, AiBudgetsListData, AiBudgetsListErrors, AiBudgetsListResponses, AiBudgetsUpdateData, AiBudgetsUpdateErrors, AiBudgetsUpdateResponses, AiChatAgentData, AiChatAgentErrors, AiChatAgentResponses, AiChatStreamData, AiChatStreamErrors, AiChatStreamResponse, AiChatStreamResponses, AiConnectionsCreateData, AiConnectionsCreateErrors, AiConnectionsCreateResponses, AiConnectionsDeleteData, AiConnectionsDeleteErrors, AiConnectionsDeleteResponses, AiConnectionsGetData, AiConnectionsGetErrors, AiConnectionsGetResponses, AiConnectionsListData, AiConnectionsListErrors, AiConnectionsListResponses, AiConnectionsTestData, AiConnectionsTestErrors, AiConnectionsTestResponses, AiConnectionsUpdateData, AiConnectionsUpdateErrors, AiConnectionsUpdateResponses, AiConversationsDeleteData, AiConversationsDeleteErrors, AiConversationsDeleteResponses, AiConversationsGetData, AiConversationsGetErrors, AiConversationsGetResponses, AiConversationsListData, AiConversationsListErrors, AiConversationsListResponses, AiConversationsRenameData, AiConversationsRenameErrors, AiConversationsRenameResponses, AiFxRefreshData, AiFxRefreshErrors, AiFxRefreshResponses, AiLabCreateData, AiLabCreateErrors, AiLabCreateResponses, AiLabGetData, AiLabGetErrors, AiLabGetResponses, AiLabListData, AiLabListErrors, AiLabListResponses, AiMessagesFeedbackData, AiMessagesFeedbackErrors, AiMessagesFeedbackResponses, AiModelsGetData, AiModelsGetErrors, AiModelsGetResponses, AiModelsImportData, AiModelsImportErrors, AiModelsImportResponses, AiModelsListData, AiModelsListErrors, AiModelsListResponses, AiModelsSyncData, AiModelsSyncErrors, AiModelsSyncResponses, AiModelsUpdateData, AiModelsUpdateErrors, AiModelsUpdateResponses, AiModelsVerifyData, AiModelsVerifyErrors, AiModelsVerifyResponses, AiPricesListData, AiPricesListErrors, AiPricesListResponses, AiPricesSetData, AiPricesSetErrors, AiPricesSetResponses, AiPricesSyncData, AiPricesSyncErrors, AiPricesSyncResponses, AiProvidersListData, AiProvidersListErrors, AiProvidersListResponses, AiRecommendationsCreateData, AiRecommendationsCreateErrors, AiRecommendationsCreateResponses, AiSyncRunsData, AiSyncRunsErrors, AiSyncRunsResponses, AiTranscriptionsCreateData, AiTranscriptionsCreateErrors, AiTranscriptionsCreateResponses, AiUsageExportData, AiUsageExportErrors, AiUsageExportResponses, AiUsageRequestsData, AiUsageRequestsErrors, AiUsageRequestsResponses, AiUsageSummaryData, AiUsageSummaryErrors, AiUsageSummaryResponses, AuthGetErrorData, AuthGetErrorErrors, AuthGetErrorResponses, AuthGetOkData, AuthGetOkErrors, AuthGetOkResponses, AuthGetSessionData, AuthGetSessionErrors, AuthGetSessionPostData, AuthGetSessionPostErrors, AuthGetSessionPostResponses, AuthGetSessionResponses, AuthListUserSessionsData, AuthListUserSessionsErrors, AuthListUserSessionsResponses, AuthPostRevokeOtherSessionsData, AuthPostRevokeOtherSessionsErrors, AuthPostRevokeOtherSessionsResponses, AuthPostRevokeSessionData, AuthPostRevokeSessionErrors, AuthPostRevokeSessionResponses, AuthPostRevokeSessionsData, AuthPostRevokeSessionsErrors, AuthPostRevokeSessionsResponses, AuthSendEmailVerificationOtpData, AuthSendEmailVerificationOtpErrors, AuthSendEmailVerificationOtpResponses, AuthSignInWithEmailOtpData, AuthSignInWithEmailOtpErrors, AuthSignInWithEmailOtpResponses, AuthSignOutData, AuthSignOutErrors, AuthSignOutResponses, AuthVerifyEmailWithOtpData, AuthVerifyEmailWithOtpErrors, AuthVerifyEmailWithOtpResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthMetricsData, HealthMetricsErrors, HealthMetricsResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, MeGetData, MeGetErrors, MeGetResponses, MeSessionsListData, MeSessionsListErrors, MeSessionsListResponses, MeSessionsRevokeData, MeSessionsRevokeErrors, MeSessionsRevokeOthersData, MeSessionsRevokeOthersErrors, MeSessionsRevokeOthersResponses, MeSessionsRevokeResponses, MeSwitchOrganizationData, MeSwitchOrganizationErrors, MeSwitchOrganizationResponses, MeUpdateData, MeUpdateErrors, MeUpdateResponses, ProjectsCreateData, ProjectsCreateErrors, ProjectsCreateResponses, ProjectsDeleteData, ProjectsDeleteErrors, ProjectsDeleteResponses, ProjectsGetData, ProjectsGetErrors, ProjectsGetResponses, ProjectsListData, ProjectsListErrors, ProjectsListResponses, ProjectsUpdateData, ProjectsUpdateErrors, ProjectsUpdateResponses, PublicSettingsData, PublicSettingsErrors, PublicSettingsResponses, RagAnalyticsData, RagAnalyticsErrors, RagAnalyticsResponses, RagCollectionsCreateData, RagCollectionsCreateErrors, RagCollectionsCreateResponses, RagCollectionsDeleteData, RagCollectionsDeleteErrors, RagCollectionsDeleteResponses, RagCollectionsGetData, RagCollectionsGetErrors, RagCollectionsGetResponses, RagCollectionsListData, RagCollectionsListErrors, RagCollectionsListResponses, RagCollectionsReindexData, RagCollectionsReindexErrors, RagCollectionsReindexResponses, RagCollectionsUpdateData, RagCollectionsUpdateErrors, RagCollectionsUpdateResponses, RagConnectionsActivateData, RagConnectionsActivateErrors, RagConnectionsActivateResponses, RagConnectionsCreateData, RagConnectionsCreateErrors, RagConnectionsCreateResponses, RagConnectionsDeleteData, RagConnectionsDeleteErrors, RagConnectionsDeleteResponses, RagConnectionsDiagnoseData, RagConnectionsDiagnoseErrors, RagConnectionsDiagnoseResponses, RagConnectionsGetData, RagConnectionsGetErrors, RagConnectionsGetResponses, RagConnectionsListData, RagConnectionsListErrors, RagConnectionsListResponses, RagConnectionsUpdateData, RagConnectionsUpdateErrors, RagConnectionsUpdateResponses, RagDocumentsDeleteData, RagDocumentsDeleteErrors, RagDocumentsDeleteResponses, RagDocumentsGetData, RagDocumentsGetErrors, RagDocumentsGetResponses, RagDocumentsListData, RagDocumentsListErrors, RagDocumentsListResponses, RagDocumentsReprocessData, RagDocumentsReprocessErrors, RagDocumentsReprocessResponses, RagDocumentsUploadData, RagDocumentsUploadErrors, RagDocumentsUploadResponses, RagEvaluationsCreateData, RagEvaluationsCreateErrors, RagEvaluationsCreateResponses, RagEvaluationsDeleteData, RagEvaluationsDeleteErrors, RagEvaluationsDeleteResponses, RagEvaluationsListData, RagEvaluationsListErrors, RagEvaluationsListResponses, RagEvaluationsRateData, RagEvaluationsRateErrors, RagEvaluationsRateResponses, RagEvaluationsRunData, RagEvaluationsRunErrors, RagEvaluationsRunResponses, RagEvaluationsRunsData, RagEvaluationsRunsErrors, RagEvaluationsRunsResponses, RagEvaluationsUpdateData, RagEvaluationsUpdateErrors, RagEvaluationsUpdateResponses, RagJobsCancelData, RagJobsCancelErrors, RagJobsCancelResponses, RagJobsGetData, RagJobsGetErrors, RagJobsGetResponses, RagJobsListData, RagJobsListErrors, RagJobsListResponses, RagJobsRetryData, RagJobsRetryErrors, RagJobsRetryResponses, RagProfilesCreateData, RagProfilesCreateErrors, RagProfilesCreateResponses, RagProfilesDeleteData, RagProfilesDeleteErrors, RagProfilesDeleteResponses, RagProfilesListData, RagProfilesListErrors, RagProfilesListResponses, RagSearchData, RagSearchErrors, RagSearchResponses, RagSourcesCreateData, RagSourcesCreateErrors, RagSourcesCreateResponses, RagSourcesDeleteData, RagSourcesDeleteErrors, RagSourcesDeleteResponses, RagSourcesListData, RagSourcesListErrors, RagSourcesListResponses, RagSourcesSyncData, RagSourcesSyncErrors, RagSourcesSyncResponses, RagSourcesUpdateData, RagSourcesUpdateErrors, RagSourcesUpdateResponses } from './types.gen.js';
+import type { AdminAuditExportData, AdminAuditExportErrors, AdminAuditExportResponses, AdminAuditListData, AdminAuditListErrors, AdminAuditListResponses, AdminDashboardData, AdminDashboardErrors, AdminDashboardResponses, AdminDiagnosticsData, AdminDiagnosticsErrors, AdminDiagnosticsResponses, AdminInvitationsCreateData, AdminInvitationsCreateErrors, AdminInvitationsCreateResponses, AdminInvitationsListData, AdminInvitationsListErrors, AdminInvitationsListResponses, AdminInvitationsResendData, AdminInvitationsResendErrors, AdminInvitationsResendResponses, AdminInvitationsRevokeData, AdminInvitationsRevokeErrors, AdminInvitationsRevokeResponses, AdminOnboardingCompleteData, AdminOnboardingCompleteErrors, AdminOnboardingCompleteResponses, AdminOrgsAddMemberData, AdminOrgsAddMemberErrors, AdminOrgsAddMemberResponses, AdminOrgsCreateData, AdminOrgsCreateErrors, AdminOrgsCreateResponses, AdminOrgsListData, AdminOrgsListErrors, AdminOrgsListResponses, AdminOrgsMembersData, AdminOrgsMembersErrors, AdminOrgsMembersResponses, AdminOrgsRemoveMemberData, AdminOrgsRemoveMemberErrors, AdminOrgsRemoveMemberResponses, AdminPermissionsListData, AdminPermissionsListErrors, AdminPermissionsListResponses, AdminPermissionsMatrixData, AdminPermissionsMatrixErrors, AdminPermissionsMatrixResponses, AdminProposalsCancelData, AdminProposalsCancelErrors, AdminProposalsCancelResponses, AdminProposalsConfirmData, AdminProposalsConfirmErrors, AdminProposalsConfirmResponses, AdminProposalsCreateData, AdminProposalsCreateErrors, AdminProposalsCreateResponses, AdminProposalsGetData, AdminProposalsGetErrors, AdminProposalsGetResponses, AdminRolesCreateData, AdminRolesCreateErrors, AdminRolesCreateResponses, AdminRolesDeleteData, AdminRolesDeleteErrors, AdminRolesDeleteResponses, AdminRolesGetData, AdminRolesGetErrors, AdminRolesGetResponses, AdminRolesListData, AdminRolesListErrors, AdminRolesListResponses, AdminRolesSetPermissionsData, AdminRolesSetPermissionsErrors, AdminRolesSetPermissionsResponses, AdminRolesUpdateData, AdminRolesUpdateErrors, AdminRolesUpdateResponses, AdminSettingsGetData, AdminSettingsGetErrors, AdminSettingsGetResponses, AdminSettingsUpdateData, AdminSettingsUpdateErrors, AdminSettingsUpdateResponses, AdminUsersAssignRoleData, AdminUsersAssignRoleErrors, AdminUsersAssignRoleResponses, AdminUsersCreateData, AdminUsersCreateErrors, AdminUsersCreateResponses, AdminUsersDeleteData, AdminUsersDeleteErrors, AdminUsersDeleteResponses, AdminUsersDisableData, AdminUsersDisableErrors, AdminUsersDisableResponses, AdminUsersEnableData, AdminUsersEnableErrors, AdminUsersEnableResponses, AdminUsersGetData, AdminUsersGetErrors, AdminUsersGetResponses, AdminUsersListData, AdminUsersListErrors, AdminUsersListResponses, AdminUsersRemoveRoleData, AdminUsersRemoveRoleErrors, AdminUsersRemoveRoleResponses, AdminUsersRevokeSessionsData, AdminUsersRevokeSessionsErrors, AdminUsersRevokeSessionsResponses, AdminUsersUpdateData, AdminUsersUpdateErrors, AdminUsersUpdateResponses, AiAgentsCreateData, AiAgentsCreateErrors, AiAgentsCreateResponses, AiAgentsDiscardDraftData, AiAgentsDiscardDraftErrors, AiAgentsDiscardDraftResponses, AiAgentsGetData, AiAgentsGetErrors, AiAgentsGetResponses, AiAgentsListData, AiAgentsListErrors, AiAgentsListResponses, AiAgentsPublishData, AiAgentsPublishErrors, AiAgentsPublishResponses, AiAgentsRollbackData, AiAgentsRollbackErrors, AiAgentsRollbackResponses, AiAgentsSaveDraftData, AiAgentsSaveDraftErrors, AiAgentsSaveDraftResponses, AiAgentsTestData, AiAgentsTestErrors, AiAgentsTestResponses, AiAgentsUpdateData, AiAgentsUpdateErrors, AiAgentsUpdateResponses, AiAgentsValidateData, AiAgentsValidateErrors, AiAgentsValidateResponses, AiAttachmentsContentData, AiAttachmentsContentErrors, AiAttachmentsContentResponses, AiAttachmentsDeleteData, AiAttachmentsDeleteErrors, AiAttachmentsDeleteResponses, AiAttachmentsUploadData, AiAttachmentsUploadErrors, AiAttachmentsUploadResponses, AiBudgetsCreateData, AiBudgetsCreateErrors, AiBudgetsCreateResponses, AiBudgetsDeleteData, AiBudgetsDeleteErrors, AiBudgetsDeleteResponses, AiBudgetsListData, AiBudgetsListErrors, AiBudgetsListResponses, AiBudgetsUpdateData, AiBudgetsUpdateErrors, AiBudgetsUpdateResponses, AiChatAgentData, AiChatAgentErrors, AiChatAgentResponses, AiChatStreamData, AiChatStreamErrors, AiChatStreamResponse, AiChatStreamResponses, AiConnectionsCreateData, AiConnectionsCreateErrors, AiConnectionsCreateResponses, AiConnectionsDeleteData, AiConnectionsDeleteErrors, AiConnectionsDeleteResponses, AiConnectionsGetData, AiConnectionsGetErrors, AiConnectionsGetResponses, AiConnectionsListData, AiConnectionsListErrors, AiConnectionsListResponses, AiConnectionsTestData, AiConnectionsTestErrors, AiConnectionsTestResponses, AiConnectionsUpdateData, AiConnectionsUpdateErrors, AiConnectionsUpdateResponses, AiConversationsDeleteData, AiConversationsDeleteErrors, AiConversationsDeleteResponses, AiConversationsGetData, AiConversationsGetErrors, AiConversationsGetResponses, AiConversationsListData, AiConversationsListErrors, AiConversationsListResponses, AiConversationsRenameData, AiConversationsRenameErrors, AiConversationsRenameResponses, AiFxRefreshData, AiFxRefreshErrors, AiFxRefreshResponses, AiLabCreateData, AiLabCreateErrors, AiLabCreateResponses, AiLabGetData, AiLabGetErrors, AiLabGetResponses, AiLabListData, AiLabListErrors, AiLabListResponses, AiMessagesFeedbackData, AiMessagesFeedbackErrors, AiMessagesFeedbackResponses, AiModelsGetData, AiModelsGetErrors, AiModelsGetResponses, AiModelsImportData, AiModelsImportErrors, AiModelsImportResponses, AiModelsListData, AiModelsListErrors, AiModelsListResponses, AiModelsSyncData, AiModelsSyncErrors, AiModelsSyncResponses, AiModelsUpdateData, AiModelsUpdateErrors, AiModelsUpdateResponses, AiModelsVerifyData, AiModelsVerifyErrors, AiModelsVerifyResponses, AiPricesListData, AiPricesListErrors, AiPricesListResponses, AiPricesSetData, AiPricesSetErrors, AiPricesSetResponses, AiPricesSyncData, AiPricesSyncErrors, AiPricesSyncResponses, AiProvidersListData, AiProvidersListErrors, AiProvidersListResponses, AiRecommendationsCreateData, AiRecommendationsCreateErrors, AiRecommendationsCreateResponses, AiSyncRunsData, AiSyncRunsErrors, AiSyncRunsResponses, AiTranscriptionsCreateData, AiTranscriptionsCreateErrors, AiTranscriptionsCreateResponses, AiUsageExportData, AiUsageExportErrors, AiUsageExportResponses, AiUsageRequestsData, AiUsageRequestsErrors, AiUsageRequestsResponses, AiUsageSummaryData, AiUsageSummaryErrors, AiUsageSummaryResponses, AuthGetErrorData, AuthGetErrorErrors, AuthGetErrorResponses, AuthGetOkData, AuthGetOkErrors, AuthGetOkResponses, AuthGetSessionData, AuthGetSessionErrors, AuthGetSessionPostData, AuthGetSessionPostErrors, AuthGetSessionPostResponses, AuthGetSessionResponses, AuthListUserSessionsData, AuthListUserSessionsErrors, AuthListUserSessionsResponses, AuthPostRevokeOtherSessionsData, AuthPostRevokeOtherSessionsErrors, AuthPostRevokeOtherSessionsResponses, AuthPostRevokeSessionData, AuthPostRevokeSessionErrors, AuthPostRevokeSessionResponses, AuthPostRevokeSessionsData, AuthPostRevokeSessionsErrors, AuthPostRevokeSessionsResponses, AuthSendEmailVerificationOtpData, AuthSendEmailVerificationOtpErrors, AuthSendEmailVerificationOtpResponses, AuthSignInWithEmailOtpData, AuthSignInWithEmailOtpErrors, AuthSignInWithEmailOtpResponses, AuthSignOutData, AuthSignOutErrors, AuthSignOutResponses, AuthVerifyEmailWithOtpData, AuthVerifyEmailWithOtpErrors, AuthVerifyEmailWithOtpResponses, HealthLiveData, HealthLiveErrors, HealthLiveResponses, HealthMetricsData, HealthMetricsErrors, HealthMetricsResponses, HealthReadyData, HealthReadyErrors, HealthReadyResponses, MailAutomationsCreateData, MailAutomationsCreateErrors, MailAutomationsCreateResponses, MailAutomationsDeleteData, MailAutomationsDeleteErrors, MailAutomationsDeleteResponses, MailAutomationsGetData, MailAutomationsGetErrors, MailAutomationsGetResponses, MailAutomationsListData, MailAutomationsListErrors, MailAutomationsListResponses, MailAutomationsTestData, MailAutomationsTestErrors, MailAutomationsTestResponses, MailAutomationsUpdateData, MailAutomationsUpdateErrors, MailAutomationsUpdateResponses, MailDeliveriesListData, MailDeliveriesListErrors, MailDeliveriesListResponses, MailDeliveriesRetryData, MailDeliveriesRetryErrors, MailDeliveriesRetryResponses, MailSettingsCheckData, MailSettingsCheckErrors, MailSettingsCheckResponses, MailSettingsGetData, MailSettingsGetErrors, MailSettingsGetResponses, MailSettingsResetData, MailSettingsResetErrors, MailSettingsResetResponses, MailSettingsTestData, MailSettingsTestErrors, MailSettingsTestResponses, MailSettingsUpdateData, MailSettingsUpdateErrors, MailSettingsUpdateResponses, MailTemplatesCreateData, MailTemplatesCreateErrors, MailTemplatesCreateResponses, MailTemplatesDeleteData, MailTemplatesDeleteErrors, MailTemplatesDeleteResponses, MailTemplatesGenerateData, MailTemplatesGenerateErrors, MailTemplatesGenerateResponses, MailTemplatesGetData, MailTemplatesGetErrors, MailTemplatesGetResponses, MailTemplatesListData, MailTemplatesListErrors, MailTemplatesListResponses, MailTemplatesResetData, MailTemplatesResetErrors, MailTemplatesResetResponses, MailTemplatesTestData, MailTemplatesTestErrors, MailTemplatesTestResponses, MailTemplatesUpdateData, MailTemplatesUpdateErrors, MailTemplatesUpdateResponses, MeGetData, MeGetErrors, MeGetResponses, MeSessionsListData, MeSessionsListErrors, MeSessionsListResponses, MeSessionsRevokeData, MeSessionsRevokeErrors, MeSessionsRevokeOthersData, MeSessionsRevokeOthersErrors, MeSessionsRevokeOthersResponses, MeSessionsRevokeResponses, MeSwitchOrganizationData, MeSwitchOrganizationErrors, MeSwitchOrganizationResponses, MeUpdateData, MeUpdateErrors, MeUpdateResponses, ProjectsCreateData, ProjectsCreateErrors, ProjectsCreateResponses, ProjectsDeleteData, ProjectsDeleteErrors, ProjectsDeleteResponses, ProjectsGetData, ProjectsGetErrors, ProjectsGetResponses, ProjectsListData, ProjectsListErrors, ProjectsListResponses, ProjectsUpdateData, ProjectsUpdateErrors, ProjectsUpdateResponses, PublicSettingsData, PublicSettingsErrors, PublicSettingsResponses, RagAnalyticsData, RagAnalyticsErrors, RagAnalyticsResponses, RagCollectionsCreateData, RagCollectionsCreateErrors, RagCollectionsCreateResponses, RagCollectionsDeleteData, RagCollectionsDeleteErrors, RagCollectionsDeleteResponses, RagCollectionsGetData, RagCollectionsGetErrors, RagCollectionsGetResponses, RagCollectionsListData, RagCollectionsListErrors, RagCollectionsListResponses, RagCollectionsReindexData, RagCollectionsReindexErrors, RagCollectionsReindexResponses, RagCollectionsUpdateData, RagCollectionsUpdateErrors, RagCollectionsUpdateResponses, RagConnectionsActivateData, RagConnectionsActivateErrors, RagConnectionsActivateResponses, RagConnectionsCreateData, RagConnectionsCreateErrors, RagConnectionsCreateResponses, RagConnectionsDeleteData, RagConnectionsDeleteErrors, RagConnectionsDeleteResponses, RagConnectionsDiagnoseData, RagConnectionsDiagnoseErrors, RagConnectionsDiagnoseResponses, RagConnectionsGetData, RagConnectionsGetErrors, RagConnectionsGetResponses, RagConnectionsListData, RagConnectionsListErrors, RagConnectionsListResponses, RagConnectionsUpdateData, RagConnectionsUpdateErrors, RagConnectionsUpdateResponses, RagDocumentsDeleteData, RagDocumentsDeleteErrors, RagDocumentsDeleteResponses, RagDocumentsGetData, RagDocumentsGetErrors, RagDocumentsGetResponses, RagDocumentsListData, RagDocumentsListErrors, RagDocumentsListResponses, RagDocumentsReprocessData, RagDocumentsReprocessErrors, RagDocumentsReprocessResponses, RagDocumentsUploadData, RagDocumentsUploadErrors, RagDocumentsUploadResponses, RagEvaluationsCreateData, RagEvaluationsCreateErrors, RagEvaluationsCreateResponses, RagEvaluationsDeleteData, RagEvaluationsDeleteErrors, RagEvaluationsDeleteResponses, RagEvaluationsListData, RagEvaluationsListErrors, RagEvaluationsListResponses, RagEvaluationsRateData, RagEvaluationsRateErrors, RagEvaluationsRateResponses, RagEvaluationsRunData, RagEvaluationsRunErrors, RagEvaluationsRunResponses, RagEvaluationsRunsData, RagEvaluationsRunsErrors, RagEvaluationsRunsResponses, RagEvaluationsUpdateData, RagEvaluationsUpdateErrors, RagEvaluationsUpdateResponses, RagJobsCancelData, RagJobsCancelErrors, RagJobsCancelResponses, RagJobsGetData, RagJobsGetErrors, RagJobsGetResponses, RagJobsListData, RagJobsListErrors, RagJobsListResponses, RagJobsRetryData, RagJobsRetryErrors, RagJobsRetryResponses, RagProfilesCreateData, RagProfilesCreateErrors, RagProfilesCreateResponses, RagProfilesDeleteData, RagProfilesDeleteErrors, RagProfilesDeleteResponses, RagProfilesListData, RagProfilesListErrors, RagProfilesListResponses, RagSearchData, RagSearchErrors, RagSearchResponses, RagSourcesCreateData, RagSourcesCreateErrors, RagSourcesCreateResponses, RagSourcesDeleteData, RagSourcesDeleteErrors, RagSourcesDeleteResponses, RagSourcesListData, RagSourcesListErrors, RagSourcesListResponses, RagSourcesSyncData, RagSourcesSyncErrors, RagSourcesSyncResponses, RagSourcesUpdateData, RagSourcesUpdateErrors, RagSourcesUpdateResponses } from './types.gen.js';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -212,6 +212,379 @@ export const adminInvitationsResend = <ThrowOnError extends boolean = false>(opt
         }],
     url: '/api/admin/invitations/{id}/resend',
     ...options
+});
+
+/**
+ * Automatizaciones de correo
+ *
+ * **Permiso requerido:** `mail.read`.
+ */
+export const mailAutomationsList = <ThrowOnError extends boolean = false>(options?: Options<MailAutomationsListData, ThrowOnError>): RequestResult<MailAutomationsListResponses, MailAutomationsListErrors, ThrowOnError> => (options?.client ?? client).get<MailAutomationsListResponses, MailAutomationsListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/automations',
+    ...options
+});
+
+/**
+ * Crear automatización
+ *
+ * Se dispara con una acción auditada (MAIL_EVENTS) o con una programación cron (UTC). Solo considera eventos posteriores a su activación.
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailAutomationsCreate = <ThrowOnError extends boolean = false>(options: Options<MailAutomationsCreateData, ThrowOnError>): RequestResult<MailAutomationsCreateResponses, MailAutomationsCreateErrors, ThrowOnError> => (options.client ?? client).post<MailAutomationsCreateResponses, MailAutomationsCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/automations',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Eliminar automatización
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailAutomationsDelete = <ThrowOnError extends boolean = false>(options: Options<MailAutomationsDeleteData, ThrowOnError>): RequestResult<MailAutomationsDeleteResponses, MailAutomationsDeleteErrors, ThrowOnError> => (options.client ?? client).delete<MailAutomationsDeleteResponses, MailAutomationsDeleteErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/automations/{id}',
+    ...options
+});
+
+/**
+ * Automatización
+ *
+ * **Permiso requerido:** `mail.read`.
+ */
+export const mailAutomationsGet = <ThrowOnError extends boolean = false>(options: Options<MailAutomationsGetData, ThrowOnError>): RequestResult<MailAutomationsGetResponses, MailAutomationsGetErrors, ThrowOnError> => (options.client ?? client).get<MailAutomationsGetResponses, MailAutomationsGetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/automations/{id}',
+    ...options
+});
+
+/**
+ * Editar, activar o desactivar automatización
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailAutomationsUpdate = <ThrowOnError extends boolean = false>(options: Options<MailAutomationsUpdateData, ThrowOnError>): RequestResult<MailAutomationsUpdateResponses, MailAutomationsUpdateErrors, ThrowOnError> => (options.client ?? client).patch<MailAutomationsUpdateResponses, MailAutomationsUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/automations/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Enviar la automatización con valores de ejemplo
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailAutomationsTest = <ThrowOnError extends boolean = false>(options: Options<MailAutomationsTestData, ThrowOnError>): RequestResult<MailAutomationsTestResponses, MailAutomationsTestErrors, ThrowOnError> => (options.client ?? client).post<MailAutomationsTestResponses, MailAutomationsTestErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/automations/{id}/test',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Envíos de correo
+ *
+ * Sistema, pruebas y automatizaciones. No guarda asuntos (pueden contener códigos).
+ *
+ * **Permiso requerido:** `mail.read`.
+ */
+export const mailDeliveriesList = <ThrowOnError extends boolean = false>(options?: Options<MailDeliveriesListData, ThrowOnError>): RequestResult<MailDeliveriesListResponses, MailDeliveriesListErrors, ThrowOnError> => (options?.client ?? client).get<MailDeliveriesListResponses, MailDeliveriesListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/deliveries',
+    ...options
+});
+
+/**
+ * Reintentar un envío fallido de automatización
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailDeliveriesRetry = <ThrowOnError extends boolean = false>(options: Options<MailDeliveriesRetryData, ThrowOnError>): RequestResult<MailDeliveriesRetryResponses, MailDeliveriesRetryErrors, ThrowOnError> => (options.client ?? client).post<MailDeliveriesRetryResponses, MailDeliveriesRetryErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/deliveries/{id}/retry',
+    ...options
+});
+
+/**
+ * Volver a las variables de entorno
+ *
+ * Elimina la configuración guardada (incluido el secreto).
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailSettingsReset = <ThrowOnError extends boolean = false>(options?: Options<MailSettingsResetData, ThrowOnError>): RequestResult<MailSettingsResetResponses, MailSettingsResetErrors, ThrowOnError> => (options?.client ?? client).delete<MailSettingsResetResponses, MailSettingsResetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/settings',
+    ...options
+});
+
+/**
+ * Proveedor de correo en uso
+ *
+ * Configurado en la plataforma (base de datos) o por variables MAIL_*. El secreto nunca se devuelve, solo una pista.
+ *
+ * **Permiso requerido:** `mail.read`.
+ */
+export const mailSettingsGet = <ThrowOnError extends boolean = false>(options?: Options<MailSettingsGetData, ThrowOnError>): RequestResult<MailSettingsGetResponses, MailSettingsGetErrors, ThrowOnError> => (options?.client ?? client).get<MailSettingsGetResponses, MailSettingsGetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/settings',
+    ...options
+});
+
+/**
+ * Guardar proveedor de correo
+ *
+ * La API key o contraseña SMTP se cifra con APP_ENCRYPTION_KEY; omitirla conserva la guardada (mismo proveedor). Requiere la versión leída (412 si cambió).
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailSettingsUpdate = <ThrowOnError extends boolean = false>(options: Options<MailSettingsUpdateData, ThrowOnError>): RequestResult<MailSettingsUpdateResponses, MailSettingsUpdateErrors, ThrowOnError> => (options.client ?? client).put<MailSettingsUpdateResponses, MailSettingsUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/settings',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Comprobar credenciales sin enviar
+ *
+ * Con `draft` prueba los valores del formulario antes de guardarlos.
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailSettingsCheck = <ThrowOnError extends boolean = false>(options: Options<MailSettingsCheckData, ThrowOnError>): RequestResult<MailSettingsCheckResponses, MailSettingsCheckErrors, ThrowOnError> => (options.client ?? client).post<MailSettingsCheckResponses, MailSettingsCheckErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/settings/check',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Enviar un correo de prueba
+ *
+ * Devuelve el resultado del proveedor (ok: false con el motivo si lo rechaza).
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailSettingsTest = <ThrowOnError extends boolean = false>(options: Options<MailSettingsTestData, ThrowOnError>): RequestResult<MailSettingsTestResponses, MailSettingsTestErrors, ThrowOnError> => (options.client ?? client).post<MailSettingsTestResponses, MailSettingsTestErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/settings/test',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Plantillas de correo
+ *
+ * **Permiso requerido:** `mail.read`.
+ */
+export const mailTemplatesList = <ThrowOnError extends boolean = false>(options?: Options<MailTemplatesListData, ThrowOnError>): RequestResult<MailTemplatesListResponses, MailTemplatesListErrors, ThrowOnError> => (options?.client ?? client).get<MailTemplatesListResponses, MailTemplatesListErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/templates',
+    ...options
+});
+
+/**
+ * Crear plantilla
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailTemplatesCreate = <ThrowOnError extends boolean = false>(options: Options<MailTemplatesCreateData, ThrowOnError>): RequestResult<MailTemplatesCreateResponses, MailTemplatesCreateErrors, ThrowOnError> => (options.client ?? client).post<MailTemplatesCreateResponses, MailTemplatesCreateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/templates',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Eliminar plantilla propia
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailTemplatesDelete = <ThrowOnError extends boolean = false>(options: Options<MailTemplatesDeleteData, ThrowOnError>): RequestResult<MailTemplatesDeleteResponses, MailTemplatesDeleteErrors, ThrowOnError> => (options.client ?? client).delete<MailTemplatesDeleteResponses, MailTemplatesDeleteErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/templates/{id}',
+    ...options
+});
+
+/**
+ * Plantilla
+ *
+ * **Permiso requerido:** `mail.read`.
+ */
+export const mailTemplatesGet = <ThrowOnError extends boolean = false>(options: Options<MailTemplatesGetData, ThrowOnError>): RequestResult<MailTemplatesGetResponses, MailTemplatesGetErrors, ThrowOnError> => (options.client ?? client).get<MailTemplatesGetResponses, MailTemplatesGetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/templates/{id}',
+    ...options
+});
+
+/**
+ * Editar plantilla
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailTemplatesUpdate = <ThrowOnError extends boolean = false>(options: Options<MailTemplatesUpdateData, ThrowOnError>): RequestResult<MailTemplatesUpdateResponses, MailTemplatesUpdateErrors, ThrowOnError> => (options.client ?? client).patch<MailTemplatesUpdateResponses, MailTemplatesUpdateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/templates/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Restablecer plantilla del sistema
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailTemplatesReset = <ThrowOnError extends boolean = false>(options: Options<MailTemplatesResetData, ThrowOnError>): RequestResult<MailTemplatesResetResponses, MailTemplatesResetErrors, ThrowOnError> => (options.client ?? client).post<MailTemplatesResetResponses, MailTemplatesResetErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/templates/{id}/reset',
+    ...options
+});
+
+/**
+ * Enviar la plantilla guardada a un correo
+ *
+ * **Permiso requerido:** `mail.manage`.
+ */
+export const mailTemplatesTest = <ThrowOnError extends boolean = false>(options: Options<MailTemplatesTestData, ThrowOnError>): RequestResult<MailTemplatesTestResponses, MailTemplatesTestErrors, ThrowOnError> => (options.client ?? client).post<MailTemplatesTestResponses, MailTemplatesTestErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/templates/{id}/test',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Generar asunto y HTML con IA
+ *
+ * Usa el modelo indicado o el del asistente predeterminado; el costo queda en el libro de uso (función mail_template). No guarda nada.
+ *
+ * **Permiso requerido:** `mail.manage`.
+ *
+ * **Módulo:** `ai` debe estar habilitado.
+ */
+export const mailTemplatesGenerate = <ThrowOnError extends boolean = false>(options: Options<MailTemplatesGenerateData, ThrowOnError>): RequestResult<MailTemplatesGenerateResponses, MailTemplatesGenerateErrors, ThrowOnError> => (options.client ?? client).post<MailTemplatesGenerateResponses, MailTemplatesGenerateErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            type: 'apiKey'
+        }],
+    url: '/api/admin/mail/templates/generate',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**

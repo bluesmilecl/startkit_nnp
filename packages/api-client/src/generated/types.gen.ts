@@ -321,6 +321,282 @@ export type SwitchOrganizationInput = {
     organizationId: string;
 };
 
+export type MailTransport = 'resend' | 'smtp' | 'postmark' | 'sendgrid' | 'mailgun' | 'brevo' | 'log';
+
+export type MailProviderInput = {
+    transport: MailTransport;
+    from: string;
+    replyTo?: string | null;
+    smtpHost?: string | null;
+    smtpPort?: number | null;
+    smtpUser?: string | null;
+    smtpSecure?: boolean | null;
+    mailgunDomain?: string | null;
+    mailgunRegion?: 'us' | 'eu';
+    secret?: string;
+};
+
+export type UpdateMailProviderInput = {
+    provider: MailProviderInput;
+    /**
+     * 0 when nothing is stored yet; a mismatch returns 412
+     */
+    version: number;
+};
+
+export type MailCheck = {
+    ok: boolean;
+    detail: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    at: string;
+};
+
+export type MailProviderSettings = {
+    source: 'database' | 'environment';
+    transport: MailTransport;
+    from: string;
+    replyTo: string | null;
+    smtpHost: string | null;
+    smtpPort: number | null;
+    smtpUser: string | null;
+    smtpSecure: boolean | null;
+    mailgunDomain: string | null;
+    mailgunRegion: 'us' | 'eu';
+    hasSecret: boolean;
+    secretHint: string | null;
+    environment: {
+        transport: MailTransport;
+        from: string;
+    };
+    lastCheck: MailCheck | null;
+    version: number;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string | null;
+};
+
+export type MailCheckInput = {
+    draft?: MailProviderInput;
+};
+
+export type MailTestInput = {
+    to: string;
+    draft?: MailProviderInput;
+};
+
+export type MailTestResult = {
+    ok: boolean;
+    messageId: string | null;
+    detail: string | null;
+};
+
+export type MailTemplateVariable = {
+    name: string;
+    description: string;
+    sample: string;
+    required: boolean;
+};
+
+export type MailTemplateKind = 'system' | 'custom';
+
+export type MailTemplateSummary = {
+    id: string;
+    key: string;
+    name: string;
+    description: string | null;
+    kind: MailTemplateKind;
+    subject: string;
+    modified: boolean;
+    usage: string | null;
+    automations: number;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+};
+
+export type MailTemplate = {
+    id: string;
+    key: string;
+    name: string;
+    description: string | null;
+    kind: MailTemplateKind;
+    subject: string;
+    modified: boolean;
+    usage: string | null;
+    automations: number;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+    html: string;
+    text: string | null;
+    variables: Array<MailTemplateVariable>;
+    baseVariables: Array<MailTemplateVariable>;
+    version: number;
+    updatedBy: {
+        id: string;
+        name: string | null;
+        email: string;
+    } | null;
+};
+
+export type CreateMailTemplateInput = {
+    key: string;
+    name: string;
+    description?: string | null;
+    subject: string;
+    html: string;
+    text?: string | null;
+    variables?: Array<MailTemplateVariable>;
+};
+
+export type UpdateMailTemplateInput = {
+    name?: string;
+    description?: string | null;
+    subject?: string;
+    html?: string;
+    text?: string | null;
+    variables?: Array<MailTemplateVariable>;
+    version: number;
+};
+
+export type MailTemplateTestInput = {
+    to: string;
+    data?: {
+        [key: string]: string;
+    };
+};
+
+export type GenerateMailTemplateInput = {
+    prompt: string;
+    modelCatalogId?: string | null;
+    variables?: Array<string>;
+    current?: {
+        subject: string;
+        html: string;
+    } | null;
+};
+
+export type GeneratedMailTemplate = {
+    subject: string;
+    html: string;
+    text: string;
+    modelId: string;
+    costUsd: string | null;
+    costStatus: string;
+};
+
+export type MailTrigger = 'users.register' | 'auth.login' | 'users.create' | 'users.update' | 'users.disable' | 'users.enable' | 'users.invite' | 'roles.update' | 'settings.update' | 'projects.create' | 'projects.delete' | 'rag.documents.upload' | 'schedule';
+
+export type MailRecipientKind = 'subject' | 'actor' | 'role' | 'emails';
+
+export type MailAutomationInput = {
+    name: string;
+    description?: string | null;
+    trigger: MailTrigger;
+    cron?: string | null;
+    templateId: string;
+    recipientKind: MailRecipientKind;
+    recipientRoleKey?: string | null;
+    recipientEmails?: Array<string>;
+    delayMinutes?: number;
+    enabled?: boolean;
+};
+
+export type UpdateMailAutomationInput = {
+    name: string;
+    description?: string | null;
+    trigger: MailTrigger;
+    cron?: string | null;
+    templateId: string;
+    recipientKind: MailRecipientKind;
+    recipientRoleKey?: string | null;
+    recipientEmails?: Array<string>;
+    delayMinutes?: number;
+    enabled?: boolean;
+    version: number;
+};
+
+export type MailAutomation = {
+    id: string;
+    name: string;
+    description: string | null;
+    trigger: MailTrigger;
+    cron: string | null;
+    template: {
+        id: string;
+        key: string;
+        name: string;
+    };
+    recipientKind: MailRecipientKind;
+    recipientRoleKey: string | null;
+    recipientEmails: Array<string>;
+    delayMinutes: number;
+    enabled: boolean;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    lastRunAt: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    nextRunAt: string | null;
+    deliveries7d: number;
+    version: number;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    updatedAt: string;
+};
+
+export type MailAutomationList = Array<MailAutomation>;
+
+export type MailDeliveryStatus = 'queued' | 'sent' | 'failed' | 'skipped';
+
+export type MailDelivery = {
+    id: string;
+    status: MailDeliveryStatus;
+    to: string;
+    templateKey: string | null;
+    category: string;
+    automation: {
+        id: string;
+        name: string;
+    } | null;
+    transport: string | null;
+    messageId: string | null;
+    error: string | null;
+    attempts: number;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    createdAt: string;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    scheduledFor: string | null;
+    /**
+     * ISO-8601 timestamp (UTC)
+     */
+    sentAt: string | null;
+};
+
+export type MailDeliveriesPage = {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+    items: Array<MailDelivery>;
+};
+
 export type BrandingSettings = {
     appName: string;
     logoUrl: string | null;
@@ -340,12 +616,10 @@ export type AuthSettings = {
 };
 
 export type MailSettings = {
-    /**
-     * Configured through deployment environment (MAIL_TRANSPORT); see docs/mail.md
-     */
-    transport: 'resend' | 'smtp' | 'postmark' | 'sendgrid' | 'mailgun' | 'brevo' | 'log';
+    transport: MailTransport;
     from: string;
     configured: boolean;
+    source: 'database' | 'environment';
 };
 
 export type RetentionSettings = {
@@ -1060,7 +1334,7 @@ export type AgentConfig = {
         showDetailsToAdmins: boolean;
     };
     access: {
-        requiredPermission: 'users.read' | 'users.create' | 'users.invite' | 'users.update' | 'users.disable' | 'users.delete' | 'roles.read' | 'roles.manage' | 'permissions.read' | 'permissions.manage' | 'organizations.read' | 'organizations.manage' | 'settings.read' | 'settings.update' | 'audit.read' | 'system.diagnostics' | 'api.docs' | 'ai.chat' | 'ai.providers.manage' | 'ai.models.manage' | 'ai.agents.manage' | 'ai.usage.read' | 'ai.budgets.manage' | 'ai.lab.use' | 'rag.collections.read' | 'rag.collections.manage' | 'rag.sources.manage' | 'rag.documents.read' | 'rag.documents.delete' | 'rag.jobs.manage' | 'rag.playground.use' | 'rag.analytics.read' | 'projects.read' | 'projects.manage';
+        requiredPermission: 'users.read' | 'users.create' | 'users.invite' | 'users.update' | 'users.disable' | 'users.delete' | 'roles.read' | 'roles.manage' | 'permissions.read' | 'permissions.manage' | 'organizations.read' | 'organizations.manage' | 'settings.read' | 'settings.update' | 'audit.read' | 'system.diagnostics' | 'api.docs' | 'ai.chat' | 'ai.providers.manage' | 'ai.models.manage' | 'ai.agents.manage' | 'ai.usage.read' | 'ai.budgets.manage' | 'ai.lab.use' | 'rag.collections.read' | 'rag.collections.manage' | 'rag.sources.manage' | 'rag.documents.read' | 'rag.documents.delete' | 'rag.jobs.manage' | 'rag.playground.use' | 'rag.analytics.read' | 'mail.read' | 'mail.manage' | 'projects.read' | 'projects.manage';
     };
 };
 
@@ -2018,6 +2292,12 @@ export type SetPriceResult = {
     result: 'unchanged' | 'created' | 'updated';
 };
 
+export type MailTemplateList = Array<MailTemplateSummary>;
+
+export type MailTestTo = {
+    to: string;
+};
+
 export type SessionList = Array<SessionSummary>;
 
 export type RevokedCount = {
@@ -2805,6 +3085,977 @@ export type AdminInvitationsResendResponses = {
 };
 
 export type AdminInvitationsResendResponse = AdminInvitationsResendResponses[keyof AdminInvitationsResendResponses];
+
+export type MailAutomationsListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/mail/automations';
+};
+
+export type MailAutomationsListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailAutomationsListError = MailAutomationsListErrors[keyof MailAutomationsListErrors];
+
+export type MailAutomationsListResponses = {
+    /**
+     * OK
+     */
+    200: MailAutomationList;
+};
+
+export type MailAutomationsListResponse = MailAutomationsListResponses[keyof MailAutomationsListResponses];
+
+export type MailAutomationsCreateData = {
+    body: MailAutomationInput;
+    path?: never;
+    query?: never;
+    url: '/api/admin/mail/automations';
+};
+
+export type MailAutomationsCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailAutomationsCreateError = MailAutomationsCreateErrors[keyof MailAutomationsCreateErrors];
+
+export type MailAutomationsCreateResponses = {
+    /**
+     * OK
+     */
+    201: MailAutomation;
+};
+
+export type MailAutomationsCreateResponse = MailAutomationsCreateResponses[keyof MailAutomationsCreateResponses];
+
+export type MailAutomationsDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/mail/automations/{id}';
+};
+
+export type MailAutomationsDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailAutomationsDeleteError = MailAutomationsDeleteErrors[keyof MailAutomationsDeleteErrors];
+
+export type MailAutomationsDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type MailAutomationsDeleteResponse = MailAutomationsDeleteResponses[keyof MailAutomationsDeleteResponses];
+
+export type MailAutomationsGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/mail/automations/{id}';
+};
+
+export type MailAutomationsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailAutomationsGetError = MailAutomationsGetErrors[keyof MailAutomationsGetErrors];
+
+export type MailAutomationsGetResponses = {
+    /**
+     * OK
+     */
+    200: MailAutomation;
+};
+
+export type MailAutomationsGetResponse = MailAutomationsGetResponses[keyof MailAutomationsGetResponses];
+
+export type MailAutomationsUpdateData = {
+    body: UpdateMailAutomationInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/mail/automations/{id}';
+};
+
+export type MailAutomationsUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Precondición fallida (versión desactualizada)
+     */
+    412: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailAutomationsUpdateError = MailAutomationsUpdateErrors[keyof MailAutomationsUpdateErrors];
+
+export type MailAutomationsUpdateResponses = {
+    /**
+     * OK
+     */
+    200: MailAutomation;
+};
+
+export type MailAutomationsUpdateResponse = MailAutomationsUpdateResponses[keyof MailAutomationsUpdateResponses];
+
+export type MailAutomationsTestData = {
+    body: MailTestTo;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/mail/automations/{id}/test';
+};
+
+export type MailAutomationsTestErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailAutomationsTestError = MailAutomationsTestErrors[keyof MailAutomationsTestErrors];
+
+export type MailAutomationsTestResponses = {
+    /**
+     * OK
+     */
+    200: MailTestResult;
+};
+
+export type MailAutomationsTestResponse = MailAutomationsTestResponses[keyof MailAutomationsTestResponses];
+
+export type MailDeliveriesListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        pageSize?: number;
+        status?: MailDeliveryStatus;
+        automationId?: string;
+        search?: string;
+    };
+    url: '/api/admin/mail/deliveries';
+};
+
+export type MailDeliveriesListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailDeliveriesListError = MailDeliveriesListErrors[keyof MailDeliveriesListErrors];
+
+export type MailDeliveriesListResponses = {
+    /**
+     * OK
+     */
+    200: MailDeliveriesPage;
+};
+
+export type MailDeliveriesListResponse = MailDeliveriesListResponses[keyof MailDeliveriesListResponses];
+
+export type MailDeliveriesRetryData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/mail/deliveries/{id}/retry';
+};
+
+export type MailDeliveriesRetryErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailDeliveriesRetryError = MailDeliveriesRetryErrors[keyof MailDeliveriesRetryErrors];
+
+export type MailDeliveriesRetryResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type MailDeliveriesRetryResponse = MailDeliveriesRetryResponses[keyof MailDeliveriesRetryResponses];
+
+export type MailSettingsResetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/mail/settings';
+};
+
+export type MailSettingsResetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailSettingsResetError = MailSettingsResetErrors[keyof MailSettingsResetErrors];
+
+export type MailSettingsResetResponses = {
+    /**
+     * OK
+     */
+    200: MailProviderSettings;
+};
+
+export type MailSettingsResetResponse = MailSettingsResetResponses[keyof MailSettingsResetResponses];
+
+export type MailSettingsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/mail/settings';
+};
+
+export type MailSettingsGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailSettingsGetError = MailSettingsGetErrors[keyof MailSettingsGetErrors];
+
+export type MailSettingsGetResponses = {
+    /**
+     * OK
+     */
+    200: MailProviderSettings;
+};
+
+export type MailSettingsGetResponse = MailSettingsGetResponses[keyof MailSettingsGetResponses];
+
+export type MailSettingsUpdateData = {
+    body: UpdateMailProviderInput;
+    path?: never;
+    query?: never;
+    url: '/api/admin/mail/settings';
+};
+
+export type MailSettingsUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Precondición fallida (versión desactualizada)
+     */
+    412: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailSettingsUpdateError = MailSettingsUpdateErrors[keyof MailSettingsUpdateErrors];
+
+export type MailSettingsUpdateResponses = {
+    /**
+     * OK
+     */
+    200: MailProviderSettings;
+};
+
+export type MailSettingsUpdateResponse = MailSettingsUpdateResponses[keyof MailSettingsUpdateResponses];
+
+export type MailSettingsCheckData = {
+    body: MailCheckInput;
+    path?: never;
+    query?: never;
+    url: '/api/admin/mail/settings/check';
+};
+
+export type MailSettingsCheckErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailSettingsCheckError = MailSettingsCheckErrors[keyof MailSettingsCheckErrors];
+
+export type MailSettingsCheckResponses = {
+    /**
+     * OK
+     */
+    200: MailCheck;
+};
+
+export type MailSettingsCheckResponse = MailSettingsCheckResponses[keyof MailSettingsCheckResponses];
+
+export type MailSettingsTestData = {
+    body: MailTestInput;
+    path?: never;
+    query?: never;
+    url: '/api/admin/mail/settings/test';
+};
+
+export type MailSettingsTestErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailSettingsTestError = MailSettingsTestErrors[keyof MailSettingsTestErrors];
+
+export type MailSettingsTestResponses = {
+    /**
+     * OK
+     */
+    200: MailTestResult;
+};
+
+export type MailSettingsTestResponse = MailSettingsTestResponses[keyof MailSettingsTestResponses];
+
+export type MailTemplatesListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/mail/templates';
+};
+
+export type MailTemplatesListErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailTemplatesListError = MailTemplatesListErrors[keyof MailTemplatesListErrors];
+
+export type MailTemplatesListResponses = {
+    /**
+     * OK
+     */
+    200: MailTemplateList;
+};
+
+export type MailTemplatesListResponse = MailTemplatesListResponses[keyof MailTemplatesListResponses];
+
+export type MailTemplatesCreateData = {
+    body: CreateMailTemplateInput;
+    path?: never;
+    query?: never;
+    url: '/api/admin/mail/templates';
+};
+
+export type MailTemplatesCreateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailTemplatesCreateError = MailTemplatesCreateErrors[keyof MailTemplatesCreateErrors];
+
+export type MailTemplatesCreateResponses = {
+    /**
+     * OK
+     */
+    201: MailTemplate;
+};
+
+export type MailTemplatesCreateResponse = MailTemplatesCreateResponses[keyof MailTemplatesCreateResponses];
+
+export type MailTemplatesDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/mail/templates/{id}';
+};
+
+export type MailTemplatesDeleteErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailTemplatesDeleteError = MailTemplatesDeleteErrors[keyof MailTemplatesDeleteErrors];
+
+export type MailTemplatesDeleteResponses = {
+    /**
+     * OK
+     */
+    200: OkResponse;
+};
+
+export type MailTemplatesDeleteResponse = MailTemplatesDeleteResponses[keyof MailTemplatesDeleteResponses];
+
+export type MailTemplatesGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/mail/templates/{id}';
+};
+
+export type MailTemplatesGetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailTemplatesGetError = MailTemplatesGetErrors[keyof MailTemplatesGetErrors];
+
+export type MailTemplatesGetResponses = {
+    /**
+     * OK
+     */
+    200: MailTemplate;
+};
+
+export type MailTemplatesGetResponse = MailTemplatesGetResponses[keyof MailTemplatesGetResponses];
+
+export type MailTemplatesUpdateData = {
+    body: UpdateMailTemplateInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/mail/templates/{id}';
+};
+
+export type MailTemplatesUpdateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Precondición fallida (versión desactualizada)
+     */
+    412: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailTemplatesUpdateError = MailTemplatesUpdateErrors[keyof MailTemplatesUpdateErrors];
+
+export type MailTemplatesUpdateResponses = {
+    /**
+     * OK
+     */
+    200: MailTemplate;
+};
+
+export type MailTemplatesUpdateResponse = MailTemplatesUpdateResponses[keyof MailTemplatesUpdateResponses];
+
+export type MailTemplatesResetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/mail/templates/{id}/reset';
+};
+
+export type MailTemplatesResetErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Conflicto
+     */
+    409: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailTemplatesResetError = MailTemplatesResetErrors[keyof MailTemplatesResetErrors];
+
+export type MailTemplatesResetResponses = {
+    /**
+     * OK
+     */
+    200: MailTemplate;
+};
+
+export type MailTemplatesResetResponse = MailTemplatesResetResponses[keyof MailTemplatesResetResponses];
+
+export type MailTemplatesTestData = {
+    body: MailTemplateTestInput;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/mail/templates/{id}/test';
+};
+
+export type MailTemplatesTestErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * No encontrado
+     */
+    404: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+};
+
+export type MailTemplatesTestError = MailTemplatesTestErrors[keyof MailTemplatesTestErrors];
+
+export type MailTemplatesTestResponses = {
+    /**
+     * OK
+     */
+    200: MailTestResult;
+};
+
+export type MailTemplatesTestResponse = MailTemplatesTestResponses[keyof MailTemplatesTestResponses];
+
+export type MailTemplatesGenerateData = {
+    body: GenerateMailTemplateInput;
+    path?: never;
+    query?: never;
+    url: '/api/admin/mail/templates/generate';
+};
+
+export type MailTemplatesGenerateErrors = {
+    /**
+     * Solicitud inválida
+     */
+    400: ErrorResponse;
+    /**
+     * Sesión requerida
+     */
+    401: ErrorResponse;
+    /**
+     * Permiso insuficiente
+     */
+    403: ErrorResponse;
+    /**
+     * Validación fallida
+     */
+    422: ErrorResponse;
+    /**
+     * Error interno
+     */
+    500: ErrorResponse;
+    /**
+     * Error del proveedor externo
+     */
+    502: ErrorResponse;
+    /**
+     * Servicio no disponible temporalmente (ver Retry-After)
+     */
+    503: ErrorResponse;
+};
+
+export type MailTemplatesGenerateError = MailTemplatesGenerateErrors[keyof MailTemplatesGenerateErrors];
+
+export type MailTemplatesGenerateResponses = {
+    /**
+     * OK
+     */
+    200: GeneratedMailTemplate;
+};
+
+export type MailTemplatesGenerateResponse = MailTemplatesGenerateResponses[keyof MailTemplatesGenerateResponses];
 
 export type AdminOrgsListData = {
     body?: never;

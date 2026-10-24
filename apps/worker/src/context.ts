@@ -1,7 +1,7 @@
 import type { Env, FeatureFlags, SecretBox } from '@starter/config';
 import type { DbHandle } from '@starter/db';
 import type { JobQueue } from '@starter/jobs';
-import type { Mailer } from '@starter/mail';
+import type { ConfiguredMailer } from '@starter/mail';
 import type { Storage } from '@starter/storage';
 
 /** Shared dependencies for job handlers (same domain packages as the API, no duplicated logic). */
@@ -10,7 +10,7 @@ export interface WorkerContext {
   features: FeatureFlags;
   db: DbHandle;
   jobs: JobQueue;
-  mailer: Mailer;
+  mailer: ConfiguredMailer;
   storage: Storage;
   secrets: SecretBox;
 }

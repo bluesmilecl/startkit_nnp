@@ -22,7 +22,7 @@ const EMPTY: AppSettings = {
   branding: { appName: '', logoUrl: null, primaryColor: '#2563eb', supportEmail: null },
   locale: { locale: 'es-CL', timezone: 'UTC', currencyDisplay: 'USD' },
   auth: { registration: 'invite-only', sessionExpiresDays: 7 },
-  mail: { transport: 'smtp', from: '', configured: false },
+  mail: { transport: 'smtp', from: '', configured: false, source: 'environment' },
   retention: { conversationsDays: null, retrievalQueriesDays: null, audioKeepAfterTranscription: false, auditDays: null },
   onboardingCompletedAt: null,
 };
@@ -103,11 +103,12 @@ const timezones = typeof Intl.supportedValuesOf === 'function' ? Intl.supportedV
     </TabsContent>
     <TabsContent value="mail">
       <Card>
-        <CardHeader><CardTitle>Correo</CardTitle><CardDescription>El proveedor y sus credenciales se configuran en el despliegue (variables MAIL_*, o <code>pnpm starter mail use resend</code>), nunca en la base de datos.</CardDescription></CardHeader>
+        <CardHeader><CardTitle>Correo</CardTitle><CardDescription>Proveedor, plantillas y automatizaciones se administran en la sección Correo; las credenciales se guardan cifradas. Sin configuración guardada se usan las variables MAIL_* del despliegue.</CardDescription></CardHeader>
         <CardContent class="space-y-2 text-sm">
-          <div>Transporte: <Badge variant="secondary">{{ draft.mail.transport }}</Badge></div>
+          <div>Transporte: <Badge variant="secondary">{{ draft.mail.transport }}</Badge> <span class="text-muted-foreground">({{ draft.mail.source === 'database' ? 'configurado en la plataforma' : 'variables de entorno' }})</span></div>
           <p>Remitente: <code>{{ draft.mail.from }}</code></p>
           <p>Estado: <StatusBadge :status="draft.mail.configured ? 'ok' : 'degraded'" /></p>
+          <Button v-if="can('mail.read')" as-child variant="outline" size="sm"><NuxtLink to="/admin/mail">Configurar correo</NuxtLink></Button>
         </CardContent>
       </Card>
     </TabsContent>

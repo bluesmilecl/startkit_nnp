@@ -72,6 +72,8 @@ Cómo se sincronizan los permisos por defecto (`syncAccessCatalog`, ejecutado po
 | `rag.jobs.manage` | rag | Gestionar trabajos de indexación | ✔ | ✔ | ✔ | — |
 | `rag.playground.use` | rag | Usar el laboratorio de búsqueda | ✔ | ✔ | ✔ | — |
 | `rag.analytics.read` | rag | Ver analítica de conocimiento | ✔ | ✔ | ✔ | — |
+| `mail.read` | mail | Ver configuración, plantillas, automatizaciones y envíos de correo | ✔ | ✔ | — | — |
+| `mail.manage` | mail | Configurar el proveedor de correo, plantillas y automatizaciones **(sensible)** | ✔ | ✔ | — | — |
 | `projects.read` | projects | Ver proyectos | ✔ | ✔ | ✔ | ✔ |
 | `projects.manage` | projects | Crear y editar proyectos | ✔ | ✔ | ✔ | — |
 

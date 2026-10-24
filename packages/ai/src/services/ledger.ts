@@ -3,7 +3,7 @@ import { currentContext } from '@starter/observability';
 import { add, costOf, ZERO } from '../money.js';
 import type { PricesService } from './prices.js';
 
-export type Feature = 'chat' | 'recommendation' | 'lab' | 'embedding' | 'rag_query' | 'transcription' | 'tool' | 'connection_test' | 'evaluation' | 'summary';
+export type Feature = 'chat' | 'recommendation' | 'lab' | 'embedding' | 'rag_query' | 'transcription' | 'tool' | 'connection_test' | 'evaluation' | 'summary' | 'mail_template';
 
 export interface StartRequest {
   organizationId: string;

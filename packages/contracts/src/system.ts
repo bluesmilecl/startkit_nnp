@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { IsoDate, PageQuery, pageOf, Uuid } from './common.js';
+import { MailTransport } from './mail.js';
 
 export const BrandingSettings = z
   .object({
@@ -30,9 +31,11 @@ export const AuthSettings = z
 
 export const MailSettings = z
   .object({
-    transport: z.enum(['resend', 'smtp', 'postmark', 'sendgrid', 'mailgun', 'brevo', 'log']).meta({ description: 'Configured through deployment environment (MAIL_TRANSPORT); see docs/mail.md' }),
+    transport: MailTransport,
     from: z.string(),
     configured: z.boolean(),
+    /** database: configured in /admin/mail; environment: MAIL_* variables. */
+    source: z.enum(['database', 'environment']).default('environment'),
   })
   .meta({ id: 'MailSettings' });
 

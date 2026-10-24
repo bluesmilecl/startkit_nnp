@@ -151,7 +151,7 @@ export function createAuth({ db, env, mailer, features, basePath = '/api/auth' }
               otp,
               Math.round(env.OTP_EXPIRES_SECONDS / 60),
             );
-            await mailer.send({ to: email, ...tpl, category: 'otp' });
+            await mailer.send({ to: email, ...tpl, category: 'otp', template: { key: 'auth.otp', data: { code: otp, minutes: Math.round(env.OTP_EXPIRES_SECONDS / 60) } } });
           } catch (err) {
             log.error({ err: sanitizeError(err) }, 'otp e-mail failed');
             throw err;

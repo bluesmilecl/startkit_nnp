@@ -1,6 +1,6 @@
 import type { AppSettings, UpdateSettingsInput } from '@starter/contracts';
 import { type BrandingSettings, type LocaleSettings, type AuthSettings, type RetentionSettings } from '@starter/contracts';
-import { eq, and, isNull, settings, type Database, type DbOrTx } from '@starter/db';
+import { eq, and, isNull, mailSettings, settings, type Database, type DbOrTx } from '@starter/db';
 import type { z } from 'zod';
 import { assertCan, type AccessDeps, type Actor } from './actor.js';
 import { recordAudit } from './audit.js';
@@ -58,20 +58,22 @@ export class SettingsService {
 
   async getAll(): Promise<AppSettings> {
     const d = this.defaults();
-    const [branding, locale, auth, retention, onboarding] = await Promise.all([
+    const [branding, locale, auth, retention, onboarding, [mail]] = await Promise.all([
       this.getRaw<Partial<Branding>>('branding'),
       this.getRaw<Partial<Locale>>('locale'),
       this.getRaw<Partial<Auth>>('auth'),
       this.getRaw<Partial<Retention>>('retention'),
       this.getRaw<{ completedAt: string }>('onboarding'),
+      this.deps.db.select({ transport: mailSettings.transport, from: mailSettings.fromAddress }).from(mailSettings).where(eq(mailSettings.key, 'default')).limit(1),
     ]);
     const env = this.deps.env;
+    const transport = (mail?.transport ?? env.MAIL_TRANSPORT) as AppSettings['mail']['transport'];
     return {
       branding: { ...d.branding, ...(branding ?? {}) },
       locale: { ...d.locale, ...(locale ?? {}) },
       auth: { ...d.auth, ...(auth ?? {}) },
       retention: { ...d.retention, ...(retention ?? {}) },
-      mail: { transport: env.MAIL_TRANSPORT, from: env.MAIL_FROM, configured: env.MAIL_TRANSPORT !== 'log' },
+      mail: { transport, from: mail?.from ?? env.MAIL_FROM, configured: transport !== 'log', source: mail ? 'database' : 'environment' },
       onboardingCompletedAt: onboarding?.completedAt ?? null,
     };
   }

@@ -35,6 +35,9 @@
       "path": "packages/rag"
     },
     {
+      "path": "packages/messaging"
+    },
+    {
       "path": "apps/api"
     },
     {

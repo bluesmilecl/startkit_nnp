@@ -259,7 +259,8 @@ export class BudgetsService {
           );
         const branding = await settings.branding();
         const tpl = budgetAlertEmail({ appName: branding.appName, primaryColor: branding.primaryColor, appUrl: this.deps.env.APP_URL }, b.name, threshold, displayUsd(u.spentUsd), displayUsd(b.limitUsd));
-        for (const r of recipients) await this.deps.mailer.send({ to: r.email, ...tpl, category: 'budget-alert' }).catch(() => undefined);
+        const data = { budgetName: b.name, threshold: String(threshold), spent: displayUsd(u.spentUsd), limit: displayUsd(b.limitUsd), budgetsUrl: `${this.deps.env.APP_URL.replace(/\/$/, '')}/admin/ai/budgets` };
+        for (const r of recipients) await this.deps.mailer.send({ to: r.email, ...tpl, category: 'budget-alert', template: { key: 'ai.budget_alert', data } }).catch(() => undefined);
         await this.deps.db.update(budgetAlerts).set({ notifiedAt: new Date() }).where(eq(budgetAlerts.id, inserted[0]!.id));
         sent++;
       }

@@ -11,6 +11,14 @@ export interface MailMessage {
   text: string;
   /** Category used in logs and metrics (never the content). */
   category: string;
+  replyTo?: string | null;
+  /**
+   * Editable template to use instead of subject/html/text (ConfiguredMailer). The content above
+   * stays as the fallback when the template is missing or fails to render.
+   */
+  template?: { key: string; data: Record<string, unknown> };
+  /** Existing mail_deliveries row to update (queued automation sends). */
+  deliveryId?: string;
 }
 
 export interface MailCheck {
@@ -82,7 +90,7 @@ class SmtpMailer implements Mailer {
   }
   async send(m: MailMessage) {
     try {
-      const info = await this.transporter.sendMail({ from: this.from, to: m.to, subject: m.subject, html: m.html, text: m.text });
+      const info = await this.transporter.sendMail({ from: this.from, to: m.to, subject: m.subject, html: m.html, text: m.text, ...(m.replyTo ? { replyTo: m.replyTo } : {}) });
       log.info({ category: m.category, messageId: info.messageId }, 'mail sent');
       return { id: info.messageId ?? null };
     } catch (err) {
@@ -112,7 +120,7 @@ class ResendMailer implements Mailer {
     this.client = new Resend(apiKey);
   }
   async send(m: MailMessage) {
-    const { data, error } = await this.client.emails.send({ from: this.from, to: m.to, subject: m.subject, html: m.html, text: m.text });
+    const { data, error } = await this.client.emails.send({ from: this.from, to: m.to, subject: m.subject, html: m.html, text: m.text, ...(m.replyTo ? { replyTo: m.replyTo } : {}) });
     if (error) {
       // Validation errors (bad address, unverified domain) will fail again; quota and outages may not.
       const retryable = !/validation|invalid|missing|restricted|not_found/i.test(error.name ?? '');
@@ -193,7 +201,7 @@ class PostmarkMailer extends ApiMailer {
     return { accept: 'application/json', 'content-type': 'application/json', 'x-postmark-server-token': this.token };
   }
   protected request(m: MailMessage) {
-    return { url: 'https://api.postmarkapp.com/email', init: { method: 'POST', headers: this.headers, body: JSON.stringify({ From: this.from, To: m.to, Subject: m.subject, HtmlBody: m.html, TextBody: m.text, MessageStream: 'outbound', Tag: m.category }) } };
+    return { url: 'https://api.postmarkapp.com/email', init: { method: 'POST', headers: this.headers, body: JSON.stringify({ From: this.from, To: m.to, Subject: m.subject, HtmlBody: m.html, TextBody: m.text, MessageStream: 'outbound', Tag: m.category, ...(m.replyTo ? { ReplyTo: m.replyTo } : {}) }) } };
   }
   protected messageId(_res: Response, body: unknown) {
     return (body as { MessageID?: string } | null)?.MessageID ?? null;
@@ -228,6 +236,7 @@ class SendGridMailer extends ApiMailer {
             { type: 'text/html', value: m.html },
           ],
           categories: [m.category],
+          ...(m.replyTo ? { reply_to: { email: m.replyTo } } : {}),
         }),
       },
     };
@@ -258,6 +267,7 @@ class MailgunMailer extends ApiMailer {
   }
   protected request(m: MailMessage) {
     const form = new URLSearchParams({ from: this.from, to: m.to, subject: m.subject, text: m.text, html: m.html, 'o:tag': m.category });
+    if (m.replyTo) form.set('h:Reply-To', m.replyTo);
     return { url: `${this.base}/v3/${encodeURIComponent(this.domain)}/messages`, init: { method: 'POST', headers: { authorization: this.auth }, body: form } };
   }
   protected messageId(_res: Response, body: unknown) {
@@ -284,7 +294,7 @@ class BrevoMailer extends ApiMailer {
     const from = parseAddress(this.from);
     return {
       url: 'https://api.brevo.com/v3/smtp/email',
-      init: { method: 'POST', headers: this.headers, body: JSON.stringify({ sender: from.name ? { name: from.name, email: from.email } : { email: from.email }, to: [{ email: m.to }], subject: m.subject, htmlContent: m.html, textContent: m.text, tags: [m.category] }) },
+      init: { method: 'POST', headers: this.headers, body: JSON.stringify({ sender: from.name ? { name: from.name, email: from.email } : { email: from.email }, to: [{ email: m.to }], subject: m.subject, htmlContent: m.html, textContent: m.text, tags: [m.category], ...(m.replyTo ? { replyTo: { email: m.replyTo } } : {}) }) },
     };
   }
   protected messageId(_res: Response, body: unknown) {

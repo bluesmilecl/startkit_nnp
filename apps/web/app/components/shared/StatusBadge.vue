@@ -19,6 +19,7 @@ const LABELS: Record<string, [string, Variant]> = {
   error: ['Error', 'destructive'],
   unverified: ['Sin verificar', 'secondary'],
   queued: ['En cola', 'secondary'],
+  sent: ['Enviado', 'default'],
   running: ['En curso', 'secondary'],
   retrying: ['Reintentando', 'secondary'],
   paused: ['Pausado', 'outline'],

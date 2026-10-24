@@ -18,11 +18,14 @@ describe('database error mapping', () => {
     expect(isUniqueViolation(dup, 'projects_org_name_uq')).toBe(true);
     expect(isUniqueViolation(dup, 'agents_org_key_uq')).toBe(false);
     expect(isForeignKeyViolation(wrapped(pg('23503', { constraint: 'x_fk' })), 'x_fk')).toBe(true);
+    // ON DELETE RESTRICT raises restrict_violation instead of foreign_key_violation.
+    expect(isForeignKeyViolation(wrapped(pg('23001', { constraint: 'x_fk' })), 'x_fk')).toBe(true);
   });
 
   it('maps races, bad input and outages to catalog errors (never INTERNAL)', () => {
     expect(mapDatabaseError(wrapped(pg('23505')))).toMatchObject({ code: 'CONFLICT', status: 409 });
     expect(mapDatabaseError(pg('23503'))).toMatchObject({ code: 'CONFLICT' });
+    expect(mapDatabaseError(pg('23001'))).toMatchObject({ code: 'CONFLICT', status: 409 });
     expect(mapDatabaseError(pg('23502'))).toMatchObject({ code: 'VALIDATION_FAILED' });
     expect(mapDatabaseError(pg('22P02'))).toMatchObject({ code: 'BAD_REQUEST' });
     expect(mapDatabaseError(pg('40P01'))).toMatchObject({ code: 'UNAVAILABLE', retryable: true, details: { retryAfterSeconds: 1 } });

@@ -41,7 +41,9 @@ una clave real: `OPENAI_API_KEY=sk-… pnpm starter ai connect --provider openai
 > [skills](.claude/skills/) le dan el contexto para seguir construyendo.
 
 **Correo:** Resend por defecto (`RESEND_API_KEY=re_… node scripts/quickstart.mjs …` o
-`pnpm starter mail use resend`), o tu propio SMTP, Postmark, SendGrid, Mailgun o Brevo:
+`pnpm starter mail use resend`), o tu propio SMTP, Postmark, SendGrid, Mailgun o Brevo. También
+se configura y prueba desde el panel (**Correo**), con la clave cifrada, plantillas editables con
+vista previa y generación con IA, y automatizaciones por evento o programación:
 [docs/mail.md](docs/mail.md).
 
 Variantes (PostgreSQL propio, OpenAI/Anthropic/Google, solo algunos módulos) en
@@ -78,7 +80,7 @@ packages/
   auth/       actor, permisos, políticas, auditoría, invitaciones, propuestas
   ai/         proveedores, catálogo, tarifas, libro de uso, presupuestos, agentes, chat
   rag/        almacenes (pgvector, PostgreSQL externo, API), parsing, ingesta, recuperación
-  jobs/ mail/ storage/ observability/ ui/ api-client/
+  jobs/ mail/ messaging/ storage/ observability/ ui/ api-client/
 tooling/
   create-starter/   CLI create-ecortes-app / pnpm starter
   generator/        generador de módulos

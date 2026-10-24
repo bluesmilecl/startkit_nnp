@@ -17,6 +17,7 @@
     "@starter/db": "workspace:*",
     "@starter/jobs": "workspace:*",
     "@starter/mail": "workspace:*",
+    "@starter/messaging": "workspace:*",
     "@starter/observability": "workspace:*",
     "@starter/rag": "workspace:*",
     "@starter/storage": "workspace:*"

@@ -89,9 +89,33 @@ function summarizeToolResult(name: string, output: unknown): string {
   return `Listo (${name}).`;
 }
 
+/** Deterministic e-mail for structured { subject, html } requests (template generation demos). */
+function testEmail(prompt: string): { subject: string; html: string } {
+  const what = (/Correo a crear:\s*([^\n]+)/.exec(prompt)?.[1] ?? prompt).trim().replace(/[<>{}]/g, '').slice(0, 140);
+  const title = what.charAt(0).toUpperCase() + what.slice(1);
+  const greet = prompt.includes('{{recipient.name}}') ? 'Hola{{#recipient.name}} {{recipient.name}}{{/recipient.name}},' : 'Hola,';
+  const html = `<!doctype html><html lang="es"><body style="margin:0;background:#f4f5f7;font-family:Arial,sans-serif;color:#111827">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:28px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;border-top:4px solid {{primaryColor}}">
+<tr><td style="padding:22px 26px;font-size:18px;font-weight:700">{{appName}}</td></tr>
+<tr><td style="padding:0 26px 24px;font-size:15px;line-height:1.6"><h1 style="font-size:20px;margin:0 0 12px">${title}</h1>
+<p style="margin:0 0 16px">${greet} este es un correo de ejemplo generado por el proveedor de prueba a partir de tu descripción.</p>
+<a href="{{appUrl}}" style="display:inline-block;background:{{primaryColor}};color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">Abrir {{appName}}</a></td></tr>
+<tr><td style="padding:16px 26px;background:#f9fafb;color:#6b7280;font-size:12px">© {{year}} {{appName}}</td></tr>
+</table></td></tr></table></body></html>`;
+  const short = title.length > 70 ? `${title.slice(0, title.lastIndexOf(' ', 70)).replace(/[,;:]$/, '')}…` : title;
+  return { subject: `${short} · {{appName}}`, html };
+}
+
 function decide(options: LanguageModelV4CallOptions): Decision {
   const tools = new Set((options.tools ?? []).map((t) => t.name));
   const last = options.prompt.at(-1);
+  const format = options.responseFormat;
+  if (format?.type === 'json') {
+    const props = Object.keys(((format.schema ?? {}) as { properties?: Record<string, unknown> }).properties ?? {});
+    const prompt = options.prompt.map((m) => (typeof m.content === 'string' ? m.content : m.content.map((p) => ('text' in p ? p.text : '')).join(' '))).join('\n');
+    if (props.includes('subject') && props.includes('html')) return { kind: 'text', text: JSON.stringify(testEmail(prompt)) };
+  }
   if (last?.role === 'tool') {
     const parts = last.content.filter((p) => p.type === 'tool-result');
     const texts = parts.map((p) => {
