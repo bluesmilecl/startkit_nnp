@@ -1,0 +1,39 @@
+{
+  "name": "create-ecortes-app",
+  "version": "0.1.0",
+  "description": "Instalador y CLI de operación del Starter Kit Nuxt + NestJS IA (create, doctor, config, ai, rag, generate, docs, owner).",
+  "type": "module",
+  "bin": {
+    "create-ecortes-app": "./dist/cli.js",
+    "starter": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/cli.d.ts",
+      "default": "./dist/cli.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "starter": {
+    "templateRepository": "https://github.com/bluesmilecl/startkit_nnp.git"
+  },
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@starter/ai": "workspace:*",
+    "@starter/auth": "workspace:*",
+    "@starter/config": "workspace:*",
+    "@starter/db": "workspace:*",
+    "@starter/generator": "workspace:*",
+    "@starter/jobs": "workspace:*",
+    "@starter/mail": "workspace:*",
+    "@starter/rag": "workspace:*",
+    "@starter/storage": "workspace:*"
+  }
+}

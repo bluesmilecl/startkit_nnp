@@ -678,6 +678,38 @@ importers:
         specifier: 7.3.1
         version: 7.3.1(supports-color@10.2.2)
 
+  tooling/create-starter:
+    dependencies:
+      '@starter/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
+      '@starter/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@starter/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@starter/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@starter/generator':
+        specifier: workspace:*
+        version: link:../generator
+      '@starter/jobs':
+        specifier: workspace:*
+        version: link:../../packages/jobs
+      '@starter/mail':
+        specifier: workspace:*
+        version: link:../../packages/mail
+      '@starter/rag':
+        specifier: workspace:*
+        version: link:../../packages/rag
+      '@starter/storage':
+        specifier: workspace:*
+        version: link:../../packages/storage
+
+  tooling/generator: {}
+
 packages:
 
   '@ai-sdk/anthropic@4.0.87':

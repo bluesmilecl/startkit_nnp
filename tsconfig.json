@@ -39,6 +39,12 @@
     },
     {
       "path": "apps/worker"
+    },
+    {
+      "path": "tooling/generator"
+    },
+    {
+      "path": "tooling/create-starter"
     }
   ]
 }

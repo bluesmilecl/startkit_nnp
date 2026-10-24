@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "rootDir": "src", "outDir": "dist", "tsBuildInfoFile": "dist/.tsbuildinfo" },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts"],
+  "references": [
+    { "path": "../../packages/config" },
+    { "path": "../../packages/db" },
+    { "path": "../../packages/auth" },
+    { "path": "../../packages/ai" },
+    { "path": "../../packages/rag" },
+    { "path": "../../packages/jobs" },
+    { "path": "../../packages/mail" },
+    { "path": "../../packages/storage" },
+    { "path": "../generator" }
+  ]
+}
