@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { apiLogin, expect, sql, test, uniqueEmail, waitHydrated } from './fixtures.js';
 
 /** Reference module: the template `starter generate module` copies. */
-test.describe('Proyectos (reference module)', () => {
+test.describe('Proyectos', () => {
   test('create, search, edit, archive, restore and delete with confirmation', async ({ ownerPage: page }) => {
     const name = `Proyecto ${randomUUID().slice(0, 6)}`;
     await page.goto('/admin/projects');
@@ -68,7 +68,7 @@ test.describe('Proyectos (reference module)', () => {
     expect((await (await page.request.get(`/api/projects/${created.id}`)).json()).description).toBe('primera');
   });
 
-  test('read-only roles can list but not change projects; the panel hides the actions', async ({ ownerPage, browser }) => {
+  test('read-only roles can list but not change records; the panel hides the actions', async ({ ownerPage, browser }) => {
     await ownerPage.goto('/admin');
     const origin = new URL(ownerPage.url()).origin;
     // A dedicated role keeps this independent from specs that edit the default matrix.

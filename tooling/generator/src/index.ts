@@ -165,6 +165,7 @@ export function planModule(root: string, spec: ModuleSpec): ModulePlan {
     if (!existsSync(src)) throw new Error(`No se encontró el módulo de referencia (${from}); el generador lo usa como plantilla`);
     let content = transform(readFileSync(src, 'utf8'), n);
     if (to.endsWith('.ts') && to.includes('schema')) content = content.replace(/Reference business module \("[^"]*"\) used as the template for `starter generate module`\./, `${n.label}: generated from the reference module.`);
+    if (to.endsWith('.vue')) content = content.replace(/description="Módulo de referencia:[^"]*"/, `description="Gestión de ${lowerFirst(n.label)}."`);
     files.push({ path: to, content });
   }
   const patches: PatchPlan[] = [
