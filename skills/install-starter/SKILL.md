@@ -5,32 +5,42 @@ description: Instala y deja funcionando el Starter Kit Nuxt + NestJS IA (nueva i
 
 # Instalar el starter
 
-## 1. Crear el proyecto
+Ruta completa y verificable en [INSTALL.md](../../INSTALL.md). Resumen:
+
+## 1. Un comando (clon de este repositorio)
 
 ```bash
-# desde npm (paquete publicado) o desde un clon del starter
-pnpm create ecortes-app mi-app --owner propietaria@empresa.cl --modules ai,rag --db docker --mail smtp
-# alternativa desde este repositorio
-pnpm starter create ../mi-app --from . --owner propietaria@empresa.cl --modules ai --yes
+git clone https://github.com/bluesmilecl/startkit_nnp mi-app && cd mi-app
+node scripts/quickstart.mjs --owner propietaria@empresa.cl --test-ai
 ```
 
-- Sin `--yes` el asistente pregunta nombre, carpeta, correo propietario, módulos (`ai`, `rag`, `organizations`), base (`docker` o `external` con `--database-url`) y correo (`smtp`, `resend`, `log`).
-- Genera `.env` (permisos 600) con `BETTER_AUTH_SECRET`, `APP_ENCRYPTION_KEY` y contraseñas de PostgreSQL únicas, y `starter.config.json` **sin secretos**.
+- Revisa requisitos, instala, compila, crea `.env` con secretos únicos (`pnpm starter init`),
+  levanta PostgreSQL 18 + pgvector y Mailpit, migra y diagnostica. Es idempotente: ante un error,
+  aplica la indicación `→` y repite el mismo comando.
+- Lee la última línea: `QUICKSTART_RESULT=ok …` o `QUICKSTART_RESULT=error step="…"`; detalle en
+  `quickstart.log`.
+- Variantes: `--db external --database-url …`, `--modules ai` / `''`, `--ai openai --chat-model
+  <id>` (clave en `OPENAI_API_KEY`), `--start`.
 - Nunca copies secretos a `starter.config.json`; valida con `pnpm starter config validate`.
 
-## 2. Infraestructura, compilación y migraciones
+## 2. Arrancar y comprobar
 
 ```bash
-cd mi-app
-pnpm install                  # si se usó --no-install
-pnpm infra:up                 # PostgreSQL 18 + pgvector y Mailpit (docker compose con el .env de la raíz)
-pnpm build:ts
-pnpm db:migrate               # migraciones, cola de trabajos, almacén interno de conocimiento y datos base
-pnpm starter doctor           # debe terminar en "Instalación en buen estado."
-pnpm dev
+pnpm dev                                   # en segundo plano si eres un agente
+curl -sf http://localhost:3001/api/health/live
+pnpm starter doctor                        # debe terminar en "Instalación en buen estado."
 ```
 
-Base externa: asegúrate de PostgreSQL 18 con pgvector disponible; define `DATABASE_URL` (rol de la aplicación) y opcionalmente `DATABASE_MIGRATION_URL` (rol con permisos de DDL).
+IA después de instalar (la clave se lee de una variable de entorno, nunca de un argumento):
+
+```bash
+OPENAI_API_KEY=sk-… pnpm starter ai connect --provider openai --chat-model gpt-4.1-mini
+```
+
+Copia nueva en otra carpeta: `pnpm starter create ../mi-app --from . --owner propietaria@empresa.cl --modules ai --yes`.
+
+Base externa: PostgreSQL 18 con pgvector; define `DATABASE_URL` (rol de la aplicación) y
+opcionalmente `DATABASE_MIGRATION_URL` (rol con permisos de DDL).
 
 ## 3. Primer ingreso
 

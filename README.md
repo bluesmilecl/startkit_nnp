@@ -18,27 +18,33 @@ Base de producción para aplicaciones internas con **autenticación por código 
 
 ## Inicio rápido
 
-Requisitos: Node 24 LTS (ver `.node-version`), pnpm 12 (`corepack enable`) y Docker con Compose v2.
+Requisitos: Node 24 LTS, Docker con Compose v2 y git (pnpm se activa solo con corepack).
 
 ```bash
-# Nueva instalación (genera .env con secretos únicos y starter.config.json sin secretos)
-pnpm create ecortes-app mi-app --owner tu@empresa.cl --modules ai,rag
-cd mi-app
-
-pnpm infra:up                 # PostgreSQL 18 + pgvector y Mailpit en Docker
-pnpm build:ts && pnpm db:migrate
-pnpm starter doctor           # diagnóstico de la instalación
-pnpm dev                      # API :3001, worker y web :3000
+git clone https://github.com/bluesmilecl/startkit_nnp mi-app && cd mi-app
+node scripts/quickstart.mjs --owner tu@empresa.cl --test-ai   # instala, configura, levanta la base y migra
+pnpm dev                                                      # web :3000 · API :3001 · worker
 ```
 
-Abre http://localhost:3000, ingresa con el correo propietario y lee el código en Mailpit (http://localhost:8025). Desde este repositorio también puedes crear un proyecto con `pnpm starter create ../mi-app --from .`.
+Abre http://localhost:3000, ingresa con el correo propietario y lee el código en Mailpit
+(http://localhost:8025). `--test-ai` deja el chat funcionando sin claves (solo desarrollo); con
+una clave real: `OPENAI_API_KEY=sk-… pnpm starter ai connect --provider openai --chat-model gpt-4.1-mini`.
 
-Para producción con contenedores (web, API, worker, migrate y proxy Caddy con HTTPS automático) revisa [docs/docker.md](docs/docker.md).
+> **¿Con un asistente de IA?** Pídele: *«Instala https://github.com/bluesmilecl/startkit_nnp
+> siguiendo su INSTALL.md; el propietario es tu@empresa.cl»*. [INSTALL.md](INSTALL.md) es una
+> ruta sin preguntas, repetible y verificable (`QUICKSTART_RESULT=ok`), y `CLAUDE.md` /
+> `AGENTS.md` / `GEMINI.md` le indican cómo trabajar en el código después.
+
+Variantes (PostgreSQL propio, OpenAI/Anthropic/Google, solo algunos módulos) en
+[INSTALL.md](INSTALL.md). Para crear una copia nueva desde este repositorio:
+`pnpm starter create ../otra-app --from .`. Producción con contenedores (web, API, worker, migrate
+y Caddy con HTTPS automático): [docs/docker.md](docs/docker.md).
 
 ## Comandos
 
 | Comando | Qué hace |
 | --- | --- |
+| `node scripts/quickstart.mjs --owner <correo>` | Instalación local completa en un comando (idempotente) |
 | `pnpm dev` | Compilación TypeScript en modo watch + API + worker + Nuxt |
 | `pnpm infra:up` / `pnpm infra:down` | Base de datos y Mailpit en Docker (lee el `.env` de la raíz) |
 | `pnpm build` / `pnpm build:ts` | Compilación completa / solo paquetes y apps Node |
@@ -47,7 +53,7 @@ Para producción con contenedores (web, API, worker, migrate y proxy Caddy con H
 | `pnpm test` · `pnpm test:integration` · `pnpm test:e2e` | Unitarias · integración con PostgreSQL real · Playwright |
 | `pnpm api:docs:generate` · `pnpm api:client:generate` · `pnpm api:contract:check` | OpenAPI y referencia Markdown · cliente TypeScript · cambios incompatibles |
 | `pnpm docs:check` | Enlaces, comandos, `llms.txt`, configuración de ejemplo y versión del AI SDK |
-| `pnpm starter <comando>` | CLI: `create`, `doctor`, `config validate`, `ai sync`, `rag doctor`, `rag reindex`, `generate module`, `docs check`, `owner assign` |
+| `pnpm starter <comando>` | CLI: `create`, `init`, `doctor`, `config validate`, `ai connect`, `ai sync`, `rag doctor`, `rag reindex`, `generate module`, `docs check`, `owner assign` |
 | `pnpm verify` | Verificación integral reproducible (escribe `verify-report.md`) |
 
 ## Estructura

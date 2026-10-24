@@ -24,7 +24,7 @@ export interface CreateOptions {
 }
 
 const secret = (bytes: number, enc: 'hex' | 'base64') => randomBytes(bytes).toString(enc);
-const slugify = (s: string) =>
+export const slugify = (s: string) =>
   s
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
@@ -78,6 +78,77 @@ export function renderEnv(example: string, values: Record<string, string>): stri
   return out.join('\n');
 }
 
+export interface InstallationChoices {
+  name: string;
+  owner: string;
+  modules: Set<string>;
+  db: 'docker' | 'external';
+  databaseUrl: string;
+  mail: 'smtp' | 'resend' | 'log';
+  /** Host port of the local PostgreSQL container (when 5432 is taken). */
+  pgPort?: number;
+  /** Development only: enables the deterministic AI provider to try the chat without keys. */
+  testAi?: boolean;
+}
+
+/** Per-installation .env values. Secrets are generated here and written only to .env. */
+export function installationEnv(o: InstallationChoices): Record<string, string> {
+  const pgPassword = secret(18, 'hex');
+  const appPassword = secret(18, 'hex');
+  const port = o.pgPort ?? 5432;
+  return {
+    NODE_ENV: 'development',
+    APP_NAME: o.name,
+    BETTER_AUTH_SECRET: secret(32, 'hex'),
+    APP_ENCRYPTION_KEY: secret(32, 'base64'),
+    OWNER_EMAIL: o.owner,
+    FEATURE_AI: String(o.modules.has('ai')),
+    FEATURE_RAG: String(o.modules.has('rag')),
+    FEATURE_ORGANIZATIONS: String(o.modules.has('organizations')),
+    AI_TEST_PROVIDER_ENABLED: String(!!o.testAi),
+    MAIL_TRANSPORT: o.mail,
+    POSTGRES_PASSWORD: pgPassword,
+    POSTGRES_APP_PASSWORD: appPassword,
+    RAG_POSTGRES_PASSWORD: secret(18, 'hex'),
+    ...(o.pgPort ? { POSTGRES_PORT: String(o.pgPort) } : {}),
+    DATABASE_URL: o.db === 'external' ? o.databaseUrl : `postgres://starter_app:${appPassword}@localhost:${port}/starter`,
+    DATABASE_MIGRATION_URL: o.db === 'external' ? '' : `postgres://starter:${pgPassword}@localhost:${port}/starter`,
+  };
+}
+
+/** Exportable configuration (no secrets), validated with the @starter/config schema. */
+export function installationConfig(o: InstallationChoices) {
+  return {
+    $schema: './docs/schemas/starter.config.schema.json',
+    schemaVersion: 1,
+    project: { name: o.name, slug: slugify(o.name), locale: 'es-CL', timezone: 'America/Santiago', ...(o.owner ? { ownerEmail: o.owner } : {}) },
+    features: { organizations: o.modules.has('organizations'), ai: o.modules.has('ai'), rag: o.modules.has('rag') },
+    auth: { method: 'email-otp', registration: 'invite-only' },
+    database: { mode: o.db },
+    mail: { transport: o.mail },
+  };
+}
+
+/** Writes .env (mode 600) and starter.config.json into `dir`; never overwrites an existing .env. */
+export async function writeInstallation(dir: string, o: InstallationChoices, opts: { config?: boolean } = {}): Promise<void> {
+  const example = join(dir, '.env.example');
+  if (!existsSync(example)) throw new CliError('La plantilla no tiene .env.example');
+  const envPath = join(dir, '.env');
+  if (existsSync(envPath)) throw new CliError(`${envPath} ya existe; no se sobrescribe`);
+  writeFileSync(envPath, renderEnv(readFileSync(example, 'utf8'), installationEnv(o)), { mode: 0o600 });
+  if (opts.config === false) return;
+  const config = installationConfig(o);
+  try {
+    const { validateStarterConfig } = await import('@starter/config');
+    const r = validateStarterConfig(config);
+    if (!r.ok) throw new CliError(`starter.config.json inválido: ${JSON.stringify(r.errors)}`);
+  } catch (err) {
+    if (err instanceof CliError) throw err;
+    line('warn', 'No se pudo validar starter.config.json aquí', 'ejecuta "pnpm starter config validate" tras instalar');
+  }
+  writeFileSync(join(dir, 'starter.config.json'), `${JSON.stringify(config, null, 2)}\n`);
+}
+
 export async function create(opts: CreateOptions): Promise<void> {
   title('Starter Kit Nuxt + NestJS IA · nueva instalación');
   const name = opts.name ?? (await ask('Nombre de la aplicación', opts.dir ? basename(resolve(opts.dir)) : 'Mi aplicación'));
@@ -109,53 +180,12 @@ export async function create(opts: CreateOptions): Promise<void> {
   fetchTemplate(from, dir, opts.ref);
   line('ok', 'Plantilla copiada', dir);
 
-  // Secrets are generated here and written only to .env (never to starter.config.json).
-  const pgPassword = secret(18, 'hex');
-  const appPassword = secret(18, 'hex');
-  const values: Record<string, string> = {
-    NODE_ENV: 'development',
-    APP_NAME: name,
-    BETTER_AUTH_SECRET: secret(32, 'hex'),
-    APP_ENCRYPTION_KEY: secret(32, 'base64'),
-    OWNER_EMAIL: owner,
-    FEATURE_AI: String(modules.has('ai')),
-    FEATURE_RAG: String(modules.has('rag')),
-    FEATURE_ORGANIZATIONS: String(modules.has('organizations')),
-    AI_TEST_PROVIDER_ENABLED: 'false',
-    MAIL_TRANSPORT: mail,
-    POSTGRES_PASSWORD: pgPassword,
-    POSTGRES_APP_PASSWORD: appPassword,
-    RAG_POSTGRES_PASSWORD: secret(18, 'hex'),
-    DATABASE_URL: db === 'external' ? databaseUrl : `postgres://starter_app:${appPassword}@localhost:5432/starter`,
-    DATABASE_MIGRATION_URL: db === 'external' ? '' : `postgres://starter:${pgPassword}@localhost:5432/starter`,
-  };
-  const example = join(dir, '.env.example');
-  if (!existsSync(example)) throw new CliError('La plantilla no tiene .env.example');
-  writeFileSync(join(dir, '.env'), renderEnv(readFileSync(example, 'utf8'), values), { mode: 0o600 });
+  await writeInstallation(dir, { name, owner, modules, db, databaseUrl, mail });
   line('ok', '.env con secretos únicos', 'permisos 600, fuera de git');
-
-  const config = {
-    $schema: './docs/schemas/starter.config.schema.json',
-    schemaVersion: 1,
-    project: { name, slug: slugify(name), locale: 'es-CL', timezone: 'America/Santiago', ...(owner ? { ownerEmail: owner } : {}) },
-    features: { organizations: modules.has('organizations'), ai: modules.has('ai'), rag: modules.has('rag') },
-    auth: { method: 'email-otp', registration: 'invite-only' },
-    database: { mode: db },
-    mail: { transport: mail },
-  };
-  try {
-    const { validateStarterConfig } = await import('@starter/config');
-    const r = validateStarterConfig(config);
-    if (!r.ok) throw new CliError(`starter.config.json inválido: ${JSON.stringify(r.errors)}`);
-  } catch (err) {
-    if (err instanceof CliError) throw err;
-    line('warn', 'No se pudo validar starter.config.json aquí', 'ejecuta "pnpm starter config validate" tras instalar');
-  }
-  writeFileSync(join(dir, 'starter.config.json'), `${JSON.stringify(config, null, 2)}\n`);
+  line('ok', 'starter.config.json', 'configuración exportable sin secretos');
   const pkgPath = join(dir, 'package.json');
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as Record<string, unknown>;
   writeFileSync(pkgPath, `${JSON.stringify({ ...pkg, name: slugify(name), version: '0.1.0' }, null, 2)}\n`);
-  line('ok', 'starter.config.json', 'configuración exportable sin secretos');
 
   if (opts.git !== false && !existsSync(join(dir, '.git'))) {
     try {

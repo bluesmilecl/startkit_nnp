@@ -2,6 +2,8 @@
 
 Este archivo es para agentes (Claude Code u otros) que modifican este repositorio. Léelo completo antes de cambiar código. La documentación humana está en [README.md](README.md) y [docs/](docs/).
 
+**¿Solo instalar?** Sigue [INSTALL.md](INSTALL.md): `node scripts/quickstart.mjs --owner <correo>` (idempotente, termina con `QUICKSTART_RESULT=ok|error`).
+
 ## Mapa rápido
 
 | Necesitas… | Mira |

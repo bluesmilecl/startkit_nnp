@@ -6,6 +6,7 @@ Antes de modificar código, lee AGENTS.md: reglas de seguridad (sin secretos en 
 
 ## Empezar
 
+- [INSTALL.md](INSTALL.md): instalación en un comando para personas y agentes (`node scripts/quickstart.mjs --owner <correo>`), variantes, checklist y problemas frecuentes
 - [README](README.md): qué incluye, inicio rápido y comandos
 - [AGENTS.md](AGENTS.md): guía para agentes de código
 - [Instalación](docs/installation.md): requisitos, create-ecortes-app, primer ingreso, producción

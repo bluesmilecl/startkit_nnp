@@ -57,6 +57,49 @@ export async function aiSync(opts: { connection?: string }): Promise<number> {
   }
 }
 
+/** Environment variable read by default for each provider's key (never a CLI argument). */
+const KEY_ENV: Record<string, string> = { openai: 'OPENAI_API_KEY', anthropic: 'ANTHROPIC_API_KEY', google: 'GOOGLE_GENERATIVE_AI_API_KEY', 'openai-compatible': 'OPENAI_COMPATIBLE_API_KEY', test: '' };
+
+/**
+ * `starter ai connect --provider openai [--chat-model gpt-4.1-mini]`: configures AI from the
+ * terminal (agents installing the starter have no browser). The key is read from an environment
+ * variable (shell or .env), stored encrypted and never printed; with --chat-model the model is
+ * verified and published on the default assistant.
+ */
+export async function aiConnect(opts: { provider?: string; alias?: string; apiKeyEnv?: string; baseUrl?: string; chatModel?: string; sync?: boolean }): Promise<number> {
+  const provider = opts.provider ?? '';
+  if (!(provider in KEY_ENV)) throw new CliError(`Indica --provider (${Object.keys(KEY_ENV).join(', ')})`);
+  const ctx = await projectContext();
+  try {
+    if (!ctx.env.FEATURE_AI) throw new CliError('El módulo de IA está desactivado (FEATURE_AI=false)');
+    if (provider === 'test' && !ctx.env.AI_TEST_PROVIDER_ENABLED) throw new CliError('El proveedor de prueba requiere AI_TEST_PROVIDER_ENABLED=true (solo desarrollo)');
+    const envName = opts.apiKeyEnv ?? KEY_ENV[provider]!;
+    const apiKey = envName ? process.env[envName]?.trim() || undefined : undefined;
+    if (provider !== 'test' && provider !== 'openai-compatible' && !apiKey) {
+      throw new CliError(`Define la clave en la variable ${envName} (en la terminal o en .env) y repite; nunca la pases como argumento`);
+    }
+    const { createAiServices, quickConnect } = await import('@starter/ai');
+    const { systemActor } = await import('@starter/auth');
+    title('Proveedor de IA');
+    const r = await quickConnect(
+      ctx.deps,
+      createAiServices(ctx.deps),
+      systemActor(),
+      { provider: provider as 'openai', alias: opts.alias ?? provider, apiKey, baseUrl: opts.baseUrl, chatModel: opts.chatModel, sync: opts.sync },
+      (s) => line(s.ok ? 'ok' : 'fail', s.step, s.detail),
+    );
+    if (!r.agentVersion) console.log(c.dim('\n  Siguiente: repite con --chat-model <id> para publicar el asistente, o elige el modelo en /admin/ai/agents.'));
+    return 0;
+  } catch (err) {
+    // Domain errors (rejected key, unknown model, invalid config) are expected outcomes here.
+    if ((err as { name?: string })?.name !== 'AppError') throw err;
+    line('fail', (err as Error).message);
+    return 1;
+  } finally {
+    await ctx.close();
+  }
+}
+
 async function ragServices(ctx: Awaited<ReturnType<typeof projectContext>>, withQueue: boolean) {
   if (!ctx.env.FEATURE_RAG) throw new CliError('El módulo de conocimiento está desactivado (FEATURE_RAG=false)');
   const { createAiServices } = await import('@starter/ai');

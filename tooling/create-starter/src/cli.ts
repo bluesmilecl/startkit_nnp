@@ -2,9 +2,10 @@
 import { basename } from 'node:path';
 import { parseArgs } from 'node:util';
 import { create } from './commands/create.js';
+import { init } from './commands/init.js';
 import { doctor } from './commands/doctor.js';
 import { generateModule } from './commands/generate.js';
-import { aiSync, configValidate, docsCheck, ownerAssign, ragDoctor, ragReindex } from './commands/ops.js';
+import { aiConnect, aiSync, configValidate, docsCheck, ownerAssign, ragDoctor, ragReindex } from './commands/ops.js';
 import { secretsReencrypt } from './commands/secrets.js';
 import { c, CliError } from './lib/ui.js';
 
@@ -21,8 +22,14 @@ ${c.bold('Comandos')}
       --name <nombre> --owner <correo> --modules ai,rag,organizations
       --db docker|external [--database-url <url>] --mail smtp|resend|log
       --yes  --no-install  --no-git
+  init                       Prepara este clon sin preguntas: .env con secretos únicos y starter.config.json
+      --owner <correo> [--modules ai,rag] [--db docker|external --database-url <url>]
+      [--mail smtp|resend|log] [--pg-port 5433] [--test-ai]   (nunca sobrescribe un .env)
   doctor                     Diagnóstico de entorno, configuración, base, migraciones, propietario, correo, IA y RAG
   config validate [archivo]  Valida starter.config.json (esquema y ausencia de secretos)
+  ai connect                 Conecta un proveedor de IA desde la terminal (clave en una variable de entorno)
+      --provider openai|anthropic|google|openai-compatible|test [--alias a] [--base-url url]
+      [--api-key-env VARIABLE] [--chat-model <id>] [--no-sync]
   ai sync [--connection a]   Sincroniza catálogos de modelos y tarifas
   rag doctor                 Diagnostica las conexiones de conocimiento
   rag reindex <colección>    Encola una reindexación [--profile clave] [--budget usd] [--wait]
@@ -66,6 +73,14 @@ async function main(argv: string[]): Promise<number> {
       'dry-run': { type: 'boolean' },
       force: { type: 'boolean' },
       additional: { type: 'boolean' },
+      'pg-port': { type: 'string' },
+      'test-ai': { type: 'boolean' },
+      provider: { type: 'string' },
+      alias: { type: 'string' },
+      'base-url': { type: 'string' },
+      'api-key-env': { type: 'string' },
+      'chat-model': { type: 'string' },
+      'no-sync': { type: 'boolean' },
     },
   });
   if (values.version) {
@@ -75,7 +90,7 @@ async function main(argv: string[]): Promise<number> {
   }
   // Invoked as `create-ecortes-app [dir]` (pnpm create): the default command is create.
   const invokedAsCreate = /create-ecortes-app/.test(basename(process.argv[1] ?? ''));
-  const known = new Set(['create', 'doctor', 'config', 'ai', 'rag', 'generate', 'docs', 'owner', 'secrets', 'help']);
+  const known = new Set(['create', 'init', 'doctor', 'config', 'ai', 'rag', 'generate', 'docs', 'owner', 'secrets', 'help']);
   const [cmd, sub, arg] = invokedAsCreate && !known.has(positionals[0] ?? '') ? ['create', ...positionals] : positionals;
   if (values.help || !cmd || cmd === 'help') {
     console.log(HELP);
@@ -98,10 +113,23 @@ async function main(argv: string[]): Promise<number> {
         git: !values['no-git'],
       });
       return 0;
+    case 'init':
+      return init({
+        owner: values.owner,
+        name: values.name,
+        modules: values.modules,
+        db: values.db,
+        databaseUrl: values['database-url'],
+        mail: values.mail,
+        pgPort: values['pg-port'],
+        testAi: values['test-ai'],
+      });
     case 'doctor':
       return doctor();
     case 'config validate':
       return configValidate(arg);
+    case 'ai connect':
+      return aiConnect({ provider: values.provider, alias: values.alias, apiKeyEnv: values['api-key-env'], baseUrl: values['base-url'], chatModel: values['chat-model'], sync: !values['no-sync'] });
     case 'ai sync':
       return aiSync({ connection: values.connection });
     case 'rag doctor':

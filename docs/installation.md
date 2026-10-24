@@ -9,7 +9,22 @@
 | Docker + Compose v2 | Para PostgreSQL/pgvector y Mailpit locales y para las imágenes de producción. |
 | PostgreSQL | 18 con la extensión **pgvector 0.8+** si usarás conocimiento (RAG) interno. |
 
-## Opción A: instalador (`create-ecortes-app`)
+## Opción A: un comando sobre un clon (recomendada, también para agentes de IA)
+
+```bash
+git clone https://github.com/bluesmilecl/startkit_nnp mi-app && cd mi-app
+node scripts/quickstart.mjs --owner tu@empresa.cl [--test-ai] [--ai openai --chat-model <id>] [--db external --database-url …]
+pnpm dev
+```
+
+Sin dependencias previas (corre antes de `pnpm install`), idempotente y no interactivo: revisa
+Node, pnpm (lo activa con corepack), Docker y puertos (si 5432 está ocupado usa otro), instala,
+compila, ejecuta `pnpm starter init` (crea `.env` con secretos únicos si no existe; nunca lo
+sobrescribe), levanta la infraestructura, migra, ejecuta `pnpm starter doctor` y, si se pide,
+`pnpm starter ai connect`. Termina con `QUICKSTART_RESULT=ok|error` y guarda la salida en
+`quickstart.log`. Guía paso a paso y problemas frecuentes: [INSTALL.md](../INSTALL.md).
+
+## Opción B: instalador en una carpeta nueva (`create-ecortes-app`)
 
 ```bash
 pnpm create ecortes-app mi-app          # interactivo
@@ -39,7 +54,7 @@ Opciones (`pnpm starter --help`):
 | `--mail smtp\|resend\|log` | Transporte de correo (`log` solo en desarrollo). |
 | `--yes`, `--no-install`, `--no-git` | Modo no interactivo y pasos opcionales. |
 
-## Opción B: manual
+## Opción C: manual
 
 ```bash
 cp .env.example .env

@@ -19,3 +19,4 @@ export * from './services/metered-model.js';
 export * from './chat/chat.js';
 export * from './chat/admin-tools.js';
 export * from './chat/media.js';
+export * from './services/setup.js';
