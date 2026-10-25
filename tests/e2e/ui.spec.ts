@@ -10,6 +10,16 @@ test.describe('interface', () => {
     await expect(page.locator('#main')).toBeFocused();
   });
 
+  test('wide charts and tables never make the page scroll sideways on laptop widths', async ({ ownerPage: page }) => {
+    for (const [width, url] of [[1024, '/admin/audit'], [1024, '/admin/ai/usage'], [1280, '/admin/ai/usage'], [1280, '/admin/mail/deliveries']] as const) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(url);
+      await waitHydrated(page);
+      await expect(page.getByRole('main')).toHaveCount(1);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), `${url} at ${width}px`).toBeLessThanOrEqual(width);
+    }
+  });
+
   test('dark mode toggles the theme class', async ({ ownerPage: page }) => {
     await page.goto('/admin');
     await waitHydrated(page);
