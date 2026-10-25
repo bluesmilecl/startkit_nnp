@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="960" height="440" role="img" aria-labelledby="title desc">
+<title id="title">Recorrido de un mensaje en el chat con IA</title>
+<desc id="desc">Un mensaje pasa por el agente publicado (prompt y modelo del servidor), una reserva atómica de presupuesto, el conocimiento permitido y el modelo en streaming. Si el modelo pide una herramienta de cambio, se guarda una propuesta en el servidor que la persona confirma; luego se ejecuta como esa persona con auditoría y la respuesta muestra citas y costo. Todo queda en el libro de uso.</desc>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1120"/><stop offset="1" stop-color="#111827"/></linearGradient>
+<pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity=".035"/></pattern>
+<marker id="a-web" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#00dc82"/></marker><marker id="a-api" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#f43f5e"/></marker><marker id="a-worker" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#fbbf24"/></marker><marker id="a-pg" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#60a5fa"/></marker><marker id="a-ai" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#a78bfa"/></marker><marker id="a-rag" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#2dd4bf"/></marker><marker id="a-mail" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#f472b6"/></marker><marker id="a-edge" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#cbd5e1"/></marker><marker id="a-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#34d399"/></marker><marker id="a-err" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#fb7185"/></marker><marker id="a-ui" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#38bdf8"/></marker>
+
+</defs>
+<style>
+text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;fill:#e5e7eb}
+.mono{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace}
+.t{font-size:20px;font-weight:700;fill:#f8fafc}
+.st{font-size:13px;fill:#94a3b8}
+.h{font-size:14px;font-weight:600;fill:#f1f5f9}
+.m{font-size:12px;fill:#94a3b8}
+.k{font-size:11px;font-weight:600;letter-spacing:1.6px}
+.lbl{font-size:11px;fill:#cbd5e1}
+.base{fill:none;stroke-width:1.6;stroke-opacity:.4}
+.flow{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-dasharray:.1 9;animation:flow 1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-18.2}}
+.glow{animation:glow 6s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.55}50%{opacity:1}}
+.pulse{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.flow,.glow,.pulse{animation:none}}
+</style>
+<rect width="960" height="440" rx="18" fill="url(#bg)"/>
+<rect width="960" height="440" rx="18" fill="url(#grid)"/>
+<rect x=".75" y=".75" width="958.5" height="438.5" rx="17.25" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+<text x="28" y="52" style="font-size:15px;font-weight:600;fill:#e2e8f0">El cliente no envía prompt, modelo ni colecciones: el servidor los toma del agente publicado</text>
+<path d="M188 144 H210" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M188 144 H210" class="flow" stroke="#cbd5e1"/>
+<path d="M374 144 H396" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M374 144 H396" class="flow" stroke="#cbd5e1"/>
+<path d="M560 144 H582" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M560 144 H582" class="flow" stroke="#cbd5e1"/>
+<path d="M746 144 H768" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M746 144 H768" class="flow" stroke="#cbd5e1"/>
+<path d="M850 196 V248" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M850 196 V248" class="flow" stroke="#cbd5e1"/>
+<path d="M768 300 H746" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M768 300 H746" class="flow" stroke="#cbd5e1"/>
+<path d="M582 300 H560" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M582 300 H560" class="flow" stroke="#cbd5e1"/>
+<path d="M396 300 H374" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M396 300 H374" class="flow" stroke="#cbd5e1"/>
+<path d="M210 300 H188" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M210 300 H188" class="flow" stroke="#cbd5e1"/>
+<path d="M932 144 H948 V404 H936" class="base" stroke="#fbbf24" marker-end="url(#a-worker)"/><path d="M932 144 H948 V404 H936" class="flow" stroke="#fbbf24"/>
+<g opacity="0"><circle r="9.4" fill="#a78bfa" fill-opacity=".18"/><circle r="3.6" fill="#a78bfa"/><animateMotion dur="11s" begin="0.0s" repeatCount="indefinite" path="M106 144 H850 V300 H106"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.06;.94;1" dur="11s" begin="0.0s" repeatCount="indefinite"/></g>
+<rect x="24" y="92" width="164" height="104" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-opacity=".5" stroke-width="1.5"><animate attributeName="stroke-opacity" values=".5;.5;1;.5;.5" keyTimes="0;0.001;0.000;0.060;1" dur="11s" repeatCount="indefinite"/></rect>
+<rect x="36" y="104" width="30" height="30" rx="8" fill="#38bdf8" fill-opacity=".15"/>
+<g transform="translate(41 109) scale(0.8333)" fill="none" stroke="#38bdf8" color="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M7 11h10"/><path d="M7 15h6"/><path d="M7 7h8"/></g>
+<text x="76" y="124" class="h">Mensaje</text>
+<text x="38" y="156" class="m">persona con permiso</text>
+<text x="38" y="174" class="m">ai.chat</text>
+<rect x="210" y="92" width="164" height="104" rx="12" fill="#0f172a" stroke="#a78bfa" stroke-opacity=".5" stroke-width="1.5"><animate attributeName="stroke-opacity" values=".5;.5;1;.5;.5" keyTimes="0;0.083;0.113;0.173;1" dur="11s" repeatCount="indefinite"/></rect>
+<rect x="222" y="104" width="30" height="30" rx="8" fill="#a78bfa" fill-opacity=".15"/>
+<g transform="translate(227 109) scale(0.8333)" fill="none" stroke="#a78bfa" color="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></g>
+<text x="262" y="124" class="h">Agente</text>
+<text x="224" y="156" class="m">versión publicada:</text>
+<text x="224" y="174" class="m">prompt y modelo</text>
+<rect x="396" y="92" width="164" height="104" rx="12" fill="#0f172a" stroke="#fbbf24" stroke-opacity=".5" stroke-width="1.5"><animate attributeName="stroke-opacity" values=".5;.5;1;.5;.5" keyTimes="0;0.196;0.226;0.286;1" dur="11s" repeatCount="indefinite"/></rect>
+<rect x="408" y="104" width="30" height="30" rx="8" fill="#fbbf24" fill-opacity=".15"/>
+<g transform="translate(413 109) scale(0.8333)" fill="none" stroke="#fbbf24" color="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></g>
+<text x="448" y="124" class="h">Presupuesto</text>
+<text x="410" y="156" class="m">reserva atómica</text>
+<text x="410" y="174" class="m">(SELECT … FOR UPDATE)</text>
+<rect x="582" y="92" width="164" height="104" rx="12" fill="#0f172a" stroke="#2dd4bf" stroke-opacity=".5" stroke-width="1.5"><animate attributeName="stroke-opacity" values=".5;.5;1;.5;.5" keyTimes="0;0.309;0.339;0.399;1" dur="11s" repeatCount="indefinite"/></rect>
+<rect x="594" y="104" width="30" height="30" rx="8" fill="#2dd4bf" fill-opacity=".15"/>
+<g transform="translate(599 109) scale(0.8333)" fill="none" stroke="#2dd4bf" color="#2dd4bf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></g>
+<text x="634" y="124" class="h">Conocimiento</text>
+<text x="596" y="156" class="m">solo colecciones</text>
+<text x="596" y="174" class="m">permitidas, con citas</text>
+<rect x="768" y="92" width="164" height="104" rx="12" fill="#0f172a" stroke="#a78bfa" stroke-opacity=".5" stroke-width="1.5"><animate attributeName="stroke-opacity" values=".5;.5;1;.5;.5" keyTimes="0;0.423;0.453;0.513;1" dur="11s" repeatCount="indefinite"/></rect>
+<rect x="780" y="104" width="30" height="30" rx="8" fill="#a78bfa" fill-opacity=".15"/>
+<g transform="translate(785 109) scale(0.8333)" fill="none" stroke="#a78bfa" color="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></g>
+<text x="820" y="124" class="h">Modelo</text>
+<text x="782" y="156" class="m">respuesta en</text>
+<text x="782" y="174" class="m">streaming</text>
+<rect x="24" y="248" width="164" height="104" rx="12" fill="#0f172a" stroke="#34d399" stroke-opacity=".5" stroke-width="1.5"><animate attributeName="stroke-opacity" values=".5;.5;1;.5;.5" keyTimes="0;0.970;0.998;0.999;1" dur="11s" repeatCount="indefinite"/></rect>
+<rect x="36" y="260" width="30" height="30" rx="8" fill="#34d399" fill-opacity=".15"/>
+<g transform="translate(41 265) scale(0.8333)" fill="none" stroke="#34d399" color="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></g>
+<text x="76" y="280" class="h">Respuesta</text>
+<text x="38" y="312" class="m">con citas [1] y</text>
+<text x="38" y="330" class="m">costo visible</text>
+<rect x="210" y="248" width="164" height="104" rx="12" fill="#0f172a" stroke="#f43f5e" stroke-opacity=".5" stroke-width="1.5"><animate attributeName="stroke-opacity" values=".5;.5;1;.5;.5" keyTimes="0;0.857;0.887;0.947;1" dur="11s" repeatCount="indefinite"/></rect>
+<rect x="222" y="260" width="30" height="30" rx="8" fill="#f43f5e" fill-opacity=".15"/>
+<g transform="translate(227 265) scale(0.8333)" fill="none" stroke="#f43f5e" color="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></g>
+<text x="262" y="280" class="h">Ejecución</text>
+<text x="224" y="312" class="m">como la persona,</text>
+<text x="224" y="330" class="m">con auditoría</text>
+<rect x="396" y="248" width="164" height="104" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-opacity=".5" stroke-width="1.5"><animate attributeName="stroke-opacity" values=".5;.5;1;.5;.5" keyTimes="0;0.744;0.774;0.834;1" dur="11s" repeatCount="indefinite"/></rect>
+<rect x="408" y="260" width="30" height="30" rx="8" fill="#38bdf8" fill-opacity=".15"/>
+<g transform="translate(413 265) scale(0.8333)" fill="none" stroke="#38bdf8" color="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></g>
+<text x="448" y="280" class="h">Confirmación</text>
+<text x="410" y="312" class="m">la persona revisa</text>
+<text x="410" y="330" class="m">y confirma</text>
+<rect x="582" y="248" width="164" height="104" rx="12" fill="#0f172a" stroke="#fbbf24" stroke-opacity=".5" stroke-width="1.5"><animate attributeName="stroke-opacity" values=".5;.5;1;.5;.5" keyTimes="0;0.631;0.661;0.721;1" dur="11s" repeatCount="indefinite"/></rect>
+<rect x="594" y="260" width="30" height="30" rx="8" fill="#fbbf24" fill-opacity=".15"/>
+<g transform="translate(599 265) scale(0.8333)" fill="none" stroke="#fbbf24" color="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h8"/><path d="M13 12h8"/><path d="M13 19h8"/><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/></g>
+<text x="634" y="280" class="h">Propuesta</text>
+<text x="596" y="312" class="m">guardada en el</text>
+<text x="596" y="330" class="m">servidor, con hash</text>
+<rect x="768" y="248" width="164" height="104" rx="12" fill="#0f172a" stroke="#f43f5e" stroke-opacity=".5" stroke-width="1.5"><animate attributeName="stroke-opacity" values=".5;.5;1;.5;.5" keyTimes="0;0.517;0.547;0.607;1" dur="11s" repeatCount="indefinite"/></rect>
+<rect x="780" y="260" width="30" height="30" rx="8" fill="#f43f5e" fill-opacity=".15"/>
+<g transform="translate(785 265) scale(0.8333)" fill="none" stroke="#f43f5e" color="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></g>
+<text x="820" y="280" class="h">Herramienta</text>
+<text x="782" y="312" class="m">lectura: se ejecuta</text>
+<text x="782" y="330" class="m">cambio: se propone</text>
+<rect x="24" y="384" width="912" height="40" rx="12" fill="#fbbf24" fill-opacity=".07" stroke="#fbbf24" stroke-opacity=".45"/>
+<g transform="translate(40 394) scale(0.8333)" fill="none" stroke="#fbbf24" color="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></g>
+<text x="70" y="409" style="font-size:12.5px;fill:#fde68a">Libro de uso: cada intento con tokens, latencia y costo exacto (12 decimales). Un costo desconocido queda como desconocido, nunca cero.</text>
+</svg>

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="960" height="360" role="img" aria-labelledby="title desc">
+<title id="title">Starter Kit Nuxt + NestJS + IA</title>
+<desc id="desc">Base de producción para aplicaciones internas con acceso por código, permisos, IA con costos, agentes con chat, conocimiento y correo. A la derecha, una terminal reproduce la instalación en un comando con node scripts/quickstart.mjs.</desc>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1120"/><stop offset="1" stop-color="#111827"/></linearGradient>
+<pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity=".035"/></pattern>
+<marker id="a-web" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#00dc82"/></marker><marker id="a-api" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#f43f5e"/></marker><marker id="a-worker" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#fbbf24"/></marker><marker id="a-pg" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#60a5fa"/></marker><marker id="a-ai" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#a78bfa"/></marker><marker id="a-rag" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#2dd4bf"/></marker><marker id="a-mail" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#f472b6"/></marker><marker id="a-edge" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#cbd5e1"/></marker><marker id="a-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#34d399"/></marker><marker id="a-err" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#fb7185"/></marker><marker id="a-ui" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#38bdf8"/></marker>
+
+<radialGradient id="gv"><stop offset="0" stop-color="#a78bfa" stop-opacity=".35"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></radialGradient>
+<radialGradient id="gg"><stop offset="0" stop-color="#00dc82" stop-opacity=".22"/><stop offset="1" stop-color="#00dc82" stop-opacity="0"/></radialGradient>
+<linearGradient id="gt" x1="0" x2="1"><stop offset="0" stop-color="#00dc82"/><stop offset=".55" stop-color="#38bdf8"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+<clipPath id="frame"><rect width="960" height="360" rx="18"/></clipPath>
+
+</defs>
+<style>
+text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;fill:#e5e7eb}
+.mono{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace}
+.t{font-size:20px;font-weight:700;fill:#f8fafc}
+.st{font-size:13px;fill:#94a3b8}
+.h{font-size:14px;font-weight:600;fill:#f1f5f9}
+.m{font-size:12px;fill:#94a3b8}
+.k{font-size:11px;font-weight:600;letter-spacing:1.6px}
+.lbl{font-size:11px;fill:#cbd5e1}
+.base{fill:none;stroke-width:1.6;stroke-opacity:.4}
+.flow{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-dasharray:.1 9;animation:flow 1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-18.2}}
+.glow{animation:glow 6s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.55}50%{opacity:1}}
+.pulse{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.flow,.glow,.pulse{animation:none}}
+</style>
+<rect width="960" height="360" rx="18" fill="url(#bg)"/>
+<rect width="960" height="360" rx="18" fill="url(#grid)"/>
+<rect x=".75" y=".75" width="958.5" height="358.5" rx="17.25" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+<g clip-path="url(#frame)"><circle cx="830" cy="30" r="300" fill="url(#gv)" class="glow"/><circle cx="60" cy="400" r="280" fill="url(#gg)" class="glow" style="animation-delay:-3s"/></g>
+<text x="48" y="78" class="k" style="fill:#00dc82">MONOREPO · ES-CL · LISTO PARA PRODUCCIÓN</text>
+<text x="46" y="132" style="font-size:50px;font-weight:800;fill:#f8fafc;letter-spacing:-1px">Starter Kit</text>
+<text x="48" y="172" style="font-size:30px;font-weight:700;fill:url(#gt)">Nuxt + NestJS + IA</text>
+<text x="48" y="210" style="font-size:15px;fill:#cbd5e1">Base de producción para aplicaciones internas:</text>
+<text x="48" y="232" style="font-size:15px;fill:#cbd5e1">acceso por código, permisos, IA con costos,</text>
+<text x="48" y="254" style="font-size:15px;fill:#cbd5e1">agentes con chat, conocimiento (RAG) y correo.</text>
+<rect x="48" y="284" width="77" height="26" rx="13" fill="#00dc82" fill-opacity=".1" stroke="#00dc82" stroke-opacity=".45"/><circle cx="62" cy="297" r="3.5" fill="#00dc82" class="pulse" style="animation-delay:-0.0s"/><text x="72" y="301.5" style="font-size:12.5px;fill:#e2e8f0">Nuxt 4</text>
+<rect x="133.2" y="284" width="99" height="26" rx="13" fill="#f43f5e" fill-opacity=".1" stroke="#f43f5e" stroke-opacity=".45"/><circle cx="147.2" cy="297" r="3.5" fill="#f43f5e" class="pulse" style="animation-delay:-0.3s"/><text x="157.2" y="301.5" style="font-size:12.5px;fill:#e2e8f0">NestJS 12</text>
+<rect x="240.0" y="284" width="128" height="26" rx="13" fill="#60a5fa" fill-opacity=".1" stroke="#60a5fa" stroke-opacity=".45"/><circle cx="254.0" cy="297" r="3.5" fill="#60a5fa" class="pulse" style="animation-delay:-0.6s"/><text x="264.0" y="301.5" style="font-size:12.5px;fill:#e2e8f0">PostgreSQL 18</text>
+<rect x="375.6" y="284" width="92" height="26" rx="13" fill="#60a5fa" fill-opacity=".1" stroke="#60a5fa" stroke-opacity=".45"/><circle cx="389.6" cy="297" r="3.5" fill="#60a5fa" class="pulse" style="animation-delay:-0.9s"/><text x="399.6" y="301.5" style="font-size:12.5px;fill:#e2e8f0">pgvector</text>
+<rect x="48" y="318" width="120" height="26" rx="13" fill="#38bdf8" fill-opacity=".1" stroke="#38bdf8" stroke-opacity=".45"/><circle cx="62" cy="331" r="3.5" fill="#38bdf8" class="pulse" style="animation-delay:-1.2s"/><text x="72" y="335.5" style="font-size:12.5px;fill:#e2e8f0">TypeScript 6</text>
+<rect x="176.4" y="318" width="84" height="26" rx="13" fill="#fbbf24" fill-opacity=".1" stroke="#fbbf24" stroke-opacity=".45"/><circle cx="190.4" cy="331" r="3.5" fill="#fbbf24" class="pulse" style="animation-delay:-1.5s"/><text x="200.4" y="335.5" style="font-size:12.5px;fill:#e2e8f0">pg-boss</text>
+<rect x="268.8" y="318" width="92" height="26" rx="13" fill="#a78bfa" fill-opacity=".1" stroke="#a78bfa" stroke-opacity=".45"/><circle cx="282.8" cy="331" r="3.5" fill="#a78bfa" class="pulse" style="animation-delay:-1.8s"/><text x="292.8" y="335.5" style="font-size:12.5px;fill:#e2e8f0">AI SDK 7</text>
+<rect x="368.4" y="318" width="77" height="26" rx="13" fill="#cbd5e1" fill-opacity=".1" stroke="#cbd5e1" stroke-opacity=".45"/><circle cx="382.4" cy="331" r="3.5" fill="#cbd5e1" class="pulse" style="animation-delay:-2.1s"/><text x="392.4" y="335.5" style="font-size:12.5px;fill:#e2e8f0">Docker</text>
+<rect x="498" y="34" width="430" height="292" rx="14" fill="#0a0f1c" stroke="#263247" stroke-width="1.5"/>
+<path d="M498 68H928" stroke="#1e293b"/>
+<circle cx="518" cy="51" r="5.5" fill="#ff5f57"/>
+<circle cx="536" cy="51" r="5.5" fill="#febc2e"/>
+<circle cx="554" cy="51" r="5.5" fill="#28c840"/>
+<text x="713.0" y="55" text-anchor="middle" class="mono" style="font-size:11.5px;fill:#64748b">~/mesa-de-ayuda</text>
+<clipPath id="ty0"><rect x="514" y="83" height="20" width="400"><animate attributeName="width" values="0;0;400;400;0" keyTimes="0;0.001;0.100;.97;1" dur="12s" repeatCount="indefinite"/></rect></clipPath>
+<g clip-path="url(#ty0)"><text x="516" y="98" class="mono" xml:space="preserve" style="font-size:12.5px;white-space:pre"><tspan style="fill:#00dc82">$ </tspan><tspan style="fill:#e2e8f0">node scripts/quickstart.mjs \</tspan></text></g>
+<clipPath id="ty1"><rect x="514" y="104" height="20" width="400"><animate attributeName="width" values="0;0;400;400;0" keyTimes="0;0.101;0.200;.97;1" dur="12s" repeatCount="indefinite"/></rect></clipPath>
+<g clip-path="url(#ty1)"><text x="516" y="119" class="mono" xml:space="preserve" style="font-size:12.5px;white-space:pre"><tspan style="fill:#e2e8f0">    --new </tspan><tspan style="fill:#fde68a">&quot;Mesa de Ayuda&quot;</tspan><tspan style="fill:#e2e8f0"> --owner tu@empresa.cl</tspan></text></g>
+<g><text x="516" y="148" class="mono" xml:space="preserve" style="font-size:12.5px;white-space:pre"><tspan style="fill:#00dc82">✔ </tspan><tspan style="fill:#64748b">Node 24 · pnpm 12 · Docker Compose</tspan></text><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.240;0.255;.97;1" dur="12s" repeatCount="indefinite"/></g>
+<g><text x="516" y="170" class="mono" xml:space="preserve" style="font-size:12.5px;white-space:pre"><tspan style="fill:#22d3ee">▶ </tspan><tspan style="fill:#e2e8f0">Dependencias (pnpm install)… </tspan><tspan style="fill:#00dc82">ok</tspan></text><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.320;0.335;.97;1" dur="12s" repeatCount="indefinite"/></g>
+<g><text x="516" y="192" class="mono" xml:space="preserve" style="font-size:12.5px;white-space:pre"><tspan style="fill:#22d3ee">▶ </tspan><tspan style="fill:#e2e8f0">PostgreSQL 18 + pgvector y Mailpit… </tspan><tspan style="fill:#00dc82">ok</tspan></text><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.400;0.415;.97;1" dur="12s" repeatCount="indefinite"/></g>
+<g><text x="516" y="214" class="mono" xml:space="preserve" style="font-size:12.5px;white-space:pre"><tspan style="fill:#22d3ee">▶ </tspan><tspan style="fill:#e2e8f0">Migraciones y datos base… </tspan><tspan style="fill:#00dc82">ok</tspan></text><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.480;0.495;.97;1" dur="12s" repeatCount="indefinite"/></g>
+<g><text x="516" y="236" class="mono" xml:space="preserve" style="font-size:12.5px;white-space:pre"><tspan style="fill:#22d3ee">▶ </tspan><tspan style="fill:#e2e8f0">Diagnóstico (pnpm starter doctor)… </tspan><tspan style="fill:#00dc82">ok</tspan></text><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.560;0.575;.97;1" dur="12s" repeatCount="indefinite"/></g>
+<g><text x="516" y="266" class="mono" xml:space="preserve" style="font-size:12.5px;white-space:pre"><tspan style="fill:#00dc82">QUICKSTART_RESULT=ok </tspan><tspan style="fill:#64748b">web=http://localhost:3000</tspan></text><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.660;0.675;.97;1" dur="12s" repeatCount="indefinite"/></g>
+<g><text x="516" y="296" class="mono" xml:space="preserve" style="font-size:12.5px;white-space:pre"><tspan style="fill:#00dc82">$ </tspan><tspan style="fill:#e2e8f0">pnpm dev</tspan></text><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.760;0.775;.97;1" dur="12s" repeatCount="indefinite"/></g>
+<g><rect x="592" y="284" width="8" height="15" fill="#00dc82"><animate attributeName="opacity" values="1;0" dur="1s" calcMode="discrete" repeatCount="indefinite"/></rect><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.76;.775;.97;1" dur="12s" repeatCount="indefinite"/></g>
+</svg>

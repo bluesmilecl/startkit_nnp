@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="960" height="360" role="img" aria-labelledby="title desc">
+<title id="title">Correo y automatizaciones</title>
+<desc id="desc">Una acción auditada, como crear un proyecto, activa una automatización que revisa los eventos cada minuto sin duplicados, deja una fila en Envíos y la envía con el trabajo durable mail.send usando la plantilla con variables y marca, por Resend, SMTP, Postmark u otro proveedor. Los correos del sistema (código, invitación, alertas) usan las mismas plantillas y quedan en el mismo registro.</desc>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1120"/><stop offset="1" stop-color="#111827"/></linearGradient>
+<pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity=".035"/></pattern>
+<marker id="a-web" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#00dc82"/></marker><marker id="a-api" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#f43f5e"/></marker><marker id="a-worker" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#fbbf24"/></marker><marker id="a-pg" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#60a5fa"/></marker><marker id="a-ai" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#a78bfa"/></marker><marker id="a-rag" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#2dd4bf"/></marker><marker id="a-mail" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#f472b6"/></marker><marker id="a-edge" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#cbd5e1"/></marker><marker id="a-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#34d399"/></marker><marker id="a-err" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#fb7185"/></marker><marker id="a-ui" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#38bdf8"/></marker>
+
+</defs>
+<style>
+text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;fill:#e5e7eb}
+.mono{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace}
+.t{font-size:20px;font-weight:700;fill:#f8fafc}
+.st{font-size:13px;fill:#94a3b8}
+.h{font-size:14px;font-weight:600;fill:#f1f5f9}
+.m{font-size:12px;fill:#94a3b8}
+.k{font-size:11px;font-weight:600;letter-spacing:1.6px}
+.lbl{font-size:11px;fill:#cbd5e1}
+.base{fill:none;stroke-width:1.6;stroke-opacity:.4}
+.flow{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-dasharray:.1 9;animation:flow 1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-18.2}}
+.glow{animation:glow 6s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.55}50%{opacity:1}}
+.pulse{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.flow,.glow,.pulse{animation:none}}
+</style>
+<rect width="960" height="360" rx="18" fill="url(#bg)"/>
+<rect width="960" height="360" rx="18" fill="url(#grid)"/>
+<rect x=".75" y=".75" width="958.5" height="358.5" rx="17.25" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+<text x="28" y="52" style="font-size:15px;font-weight:600;fill:#e2e8f0">Proveedor, plantillas y reglas se configuran en el panel; los envíos de automatizaciones son trabajos durables</text>
+<path d="M188 144 H210" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M188 144 H210" class="flow" stroke="#cbd5e1"/>
+<path d="M374 144 H396" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M374 144 H396" class="flow" stroke="#cbd5e1"/>
+<path d="M560 144 H582" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M560 144 H582" class="flow" stroke="#cbd5e1"/>
+<path d="M664 196 V236" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M664 196 V236" class="flow" stroke="#cbd5e1"/>
+<path d="M188 288 H582" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M188 288 H582" class="flow" stroke="#cbd5e1"/>
+<path d="M746 288 H850 V196" class="base" stroke="#f472b6" marker-end="url(#a-mail)"/><path d="M746 288 H850 V196" class="flow" stroke="#f472b6"/>
+<g opacity="0"><circle r="9.4" fill="#f472b6" fill-opacity=".18"/><circle r="3.6" fill="#f472b6"/><animateMotion dur="8s" begin="0.0s" repeatCount="indefinite" path="M106 144 H664 V288 H850 V144"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.06;.94;1" dur="8s" begin="0.0s" repeatCount="indefinite"/></g>
+<g opacity="0"><circle r="9.4" fill="#38bdf8" fill-opacity=".18"/><circle r="3.6" fill="#38bdf8"/><animateMotion dur="6.5s" begin="-3s" repeatCount="indefinite" path="M106 288 H850 V144"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.06;.94;1" dur="6.5s" begin="-3s" repeatCount="indefinite"/></g>
+<rect x="24" y="92" width="164" height="104" rx="12" fill="#0f172a" stroke="#fbbf24" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="36" y="104" width="30" height="30" rx="8" fill="#fbbf24" fill-opacity=".15"/>
+<g transform="translate(41 109) scale(0.8333)" fill="none" stroke="#fbbf24" color="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></g>
+<text x="76" y="124" class="h">Evento</text>
+<text x="38" y="156" class="m">acción auditada:</text>
+<text x="38" y="174" class="m">proyecto creado…</text>
+<rect x="210" y="92" width="164" height="104" rx="12" fill="#0f172a" stroke="#f472b6" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="222" y="104" width="30" height="30" rx="8" fill="#f472b6" fill-opacity=".15"/>
+<g transform="translate(227 109) scale(0.8333)" fill="none" stroke="#f472b6" color="#f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></g>
+<text x="262" y="124" class="h" style="font-size:13px">Automatización</text>
+<text x="224" y="156" class="m">revisa cada minuto,</text>
+<text x="224" y="174" class="m">sin duplicados</text>
+<rect x="396" y="92" width="164" height="104" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="408" y="104" width="30" height="30" rx="8" fill="#38bdf8" fill-opacity=".15"/>
+<g transform="translate(413 109) scale(0.8333)" fill="none" stroke="#38bdf8" color="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></g>
+<text x="448" y="124" class="h">Envío en cola</text>
+<text x="410" y="156" class="m">fila en Envíos</text>
+<text x="410" y="174" class="m">con su estado</text>
+<rect x="582" y="92" width="164" height="104" rx="12" fill="#0f172a" stroke="#fbbf24" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="594" y="104" width="30" height="30" rx="8" fill="#fbbf24" fill-opacity=".15"/>
+<g transform="translate(599 109) scale(0.8333)" fill="none" stroke="#fbbf24" color="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></g>
+<text x="634" y="124" class="h">mail.send</text>
+<text x="596" y="156" class="m">trabajo durable</text>
+<text x="596" y="174" class="m">con reintentos</text>
+<rect x="768" y="92" width="164" height="104" rx="12" fill="#0f172a" stroke="#f472b6" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="780" y="104" width="30" height="30" rx="8" fill="#f472b6" fill-opacity=".15"/>
+<g transform="translate(785 109) scale(0.8333)" fill="none" stroke="#f472b6" color="#f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></g>
+<text x="820" y="124" class="h">Proveedor</text>
+<text x="782" y="156" class="m">Resend, SMTP,</text>
+<text x="782" y="174" class="m">Postmark y otros</text>
+<rect x="24" y="236" width="164" height="104" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="36" y="248" width="30" height="30" rx="8" fill="#38bdf8" fill-opacity=".15"/>
+<g transform="translate(41 253) scale(0.8333)" fill="none" stroke="#38bdf8" color="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></g>
+<text x="76" y="268" class="h">Del sistema</text>
+<text x="38" y="300" class="m">código, invitación,</text>
+<text x="38" y="318" class="m">alertas de IA</text>
+<rect x="582" y="236" width="164" height="104" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="594" y="248" width="30" height="30" rx="8" fill="#38bdf8" fill-opacity=".15"/>
+<g transform="translate(599 253) scale(0.8333)" fill="none" stroke="#38bdf8" color="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></g>
+<text x="634" y="268" class="h">Plantilla</text>
+<text x="596" y="300" class="m">{{variables}} y marca;</text>
+<text x="596" y="318" class="m">editor con IA</text>
+<rect x="376.2" y="277" width="203.6" height="22" rx="11" fill="#0b1120" stroke="#38bdf8" stroke-opacity=".55"/><text x="478.0" y="292" class="lbl" text-anchor="middle">envío directo, mismo registro</text>
+<text x="672" y="222" class="lbl" text-anchor="start" fill="#94a3b8" style="fill:#94a3b8">renderiza</text>
+</svg>

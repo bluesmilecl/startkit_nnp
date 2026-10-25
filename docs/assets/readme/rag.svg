@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 392" width="960" height="392" role="img" aria-labelledby="title desc">
+<title id="title">Conocimiento (RAG): ingesta y consulta</title>
+<desc id="desc">Ingesta en el worker: la fuente (archivo, URL, sitemap o texto) se descarga con safeFetch, se divide en fragmentos, se calculan embeddings con costo medido y se guarda en pgvector, un PostgreSQL externo o una API. Consulta: la pregunta se filtra por permisos de colección y documento, se busca de forma híbrida (vector y texto con RRF), el contexto se trata como datos y la respuesta cita sus fuentes.</desc>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1120"/><stop offset="1" stop-color="#111827"/></linearGradient>
+<pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity=".035"/></pattern>
+<marker id="a-web" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#00dc82"/></marker><marker id="a-api" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#f43f5e"/></marker><marker id="a-worker" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#fbbf24"/></marker><marker id="a-pg" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#60a5fa"/></marker><marker id="a-ai" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#a78bfa"/></marker><marker id="a-rag" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#2dd4bf"/></marker><marker id="a-mail" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#f472b6"/></marker><marker id="a-edge" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#cbd5e1"/></marker><marker id="a-ok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#34d399"/></marker><marker id="a-err" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#fb7185"/></marker><marker id="a-ui" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#38bdf8"/></marker>
+
+</defs>
+<style>
+text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;fill:#e5e7eb}
+.mono{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace}
+.t{font-size:20px;font-weight:700;fill:#f8fafc}
+.st{font-size:13px;fill:#94a3b8}
+.h{font-size:14px;font-weight:600;fill:#f1f5f9}
+.m{font-size:12px;fill:#94a3b8}
+.k{font-size:11px;font-weight:600;letter-spacing:1.6px}
+.lbl{font-size:11px;fill:#cbd5e1}
+.base{fill:none;stroke-width:1.6;stroke-opacity:.4}
+.flow{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-dasharray:.1 9;animation:flow 1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-18.2}}
+.glow{animation:glow 6s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.55}50%{opacity:1}}
+.pulse{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.flow,.glow,.pulse{animation:none}}
+</style>
+<rect width="960" height="392" rx="18" fill="url(#bg)"/>
+<rect width="960" height="392" rx="18" fill="url(#grid)"/>
+<rect x=".75" y=".75" width="958.5" height="390.5" rx="17.25" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+<text x="28" y="52" style="font-size:15px;font-weight:600;fill:#e2e8f0">Documentos como datos no confiables, permisos por colección y documento, y costos medidos</text>
+<text x="24" y="98" class="k" style="fill:#fbbf24">INGESTA · TRABAJO DURABLE EN EL WORKER (PROGRESO, REINTENTOS, CANCELACIÓN)</text>
+<text x="24" y="256" class="k" style="fill:#38bdf8">CONSULTA · CHAT Y LABORATORIO DE BÚSQUEDA</text>
+<path d="M188 156 H210" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M188 156 H210" class="flow" stroke="#cbd5e1"/>
+<path d="M188 314 H210" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M188 314 H210" class="flow" stroke="#cbd5e1"/>
+<path d="M374 156 H396" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M374 156 H396" class="flow" stroke="#cbd5e1"/>
+<path d="M374 314 H396" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M374 314 H396" class="flow" stroke="#cbd5e1"/>
+<path d="M560 156 H582" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M560 156 H582" class="flow" stroke="#cbd5e1"/>
+<path d="M560 314 H582" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M560 314 H582" class="flow" stroke="#cbd5e1"/>
+<path d="M746 156 H768" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M746 156 H768" class="flow" stroke="#cbd5e1"/>
+<path d="M746 314 H768" class="base" stroke="#cbd5e1" marker-end="url(#a-edge)"/><path d="M746 314 H768" class="flow" stroke="#cbd5e1"/>
+<path d="M850 204 V232 H478 V266" class="base" stroke="#60a5fa" marker-end="url(#a-pg)"/><path d="M850 204 V232 H478 V266" class="flow" stroke="#60a5fa"/>
+<g opacity="0"><circle r="9.4" fill="#fbbf24" fill-opacity=".18"/><circle r="3.6" fill="#fbbf24"/><animateMotion dur="7s" begin="0.0s" repeatCount="indefinite" path="M106 156 H850"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.06;.94;1" dur="7s" begin="0.0s" repeatCount="indefinite"/></g>
+<g opacity="0"><circle r="9.4" fill="#38bdf8" fill-opacity=".18"/><circle r="3.6" fill="#38bdf8"/><animateMotion dur="7s" begin="-3.5s" repeatCount="indefinite" path="M106 314 H850"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.06;.94;1" dur="7s" begin="-3.5s" repeatCount="indefinite"/></g>
+<rect x="24" y="108" width="164" height="96" rx="12" fill="#0f172a" stroke="#cbd5e1" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="36" y="120" width="30" height="30" rx="8" fill="#cbd5e1" fill-opacity=".15"/>
+<g transform="translate(41 125) scale(0.8333)" fill="none" stroke="#cbd5e1" color="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></g>
+<text x="76" y="140" class="h">Fuente</text>
+<text x="38" y="172" class="m">archivo, URL, sitemap</text>
+<text x="38" y="190" class="m">o texto programado</text>
+<rect x="210" y="108" width="164" height="96" rx="12" fill="#0f172a" stroke="#f43f5e" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="222" y="120" width="30" height="30" rx="8" fill="#f43f5e" fill-opacity=".15"/>
+<g transform="translate(227 125) scale(0.8333)" fill="none" stroke="#f43f5e" color="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></g>
+<text x="262" y="140" class="h">Lectura</text>
+<text x="224" y="172" class="m">safeFetch: SSRF,</text>
+<text x="224" y="190" class="m">tamaño, redirecciones</text>
+<rect x="396" y="108" width="164" height="96" rx="12" fill="#0f172a" stroke="#2dd4bf" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="408" y="120" width="30" height="30" rx="8" fill="#2dd4bf" fill-opacity=".15"/>
+<g transform="translate(413 125) scale(0.8333)" fill="none" stroke="#2dd4bf" color="#2dd4bf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></g>
+<text x="448" y="140" class="h">Fragmentos</text>
+<text x="410" y="172" class="m">por estructura</text>
+<text x="410" y="190" class="m">con metadatos</text>
+<rect x="582" y="108" width="164" height="96" rx="12" fill="#0f172a" stroke="#a78bfa" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="594" y="120" width="30" height="30" rx="8" fill="#a78bfa" fill-opacity=".15"/>
+<g transform="translate(599 125) scale(0.8333)" fill="none" stroke="#a78bfa" color="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></g>
+<text x="634" y="140" class="h">Embeddings</text>
+<text x="596" y="172" class="m">costo medido en</text>
+<text x="596" y="190" class="m">el libro de uso</text>
+<rect x="768" y="108" width="164" height="96" rx="12" fill="#0f172a" stroke="#60a5fa" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="780" y="120" width="30" height="30" rx="8" fill="#60a5fa" fill-opacity=".15"/>
+<g transform="translate(785 125) scale(0.8333)" fill="none" stroke="#60a5fa" color="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></g>
+<text x="820" y="140" class="h">Índice</text>
+<text x="782" y="172" class="m">pgvector, PostgreSQL</text>
+<text x="782" y="190" class="m">externo o API</text>
+<rect x="24" y="266" width="164" height="96" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="36" y="278" width="30" height="30" rx="8" fill="#38bdf8" fill-opacity=".15"/>
+<g transform="translate(41 283) scale(0.8333)" fill="none" stroke="#38bdf8" color="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></g>
+<text x="76" y="298" class="h">Pregunta</text>
+<text x="38" y="330" class="m">desde el chat o</text>
+<text x="38" y="348" class="m">el laboratorio</text>
+<rect x="210" y="266" width="164" height="96" rx="12" fill="#0f172a" stroke="#f43f5e" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="222" y="278" width="30" height="30" rx="8" fill="#f43f5e" fill-opacity=".15"/>
+<g transform="translate(227 283) scale(0.8333)" fill="none" stroke="#f43f5e" color="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></g>
+<text x="262" y="298" class="h">Permisos</text>
+<text x="224" y="330" class="m">colección + ACL</text>
+<text x="224" y="348" class="m">por documento</text>
+<rect x="396" y="266" width="164" height="96" rx="12" fill="#0f172a" stroke="#2dd4bf" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="408" y="278" width="30" height="30" rx="8" fill="#2dd4bf" fill-opacity=".15"/>
+<g transform="translate(413 283) scale(0.8333)" fill="none" stroke="#2dd4bf" color="#2dd4bf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6a9 9 0 0 0-9 9V3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/></g>
+<text x="448" y="298" class="h">Híbrida</text>
+<text x="410" y="330" class="m">vector + texto</text>
+<text x="410" y="348" class="m">con fusión RRF</text>
+<rect x="582" y="266" width="164" height="96" rx="12" fill="#0f172a" stroke="#fbbf24" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="594" y="278" width="30" height="30" rx="8" fill="#fbbf24" fill-opacity=".15"/>
+<g transform="translate(599 283) scale(0.8333)" fill="none" stroke="#fbbf24" color="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><circle cx="11.5" cy="14.5" r="2.5"/><path d="M13.3 16.3 15 18"/></g>
+<text x="634" y="298" class="h">Contexto</text>
+<text x="596" y="330" class="m">datos, nunca</text>
+<text x="596" y="348" class="m">instrucciones</text>
+<rect x="768" y="266" width="164" height="96" rx="12" fill="#0f172a" stroke="#34d399" stroke-opacity=".5" stroke-width="1.5"></rect>
+<rect x="780" y="278" width="30" height="30" rx="8" fill="#34d399" fill-opacity=".15"/>
+<g transform="translate(785 283) scale(0.8333)" fill="none" stroke="#34d399" color="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></g>
+<text x="820" y="298" class="h">Respuesta</text>
+<text x="782" y="330" class="m">con citas [1]</text>
+<text x="782" y="348" class="m">al documento</text>
+</svg>
