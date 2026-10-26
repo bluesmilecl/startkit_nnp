@@ -37,7 +37,7 @@ OpenAPI y del cliente TypeScript. Todos los textos de la interfaz están en espa
 
 > [!TIP]
 > **¿Trabajas con un asistente de IA?** Pídele: *«Crea un proyecto llamado Mesa de Ayuda a partir
-> de https://github.com/bluesmilecl/startkit_nnp siguiendo su INSTALL.md; el propietario es
+> de https://github.com/ecr17dev/startkit_nnp siguiendo su INSTALL.md; el propietario es
 > tu@empresa.cl»*. [INSTALL.md](INSTALL.md) es una ruta sin preguntas, repetible y verificable;
 > después [AGENTS.md](AGENTS.md), `PROJECT.md` y las [skills](.claude/skills/) le dan el contexto
 > para seguir construyendo.
@@ -48,7 +48,7 @@ Requisitos: **Node 24 LTS**, **Docker** con Compose v2 y **git** (pnpm se activa
 corepack).
 
 ```bash
-git clone https://github.com/bluesmilecl/startkit_nnp mesa-de-ayuda && cd mesa-de-ayuda
+git clone https://github.com/ecr17dev/startkit_nnp mesa-de-ayuda && cd mesa-de-ayuda
 node scripts/quickstart.mjs --new "Mesa de Ayuda" --owner tu@empresa.cl --test-ai
 pnpm dev
 ```
